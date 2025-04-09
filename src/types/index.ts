@@ -1,9 +1,5 @@
 
-export type GoalType = 
-  | 'maxima_disponibilidad' 
-  | 'maximizar_beneficios' 
-  | 'ahorrar_jubilacion' 
-  | 'mas_retorno';
+export type GoalType = string;
 
 export interface Product {
   id: string;
@@ -17,6 +13,7 @@ export interface Product {
   goal: GoalType;
   taxation: string;
   disclaimer?: string;
+  url?: string;
 }
 
 export interface SimulationResult {
@@ -31,4 +28,5 @@ export interface SimulationResult {
   generatedInterest: number;
   monthlyData: { month: number; value: number }[];
   taxation: string;
+  url?: string;
 }

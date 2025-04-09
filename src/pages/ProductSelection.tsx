@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockProducts } from '../data/mockProducts';
 import { GoalType, Product } from '../types';
 import { ChevronRight } from 'lucide-react';
+import { useSimulator } from '../context/SimulatorContext';
 
 interface ProductSelectionProps {
   selectedGoal: GoalType | null;
@@ -18,13 +18,14 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
 }) => {
   const navigate = useNavigate();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const { availableProducts, isLoading } = useSimulator();
   
   useEffect(() => {
-    if (selectedGoal) {
-      const products = mockProducts.filter(product => product.goal === selectedGoal);
+    if (selectedGoal && availableProducts.length > 0) {
+      const products = availableProducts.filter(product => product.goal === selectedGoal);
       setFilteredProducts(products);
     }
-  }, [selectedGoal]);
+  }, [selectedGoal, availableProducts]);
   
   const handleProductToggle = (product: Product) => {
     const isSelected = selectedProducts.some(p => p.id === product.id);
@@ -53,6 +54,16 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const isSelected = (productId: string) => {
     return selectedProducts.some(p => p.id === productId);
   };
+  
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-10">
+        <div className="step-container">
+          <p>Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6">

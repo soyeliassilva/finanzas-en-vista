@@ -20,6 +20,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
   const [termYears, setTermYears] = useState<number>(1);
   const [results, setResults] = useState<SimulationResult[]>([]);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
   
   const handleCalculate = () => {
     if (selectedProducts.length === 0) return;
@@ -43,12 +44,14 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
         finalAmount,
         generatedInterest: finalAmount - (initialDeposit + (monthlyDeposit * termYears * 12)),
         monthlyData,
-        taxation: product.taxation
+        taxation: product.taxation,
+        url: product.url
       };
     });
     
     setResults(newResults);
     setCalculationPerformed(true);
+    setFadeIn(true);
   };
   
   const handleBack = () => {
@@ -193,7 +196,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
       </div>
       
       {calculationPerformed && results.length > 0 && (
-        <>
+        <div className={`transition-opacity duration-300 ease-in-out ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
             <div className="md:col-span-5 step-container">
               <h3 className="text-xl font-bold mb-4">Resumen del producto</h3>
@@ -322,8 +325,17 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
                       <td>{result.yield}%</td>
                       <td>{formatCurrency(result.finalAmount)}</td>
                       <td>{formatCurrency(result.generatedInterest)}</td>
-                      <td>Detalles</td>
-                      <td><a href="#" className="text-primary underline">Más info</a></td>
+                      <td>{result.taxation}</td>
+                      <td>
+                        <a 
+                          href={result.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-primary underline"
+                        >
+                          Más info
+                        </a>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -336,7 +348,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
