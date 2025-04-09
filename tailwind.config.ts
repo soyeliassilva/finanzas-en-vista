@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,12 +26,24 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#004236', // Verde oscuro
+					foreground: '#ffffff'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#D1A4C4', // Lila
+					foreground: '#004236'
+				},
+				accent: {
+					DEFAULT: '#B9EDAA', // Verde claro
+					foreground: '#004236'
+				},
+				neutral: {
+					DEFAULT: '#CFCFCF', // Gris
+					foreground: '#004236'
+				},
+				light: {
+					DEFAULT: '#F7F7F7', // Blanco hueso
+					foreground: '#004236'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -39,10 +52,6 @@ export default {
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -67,6 +76,10 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			fontFamily: {
+				'rufina': ['Rufina', 'serif'],
+				'mutualidad': ['Mutualidad', 'sans-serif'],
 			},
 			keyframes: {
 				'accordion-down': {
