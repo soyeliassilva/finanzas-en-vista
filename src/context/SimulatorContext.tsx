@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GoalType, Product } from '../types';
 import { toast } from 'sonner';
@@ -25,13 +24,11 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Handle goal change - clear selected products
   const handleGoalChange = (goal: GoalType) => {
     setSelectedGoal(goal);
     setSelectedProducts([]);
   };
   
-  // Fetch products from Supabase
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -49,18 +46,20 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         throw new Error('No products found in the database');
       }
       
-      // Transform Supabase data to match our Product interface
       const transformedProducts: Product[] = productsData.map((item: any) => ({
         id: item.id,
         name: item.product_name,
         description: item.product_description,
         yield: Number(item.product_annual_yield),
+        yield5PlusYears: item.product_annual_yield_5_plus_years ? Number(item.product_annual_yield_5_plus_years) : undefined,
+        yield10PlusYears: item.product_annual_yield_10_plus_years ? Number(item.product_annual_yield_10_plus_years) : undefined,
         minInitialDeposit: Number(item.product_initial_contribution_min),
         maxInitialDeposit: item.product_initial_contribution_max ? Number(item.product_initial_contribution_max) : undefined,
         minMonthlyDeposit: Number(item.product_monthly_contribution_min),
         maxMonthlyDeposit: item.product_monthly_contribution_max ? Number(item.product_monthly_contribution_max) : undefined,
-        minTerm: 1, // Default value
-        maxTerm: 30, // Default value
+        product_duration_months_min: item.product_duration_months_min ? Number(item.product_duration_months_min) : undefined,
+        minTerm: item.product_duration_months_min ? Number(item.product_duration_months_min) / 12 : 1,
+        maxTotalContribution: item.product_total_contribution_max ? Number(item.product_total_contribution_max) : undefined,
         goal: item.product_goal,
         taxation: item.product_tax_treatment,
         disclaimer: item.product_disclaimer,
@@ -69,7 +68,6 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         terms: item.product_terms
       }));
       
-      // Extract unique goals and sort them
       const goals = Array.from(new Set(transformedProducts.map(p => p.goal)));
       
       setAllProducts(transformedProducts);

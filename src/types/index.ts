@@ -1,3 +1,4 @@
+
 export type GoalType = string;
 
 export interface Product {
@@ -11,7 +12,8 @@ export interface Product {
   maxInitialDeposit?: number;
   minMonthlyDeposit: number;
   maxMonthlyDeposit?: number;
-  minTerm: number;
+  product_duration_months_min?: number; // Added the missing property
+  minTerm: number; // Keep this for backward compatibility
   maxTotalContribution?: number;
   goal: GoalType;
   taxation: string;
