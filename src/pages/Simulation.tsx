@@ -4,6 +4,9 @@ import { Product, SimulationResult } from '../types';
 import { calculateFutureValue, formatCurrency } from '../utils/calculator';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ChevronRight, Mail } from 'lucide-react';
+import SimulationProductForm from './SimulationProductForm';
+import SimulationChart from './SimulationChart';
+import SimulationSummary from './SimulationSummary';
 
 interface SimulationProps {
   selectedProducts: Product[];
@@ -143,13 +146,10 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
     return highest;
   };
 
-  // --- Update: dynamic grid columns based on product count ---
-  const gridColsClass =
-    selectedProducts.length === 3
-      ? "md:grid-cols-3"
-      : selectedProducts.length === 2
-      ? "md:grid-cols-2"
-      : "md:grid-cols-1";
+  // --- Dynamic grid columns based on product count ---
+  const gridColsStyle = {
+    gridTemplateColumns: `repeat(${selectedProducts.length}, minmax(0, 1fr))`,
+  };
 
   return (
     <div className="container mx-auto px-4 pb-10">
@@ -168,64 +168,19 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
             handleCalculate();
           }}
         >
-          <div className={`grid grid-cols-1 ${gridColsClass} gap-4 mb-6`}>
-            {selectedProducts.map((product, idx) => {
+          <div
+            className={`grid grid-cols-1 gap-4 mb-6`}
+            style={gridColsStyle}
+          >
+            {selectedProducts.map((product) => {
               const values = productInputs[product.id] || defaultFormValue;
               return (
-                <div
+                <SimulationProductForm
                   key={product.id}
-                  className="form-group border rounded-lg p-4 shadow-sm bg-white"
-                >
-                  <h4 className="font-bold mb-2 text-base text-primary">{product.name}</h4>
-                  <label htmlFor={`initialDeposit_${product.id}`} className="form-label">
-                    Aportación inicial
-                  </label>
-                  <div className="relative mb-3">
-                    <input
-                      type="number"
-                      id={`initialDeposit_${product.id}`}
-                      value={values.initialDeposit}
-                      onChange={e => handleInputChange(product.id, "initialDeposit", Number(e.target.value))}
-                      className="form-input w-full"
-                      placeholder="0€"
-                      min="0"
-                    />
-                    <span className="absolute right-3 top-2">€</span>
-                  </div>
-
-                  <label htmlFor={`termYears_${product.id}`} className="form-label">
-                    Plazo de vencimiento*
-                  </label>
-                  <div className="relative mb-3">
-                    <input
-                      type="number"
-                      id={`termYears_${product.id}`}
-                      value={values.termYears}
-                      onChange={e => handleInputChange(product.id, "termYears", Number(e.target.value))}
-                      className="form-input w-full"
-                      placeholder="1 año"
-                      min="1"
-                      max="30"
-                    />
-                    <span className="absolute right-3 top-2">años</span>
-                  </div>
-
-                  <label htmlFor={`monthlyDeposit_${product.id}`} className="form-label">
-                    Aportación periódica mensual*
-                  </label>
-                  <div className="relative mb-3">
-                    <input
-                      type="number"
-                      id={`monthlyDeposit_${product.id}`}
-                      value={values.monthlyDeposit}
-                      onChange={e => handleInputChange(product.id, "monthlyDeposit", Number(e.target.value))}
-                      className="form-input w-full"
-                      placeholder="0€"
-                      min="0"
-                    />
-                    <span className="absolute right-3 top-2">€</span>
-                  </div>
-                </div>
+                  product={product}
+                  values={values}
+                  onInputChange={handleInputChange}
+                />
               );
             })}
           </div>
@@ -244,103 +199,8 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
       {calculationPerformed && results.length > 0 && (
         <div className="animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-            <div className="md:col-span-5 step-container">
-              <h3 className="text-xl font-bold mb-4">Resumen del producto</h3>
-              
-              {results.map((result, index) => (
-                <div key={result.productId} className="mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }}></div>
-                    <h4 className="text-lg font-bold">{result.name}</h4>
-                  </div>
-                  
-                  <div className="ml-5 space-y-2">
-                    <div className="flex justify-between">
-                      <span>Importe total al rescate</span>
-                      <span className="font-bold">{formatCurrency(result.finalAmount)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span>Rentabilidad</span>
-                      <span className="font-bold">{result.yield}%</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span>Intereses brutos generados</span>
-                      <span className="font-bold">{formatCurrency(result.generatedInterest)}</span>
-                    </div>
-                    
-                    <div className="mt-2 text-sm">
-                      <p className="font-bold mb-1">Detalles fiscalidad del producto</p>
-                      <p>{result.taxation}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              <div className="mt-6">
-                <button className="btn-primary w-full justify-center" onClick={handleContactAdvisor}>
-                  Contacta con nuestro gestor <Mail size={18} />
-                </button>
-              </div>
-            </div>
-            
-            <div className="md:col-span-7 step-container">
-              <h3 className="text-xl font-bold mb-4">Previsión de rentabilidad</h3>
-              
-              <div className="mb-4">
-                <div className="flex justify-between items-center">
-                  <p className="font-bold">Importe total al rescate de los tres productos</p>
-                  <p className="text-2xl font-bold">{formatCurrency(getTotalAmount())}</p>
-                </div>
-              </div>
-              
-              <div className="h-72 mt-6">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#CFCFCF" />
-                    <XAxis 
-                      dataKey="month"
-                      tickFormatter={(value) => {
-                        if (value === 0) return '0';
-                        return `${Math.floor(value / 12)} años`;
-                      }}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis 
-                      tickFormatter={(value) => {
-                        return `${(value / 1000).toFixed(0)}k`;
-                      }}
-                      width={40}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip 
-                      formatter={(value: any) => [`${formatCurrency(value)}`, '']}
-                      labelFormatter={(label) => {
-                        if (label === 0) return 'Inicio';
-                        return `Mes ${label} (${Math.floor(label / 12)} años${label % 12 > 0 ? ` ${label % 12} meses` : ''})`;
-                      }}
-                    />
-                    <Legend />
-                    {results.map((result, index) => (
-                      <Line
-                        key={result.productId}
-                        type="monotone"
-                        dataKey={result.name}
-                        stroke={chartColors[index % chartColors.length]}
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
-                        activeDot={{ r: 5 }}
-                      />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              
-              <div className="mt-4 text-xs text-right">
-                <p>El rescate tributa como rendimientos del capital en el IRPF</p>
-              </div>
-            </div>
+            <SimulationSummary results={results} handleContactAdvisor={handleContactAdvisor} />
+            <SimulationChart results={results} chartData={chartData} getTotalAmount={getTotalAmount} />
           </div>
           
           <div className="step-container">
