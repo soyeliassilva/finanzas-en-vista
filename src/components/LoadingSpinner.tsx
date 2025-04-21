@@ -23,7 +23,7 @@ const LoadingSpinner = () => {
   return (
     <div className="flex flex-col items-center gap-4">
       <span className="text-lg">Cargando</span>
-      <Progress value={progress} className="w-[360px] h-[1px]" />
+      <Progress value={progress} className="w-[360px] h-[3px]" />
     </div>
   );
 };
