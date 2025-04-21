@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType } from '../types';
@@ -55,14 +54,16 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
         
         <div className="space-y-2">
           {availableGoals.map((goal) => (
-            <div className="radio-option" key={goal}>
-              <div 
-                className={`radio-circle cursor-pointer`}
-                onClick={() => setSelectedGoal(goal)}
-              >
+            <div
+              className="radio-option h-16 rounded-lg px-4 py-2 bg-white border border-neutral transition-all duration-150 cursor-pointer flex items-center gap-2 my-0"
+              style={{ minHeight: "4rem" }}
+              key={goal}
+              onClick={() => setSelectedGoal(goal)}
+            >
+              <div className="radio-circle flex-shrink-0">
                 {selectedGoal === goal && <div className="radio-selected" />}
               </div>
-              <label className="cursor-pointer" onClick={() => setSelectedGoal(goal)}>
+              <label className="cursor-pointer flex-1 text-base font-medium select-none m-0 p-0 flex items-center h-full">
                 {goal}
               </label>
             </div>

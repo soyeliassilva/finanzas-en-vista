@@ -11,7 +11,8 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle }) => (
   <div
-    className={`product-card ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
+    className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
+    style={{ minHeight: '320px' }}
   >
     <h3 className="text-lg font-bold mb-2">{product.name}</h3>
     <p className="text-sm mb-4">{product.description}</p>
@@ -44,14 +45,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
         </div>
       )}
     </div>
-    <button
-      className={isSelected ? "btn-primary w-full justify-center" : "btn-outline w-full justify-center"}
-      onClick={() => onToggle(product)}
-    >
-      {isSelected ? 'Producto seleccionado' : <>Seleccionar producto <ChevronRight size={18} /></>}
-    </button>
+    <div className="mt-auto pt-4">
+      <button
+        className={isSelected ? "btn-primary w-full justify-center" : "btn-outline w-full justify-center"}
+        style={{ position: "absolute", bottom: "1.25rem", left: "1.25rem", right: "1.25rem" }}
+        onClick={() => onToggle(product)}
+      >
+        {isSelected ? 'Producto seleccionado' : <>Seleccionar producto <ChevronRight size={18} /></>}
+      </button>
+    </div>
   </div>
 );
 
 export default ProductCard;
-

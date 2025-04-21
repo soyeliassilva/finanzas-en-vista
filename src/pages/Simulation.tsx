@@ -207,47 +207,50 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
             <h3 className="text-xl font-bold mb-4">Resumen de los productos comparados</h3>
             
             <div className="overflow-x-auto">
-              <table className="comparison-table">
-                <thead>
-                  <tr>
-                    <th>Productos</th>
-                    <th>Rentabilidad</th>
-                    <th>Saldo acum.</th>
-                    <th>Intereses generados</th>
-                    <th>Fiscalidad</th>
-                    <th>Más info</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {results.map((result, index) => (
-                    <tr key={result.productId}>
-                      <td className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: chartColors[index % chartColors.length] }}
-                        ></div>
-                        {result.name}
-                      </td>
-                      <td>{result.yield}%</td>
-                      <td>{formatCurrency(result.finalAmount)}</td>
-                      <td>{formatCurrency(result.generatedInterest)}</td>
-                      <td>{result.taxation}</td>
-                      <td>
-                        {result.url && (
-                          <a 
-                            href={result.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="text-primary underline"
-                          >
-                            Más info
-                          </a>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div
+                className="grid"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(180px, 1fr) repeat(5, minmax(120px, 1fr))',
+                  gap: 0,
+                  width: '100%',
+                }}
+              >
+                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Productos</div>
+                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Rentabilidad</div>
+                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Saldo acum.</div>
+                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Intereses generados</div>
+                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Fiscalidad</div>
+                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Más info</div>
+                
+                {results.map((result, index) => (
+                  <React.Fragment key={result.productId}>
+                    <div className="flex items-center gap-2 py-2 px-4 border-b border-neutral">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                      ></div>
+                      {result.name}
+                    </div>
+                    <div className="py-2 px-4 border-b border-neutral flex items-center">{result.yield}%</div>
+                    <div className="py-2 px-4 border-b border-neutral flex items-center">{formatCurrency(result.finalAmount)}</div>
+                    <div className="py-2 px-4 border-b border-neutral flex items-center">{formatCurrency(result.generatedInterest)}</div>
+                    <div className="py-2 px-4 border-b border-neutral flex items-center">{result.taxation}</div>
+                    <div className="py-2 px-4 border-b border-neutral flex items-center">
+                      {result.url && (
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary underline"
+                        >
+                          Más info
+                        </a>
+                      )}
+                    </div>
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
             
             <div className="mt-8 flex justify-center">
