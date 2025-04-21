@@ -1,17 +1,15 @@
+
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, SimulationResult } from '../types';
-import { calculateFutureValue, formatCurrency } from '../utils/calculator';
-import { ChevronRight, Mail } from 'lucide-react';
-import SimulationProductForm from './SimulationProductForm';
-import SimulationChart from './SimulationChart';
-import SimulationSummary from './SimulationSummary';
+import { calculateFutureValue } from '../utils/calculator';
+import SimulationHeader from '@/components/simulation/SimulationHeader';
+import SimulationForm from '@/components/simulation/SimulationForm';
+import SimulationResults from '@/components/simulation/SimulationResults';
 
 interface SimulationProps {
   selectedProducts: Product[];
 }
-
-const chartColors = ['#004236', '#D1A4C4', '#B9EDAA'];
 
 type FormValues = {
   initialDeposit: number;
@@ -19,16 +17,10 @@ type FormValues = {
   termYears: number;
 };
 
-const defaultFormValue: FormValues = {
-  initialDeposit: 1000,
-  monthlyDeposit: 100,
-  termYears: 1,
-};
-
 const getProductDefaultFormValue = (product: Product) => {
   const minInitial = product.minInitialDeposit ?? 0;
   const minMonthly = product.minMonthlyDeposit ?? 0;
-  const minTermMonths = product.minTerm ?? 5;
+  const minTermMonths = product.product_duration_months_min ?? 12;
   const minTermYears = Math.ceil(minTermMonths / 12);
 
   const isMonthlyFixedNone = minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
@@ -44,13 +36,9 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
   const navigate = useNavigate();
 
   const initialInputs = useMemo(
-    () =>
-      Object.fromEntries(
-        selectedProducts.map((prod) => [
-          prod.id,
-          getProductDefaultFormValue(prod),
-        ])
-      ),
+    () => Object.fromEntries(
+      selectedProducts.map((prod) => [prod.id, getProductDefaultFormValue(prod)])
+    ),
     [selectedProducts]
   );
 
@@ -80,7 +68,8 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     return product.yield;
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = (e: React.FormEvent) => {
+    e.preventDefault();
     if (selectedProducts.length === 0) return;
 
     const newResults = selectedProducts.map(product => {
@@ -172,126 +161,29 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     return chartData;
   };
 
-  const chartData = generateChartData();
-
   const getTotalAmount = () => {
     if (results.length === 0) return 0;
-    const highest = Math.max(...results.map(r => r.finalAmount));
-    return highest;
-  };
-
-  const gridColsStyle = {
-    ['--md-cols' as string]: `repeat(${selectedProducts.length}, minmax(0, 1fr))`
+    return Math.max(...results.map(r => r.finalAmount));
   };
 
   return (
     <div className="container mx-auto px-4 pb-10">
-      <div className="step-container active-step mb-6">
-        <div className="mb-6">
-          <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 3</h3>
-          <h2 className="text-3xl text-primary mb-4">
-            Descubre la rentabilidad de los productos seleccionados
-          </h2>
-        </div>
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            handleCalculate();
-          }}
-        >
-          <div
-            className={`grid grid-cols-1 md:gap-4 gap-4 mb-6 md:grid-cols-[var(--md-cols)]`}
-            style={gridColsStyle}
-          >
-            {selectedProducts.map((product) => {
-              const values = productInputs[product.id] || getProductDefaultFormValue(product);
-              return (
-                <SimulationProductForm
-                  key={product.id}
-                  product={product}
-                  values={values}
-                  onInputChange={handleInputChange}
-                />
-              );
-            })}
-          </div>
-
-          <div className="flex justify-between">
-            <button className="btn-outline" type="button" onClick={handleBack}>
-              Volver
-            </button>
-            <button className="btn-primary" type="submit">
-              Calcular rentabilidad <ChevronRight size={18} />
-            </button>
-          </div>
-        </form>
-      </div>
+      <form onSubmit={handleCalculate}>
+        <SimulationHeader handleBack={handleBack} handleCalculate={handleCalculate} />
+        <SimulationForm 
+          selectedProducts={selectedProducts}
+          productInputs={productInputs}
+          handleInputChange={handleInputChange}
+        />
+      </form>
       
-      {calculationPerformed && results.length > 0 && (
-        <div className="animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-            <SimulationSummary results={results} handleContactAdvisor={handleContactAdvisor} />
-            <SimulationChart results={results} chartData={chartData} getTotalAmount={getTotalAmount} />
-          </div>
-          
-          <div className="step-container">
-            <h3 className="text-xl font-bold mb-4">Resumen de los productos comparados</h3>
-            
-            <div className="overflow-x-auto">
-              <div
-                className="grid"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'minmax(180px, 1fr) repeat(5, minmax(120px, 1fr))',
-                  gap: 0,
-                  width: '100%',
-                }}
-              >
-                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Productos</div>
-                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Rentabilidad</div>
-                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Saldo acum.</div>
-                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Intereses generados</div>
-                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Fiscalidad</div>
-                <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Más info</div>
-                
-                {results.map((result, index) => (
-                  <React.Fragment key={result.productId}>
-                    <div className="flex items-center gap-2 py-2 px-4 border-b border-neutral">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: chartColors[index % chartColors.length] }}
-                      ></div>
-                      {result.name}
-                    </div>
-                    <div className="py-2 px-4 border-b border-neutral flex items-center">{result.yield}%</div>
-                    <div className="py-2 px-4 border-b border-neutral flex items-center">{formatCurrency(result.finalAmount)}</div>
-                    <div className="py-2 px-4 border-b border-neutral flex items-center">{formatCurrency(result.generatedInterest)}</div>
-                    <div className="py-2 px-4 border-b border-neutral flex items-center">{result.taxation}</div>
-                    <div className="py-2 px-4 border-b border-neutral flex items-center">
-                      {result.url && (
-                        <a
-                          href={result.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary underline"
-                        >
-                          Más info
-                        </a>
-                      )}
-                    </div>
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-            
-            <div className="mt-8 flex justify-center">
-              <button className="btn-primary" onClick={handleContactAdvisor}>
-                Contacta con nuestro gestor <Mail size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SimulationResults 
+        results={results}
+        chartData={generateChartData()}
+        calculationPerformed={calculationPerformed}
+        getTotalAmount={getTotalAmount}
+        handleContactAdvisor={handleContactAdvisor}
+      />
     </div>
   );
 };
