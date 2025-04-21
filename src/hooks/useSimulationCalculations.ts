@@ -1,7 +1,7 @@
+
 import { useState } from 'react';
 import { Product, SimulationResult } from '../types';
 import { calculateFutureValue } from '../utils/calculator';
-import { getProductDefaultFormValue } from '../utils/productUtils';
 
 type FormValues = {
   initialDeposit: number;
@@ -27,8 +27,7 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
 
     const newResults = selectedProducts.map(product => {
       const { initialDeposit, monthlyDeposit, termYears } = productInputs[product.id] || 
-        getProductDefaultFormValue(product);
-      
+        { initialDeposit: 0, monthlyDeposit: 0, termYears: 1 };
       const applicableYield = getApplicableYield(product, termYears);
       
       const { finalAmount, monthlyData } = calculateFutureValue(

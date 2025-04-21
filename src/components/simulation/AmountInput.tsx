@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AmountInputProps {
   id: string;
@@ -29,12 +29,6 @@ const AmountInput: React.FC<AmountInputProps> = ({
   // Initialize the value to min if it's less than the minimum
   const initialValue = value < min ? min : value;
 
-  // Handle change making sure we never go below min
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = Number(e.target.value);
-    onChange(Math.max(newValue, min));
-  };
-
   return (
     <>
       <label htmlFor={id} className="form-label">
@@ -46,7 +40,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
           type="number"
           id={id}
           value={initialValue}
-          onChange={handleChange}
+          onChange={e => onChange(Number(e.target.value))}
           className="form-input w-full"
           placeholder={placeholder}
           min={min}

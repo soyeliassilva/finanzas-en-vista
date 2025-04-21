@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { Product } from '../../types';
 import { ChevronRight } from 'lucide-react';
 import SimulationProductForm from '../../pages/SimulationProductForm';
-import { getProductDefaultFormValue } from '../../utils/productUtils';
 
 type FormValues = {
   initialDeposit: number;
@@ -51,7 +51,7 @@ const SimulationForm: React.FC<SimulationFormProps> = ({
             <SimulationProductForm
               key={product.id}
               product={product}
-              values={productInputs[product.id] || getProductDefaultFormValue(product)}
+              values={productInputs[product.id] || { initialDeposit: 0, monthlyDeposit: 0, termYears: 1 }}
               onInputChange={onInputChange}
             />
           ))}
