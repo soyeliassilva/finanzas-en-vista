@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType, Product } from '../types';
@@ -116,6 +115,24 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
             Elige los productos a continuación para simular tu rentabilidad
           </p>
         </div>
+        
+        {/* Hide the instruction if 3 or fewer products available for this goal */}
+        {(() => {
+          // Count all products for this goal including multiplica if it belongs, or just multiplica if only it exists
+          let numForGoal = filteredProducts.length;
+          if (multiplica) {
+            // If multiplica matches this goal or is always shown, increment
+            numForGoal += 1;
+          }
+          if (numForGoal > 3) {
+            return (
+              <h3 className="text-lg font-bold mb-4">
+                Selecciona hasta 3 productos para comparar su rentabilidad
+              </h3>
+            );
+          }
+          return null;
+        })()}
         
         <h3 className="text-lg font-bold mb-4">
           Selecciona hasta 3 productos para comparar su rentabilidad
