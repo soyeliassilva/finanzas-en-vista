@@ -1,0 +1,37 @@
+
+import React from 'react';
+import { GoalType } from '../types';
+
+interface ProductSelectionHeaderProps {
+  onBack: () => void;
+}
+
+const ProductSelectionHeader: React.FC<ProductSelectionHeaderProps> = ({ onBack }) => (
+  <div className="md:col-span-4 step-container">
+    <div className="mb-6">
+      <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 1</h3>
+      <h2 className="text-3xl text-primary mb-4">Objetivo de ahorro</h2>
+      <p className="text-sm">
+        Selecciona tu objetivo y compara productos para maximizar tus beneficios
+      </p>
+    </div>
+    <div className="mt-4">
+      <button className="btn-outline w-full justify-center" onClick={onBack}>
+        Volver a selección de objetivos
+      </button>
+    </div>
+  </div>
+);
+
+interface Step2InstructionsProps {
+  show: boolean;
+}
+
+export const Step2Instructions: React.FC<Step2InstructionsProps> = ({ show }) =>
+  show ? (
+    <h3 className="text-lg font-bold mb-4">
+      Selecciona hasta 3 productos para comparar su rentabilidad
+    </h3>
+  ) : null;
+
+export default ProductSelectionHeader;
