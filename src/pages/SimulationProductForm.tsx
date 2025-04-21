@@ -1,3 +1,4 @@
+
 import React, { useMemo } from "react";
 import { Product } from "../types";
 
@@ -35,14 +36,10 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   const minTermMonths = product.product_duration_months_min ?? 12; // Default to 1 year if not specified
   const minTermYears = Math.ceil(minTermMonths / 12);
 
-  // Use default value if value is zero/empty
-  const initialDepositValue = values.initialDeposit === 0 ? minInitial : values.initialDeposit;
-  const termYearsValue = values.termYears === 0 ? minTermYears : values.termYears;
-  const monthlyDepositValue = isMonthlyFixedNone
-    ? 0
-    : values.monthlyDeposit === 0
-      ? minMonthly
-      : values.monthlyDeposit;
+  // DEFAULT ALL VALUES TO MINIMUM VALUES
+  const initialDepositValue = minInitial;
+  const termYearsValue = minTermYears;
+  const monthlyDepositValue = isMonthlyFixedNone ? 0 : minMonthly;
 
   // Determine which yield rate applies based on term
   const appliedYield = useMemo(() => {
@@ -171,3 +168,4 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
 };
 
 export default SimulationProductForm;
+
