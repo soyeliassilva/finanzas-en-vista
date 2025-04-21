@@ -1,10 +1,10 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
 import GoalSelection from './GoalSelection';
 import ProductSelection from './ProductSelection';
 import Simulation from './Simulation';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 interface IndexProps {
   step?: string;
@@ -38,10 +38,8 @@ const Index: React.FC<IndexProps> = ({ step }) => {
   
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <p className="text-lg">Cargando...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
       </div>
     );
   }
