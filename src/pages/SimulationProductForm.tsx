@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Product } from "../types";
 
 interface SimulationProductFormProps {
@@ -47,10 +47,39 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
       : values.monthlyDeposit === 0
         ? minMonthly
         : values.monthlyDeposit;
+        
+  // Determine which yield rate applies based on term
+  const appliedYield = useMemo(() => {
+    if (termYearsValue >= 10 && product.yield10PlusYears !== undefined) {
+      return product.yield10PlusYears;
+    } else if (termYearsValue >= 5 && product.yield5PlusYears !== undefined) {
+      return product.yield5PlusYears;
+    }
+    return product.yield;
+  }, [product, termYearsValue]);
+
+  // Calculate total planned contribution
+  const totalPlannedContribution = initialDepositValue + (monthlyDepositValue * termYearsValue * 12);
+  
+  // Check if total contribution exceeds max allowed
+  const exceedsMaxContribution = product.maxTotalContribution !== undefined && 
+    totalPlannedContribution > product.maxTotalContribution;
 
   return (
     <div className="form-group border rounded-lg p-4 shadow-sm bg-white">
       <h4 className="font-bold mb-2 text-base text-primary">{product.name}</h4>
+      
+      {(product.yield5PlusYears !== undefined || product.yield10PlusYears !== undefined) && (
+        <div className="mb-3 px-3 py-2 bg-primary/10 rounded-md text-xs">
+          <p className="font-semibold mb-1">Rentabilidad aplicada: {appliedYield}%</p>
+          <ul className="list-disc list-inside">
+            {product.yield !== undefined && <li>Base: {product.yield}%</li>}
+            {product.yield5PlusYears !== undefined && <li>Plazo ≥ 5 años: {product.yield5PlusYears}%</li>}
+            {product.yield10PlusYears !== undefined && <li>Plazo ≥ 10 años: {product.yield10PlusYears}%</li>}
+          </ul>
+        </div>
+      )}
+      
       <label htmlFor={`initialDeposit_${product.id}`} className="form-label">
         Aportación inicial
         <span className="block text-xs text-muted-foreground">
@@ -129,6 +158,16 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         />
         <span className="absolute right-3 top-2">€</span>
       </div>
+      
+      {product.maxTotalContribution && (
+        <div className={`text-xs p-2 rounded mt-2 ${exceedsMaxContribution ? 'bg-red-100 text-red-600' : 'bg-gray-100'}`}>
+          <p className="font-semibold">Aportación máxima total: {product.maxTotalContribution.toLocaleString()}€</p>
+          <p>Aportación planificada: {totalPlannedContribution.toLocaleString()}€ 
+          {exceedsMaxContribution && 
+            ' (se respetará el límite máximo en los cálculos)'}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

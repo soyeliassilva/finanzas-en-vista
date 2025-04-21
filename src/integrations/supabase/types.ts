@@ -13,6 +13,8 @@ export type Database = {
         Row: {
           id: string
           product_annual_yield: number | null
+          product_annual_yield_10_plus_years: number | null
+          product_annual_yield_5_plus_years: number | null
           product_conditions: string | null
           product_description: string | null
           product_disclaimer: string | null
@@ -25,11 +27,14 @@ export type Database = {
           product_name: string | null
           product_tax_treatment: string | null
           product_terms: string | null
+          product_total_contribution_max: number | null
           product_url: string | null
         }
         Insert: {
           id?: string
           product_annual_yield?: number | null
+          product_annual_yield_10_plus_years?: number | null
+          product_annual_yield_5_plus_years?: number | null
           product_conditions?: string | null
           product_description?: string | null
           product_disclaimer?: string | null
@@ -42,11 +47,14 @@ export type Database = {
           product_name?: string | null
           product_tax_treatment?: string | null
           product_terms?: string | null
+          product_total_contribution_max?: number | null
           product_url?: string | null
         }
         Update: {
           id?: string
           product_annual_yield?: number | null
+          product_annual_yield_10_plus_years?: number | null
+          product_annual_yield_5_plus_years?: number | null
           product_conditions?: string | null
           product_description?: string | null
           product_disclaimer?: string | null
@@ -59,6 +67,7 @@ export type Database = {
           product_name?: string | null
           product_tax_treatment?: string | null
           product_terms?: string | null
+          product_total_contribution_max?: number | null
           product_url?: string | null
         }
         Relationships: []

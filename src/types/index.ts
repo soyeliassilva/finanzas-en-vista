@@ -6,12 +6,15 @@ export interface Product {
   name: string;
   description: string;
   yield: number;
+  yield5PlusYears?: number;
+  yield10PlusYears?: number;
   minInitialDeposit: number;
   maxInitialDeposit?: number;
   minMonthlyDeposit: number;
   maxMonthlyDeposit?: number;
   minTerm: number;
   maxTerm?: number;
+  maxTotalContribution?: number;
   goal: GoalType;
   taxation: string;
   disclaimer?: string;

@@ -71,16 +71,28 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     }));
   };
 
+  const getApplicableYield = (product: Product, termYears: number) => {
+    if (termYears >= 10 && product.yield10PlusYears !== undefined) {
+      return product.yield10PlusYears;
+    } else if (termYears >= 5 && product.yield5PlusYears !== undefined) {
+      return product.yield5PlusYears;
+    }
+    return product.yield;
+  };
+
   const handleCalculate = () => {
     if (selectedProducts.length === 0) return;
 
     const newResults = selectedProducts.map(product => {
       const { initialDeposit, monthlyDeposit, termYears } = productInputs[product.id] || getProductDefaultFormValue(product);
+      const applicableYield = getApplicableYield(product, termYears);
+      
       const { finalAmount, monthlyData } = calculateFutureValue(
         initialDeposit,
         monthlyDeposit,
         termYears,
-        product.yield
+        applicableYield,
+        product.maxTotalContribution
       );
 
       return {
@@ -90,9 +102,12 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
         monthlyDeposit,
         termYears,
         termMonths: termYears * 12,
-        yield: product.yield,
+        yield: applicableYield,
         finalAmount,
-        generatedInterest: finalAmount - (initialDeposit + (monthlyDeposit * termYears * 12)),
+        generatedInterest: finalAmount - (initialDeposit + Math.min(
+          monthlyDeposit * termYears * 12,
+          (product.maxTotalContribution ? product.maxTotalContribution - initialDeposit : Infinity)
+        )),
         monthlyData,
         taxation: product.taxation,
         url: product.url
