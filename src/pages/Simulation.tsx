@@ -202,6 +202,60 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
             <SimulationSummary results={results} handleContactAdvisor={handleContactAdvisor} />
             <SimulationChart results={results} chartData={chartData} getTotalAmount={getTotalAmount} />
           </div>
+          
+          <div className="step-container">
+            <h3 className="text-xl font-bold mb-4">Resumen de los productos comparados</h3>
+            
+            <div className="overflow-x-auto">
+              <table className="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Productos</th>
+                    <th>Rentabilidad</th>
+                    <th>Saldo acum.</th>
+                    <th>Intereses generados</th>
+                    <th>Fiscalidad</th>
+                    <th>Más info</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((result, index) => (
+                    <tr key={result.productId}>
+                      <td className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                        ></div>
+                        {result.name}
+                      </td>
+                      <td>{result.yield}%</td>
+                      <td>{formatCurrency(result.finalAmount)}</td>
+                      <td>{formatCurrency(result.generatedInterest)}</td>
+                      <td>{result.taxation}</td>
+                      <td>
+                        {result.url && (
+                          <a 
+                            href={result.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-primary underline"
+                          >
+                            Más info
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="mt-8 flex justify-center">
+              <button className="btn-primary" onClick={handleContactAdvisor}>
+                Contacta con nuestro gestor <Mail size={18} />
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -13,48 +13,45 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
   <div
     className={`product-card ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
   >
-    <div className="product-card-content">
-      <h3 className="text-lg font-bold mb-2">{product.name}</h3>
-      <p className="text-sm mb-4">{product.description}</p>
-      <div className="space-y-2 mb-4">
-        <div className="flex items-start">
-          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-          <p className="text-sm">{product.yield}% de rentabilidad a cuenta</p>
-        </div>
-        <div className="flex items-start">
-          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-          {product.minTerm === 1 ? (
-            <p className="text-sm">Plazo: {product.minTerm} año</p>
-          ) : (
-            <p className="text-sm">
-              Plazo: {product.minTerm} - {product.maxTerm || '∞'} años
-            </p>
-          )}
-        </div>
-        <div className="flex items-start">
-          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+    <h3 className="text-lg font-bold mb-2">{product.name}</h3>
+    <p className="text-sm mb-4">{product.description}</p>
+    <div className="space-y-2 mb-4">
+      <div className="flex items-start">
+        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+        <p className="text-sm">{product.yield}% de rentabilidad a cuenta</p>
+      </div>
+      <div className="flex items-start">
+        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+        {product.minTerm === 1 ? (
+          <p className="text-sm">Plazo: {product.minTerm} año</p>
+        ) : (
           <p className="text-sm">
-            Aportaciones desde {product.minMonthlyDeposit}€
-            {product.minInitialDeposit > 0 && ` (inicial: ${product.minInitialDeposit}€)`}
+            Plazo: {product.minTerm} - {product.maxTerm || '∞'} años
           </p>
-        </div>
-        {product.conditions && (
-          <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-            <p className="text-sm">{product.conditions}</p>
-          </div>
         )}
       </div>
+      <div className="flex items-start">
+        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+        <p className="text-sm">
+          Aportaciones desde {product.minMonthlyDeposit}€
+          {product.minInitialDeposit > 0 && ` (inicial: ${product.minInitialDeposit}€)`}
+        </p>
+      </div>
+      {product.conditions && (
+        <div className="flex items-start">
+          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+          <p className="text-sm">{product.conditions}</p>
+        </div>
+      )}
     </div>
-    <div className="product-card-bottom">
-      <button
-        className={isSelected ? "btn-primary w-full justify-center" : "btn-outline w-full justify-center"}
-        onClick={() => onToggle(product)}
-      >
-        {isSelected ? 'Producto seleccionado' : <>Seleccionar producto <ChevronRight size={18} /></>}
-      </button>
-    </div>
+    <button
+      className={isSelected ? "btn-primary w-full justify-center" : "btn-outline w-full justify-center"}
+      onClick={() => onToggle(product)}
+    >
+      {isSelected ? 'Producto seleccionado' : <>Seleccionar producto <ChevronRight size={18} /></>}
+    </button>
   </div>
 );
 
 export default ProductCard;
+
