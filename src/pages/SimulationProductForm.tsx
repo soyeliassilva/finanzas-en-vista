@@ -27,19 +27,17 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   values,
   onInputChange,
 }) => {
-  // minInitialDeposit defaults to 0 if undefined
+  // Validation minimums
   const minInitial = product.minInitialDeposit ?? 0;
-  // minMonthlyDeposit defaults to 0 if undefined
   const minMonthly = product.minMonthlyDeposit ?? 0;
+  const minTermMonths = product.product_duration_months_min ?? 12;
+  const minTermYears = Math.ceil(minTermMonths / 12);
+
   // min/max monthly 0 disables field
   const isMonthlyFixedNone =
     minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
 
-  // Calculate minimum term in years from product_duration_months_min
-  const minTermMonths = product.product_duration_months_min ?? 12; // Default to 1 year if not specified
-  const minTermYears = Math.ceil(minTermMonths / 12);
-
-  // Determine which yield rate applies based on term
+  // Determine which yield rate applies based on term from props
   const appliedYield = useMemo(() => {
     if (values.termYears >= 10 && product.yield10PlusYears !== undefined) {
       return product.yield10PlusYears;
@@ -49,7 +47,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
     return product.yield;
   }, [product, values.termYears]);
 
-  // Calculate total planned contribution using actual values
+  // Calculate total planned contribution using values from props
   const totalPlannedContribution = values.initialDeposit + (values.monthlyDeposit * values.termYears * 12);
   
   // Check if total contribution exceeds max allowed
@@ -109,4 +107,3 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
 };
 
 export default SimulationProductForm;
-
