@@ -1,9 +1,5 @@
 
-export type GoalType = 
-  | 'maxima_disponibilidad' 
-  | 'maximizar_beneficios' 
-  | 'ahorrar_jubilacion' 
-  | 'mas_retorno';
+export type GoalType = string;
 
 export interface Product {
   id: string;
@@ -11,12 +7,17 @@ export interface Product {
   description: string;
   yield: number;
   minInitialDeposit: number;
+  maxInitialDeposit?: number;
   minMonthlyDeposit: number;
+  maxMonthlyDeposit?: number;
   minTerm: number;
   maxTerm?: number;
   goal: GoalType;
   taxation: string;
   disclaimer?: string;
+  url?: string;
+  conditions?: string;
+  terms?: string;
 }
 
 export interface SimulationResult {
@@ -31,4 +32,5 @@ export interface SimulationResult {
   generatedInterest: number;
   monthlyData: { month: number; value: number }[];
   taxation: string;
+  url?: string;
 }

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, SimulationResult } from '../types';
 import { calculateFutureValue, formatCurrency } from '../utils/calculator';
@@ -43,7 +43,8 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
         finalAmount,
         generatedInterest: finalAmount - (initialDeposit + (monthlyDeposit * termYears * 12)),
         monthlyData,
-        taxation: product.taxation
+        taxation: product.taxation,
+        url: product.url
       };
     });
     
@@ -56,22 +57,23 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
   };
   
   const handleContactAdvisor = () => {
-    const subject = "Consulta sobre simulación de productos financieros";
+    if (results.length === 0) return;
     
-    let body = "Hola,\n\nHe realizado una simulación con los siguientes productos:\n\n";
+    // Create a Typeform URL with query parameters
+    let typeformUrl = "https://mutualidad.typeform.com/to/xxYYzz?";
     
-    results.forEach(result => {
-      body += `- ${result.name} (${result.yield}%)\n`;
-      body += `  Aportación inicial: ${result.initialDeposit}€\n`;
-      body += `  Aportación mensual: ${result.monthlyDeposit}€\n`;
-      body += `  Plazo: ${result.termYears} años\n`;
-      body += `  Capital final estimado: ${result.finalAmount.toFixed(2)}€\n\n`;
+    // Add product information
+    results.forEach((result, index) => {
+      typeformUrl += `product_${index + 1}=${encodeURIComponent(result.name)}&`;
+      typeformUrl += `yield_${index + 1}=${encodeURIComponent(result.yield)}&`;
+      typeformUrl += `initial_${index + 1}=${encodeURIComponent(result.initialDeposit)}&`;
+      typeformUrl += `monthly_${index + 1}=${encodeURIComponent(result.monthlyDeposit)}&`;
+      typeformUrl += `term_${index + 1}=${encodeURIComponent(result.termYears)}&`;
+      typeformUrl += `final_${index + 1}=${encodeURIComponent(result.finalAmount)}&`;
     });
     
-    body += "Me gustaría recibir más información sobre estos productos.\n\nGracias.";
-    
-    const mailtoUrl = `mailto:asesor@mutualidad.es?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoUrl);
+    // Open Typeform in a new tab
+    window.open(typeformUrl, '_blank');
   };
   
   // Generate chart data
@@ -193,7 +195,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
       </div>
       
       {calculationPerformed && results.length > 0 && (
-        <>
+        <div className="animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
             <div className="md:col-span-5 step-container">
               <h3 className="text-xl font-bold mb-4">Resumen del producto</h3>
@@ -322,8 +324,19 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
                       <td>{result.yield}%</td>
                       <td>{formatCurrency(result.finalAmount)}</td>
                       <td>{formatCurrency(result.generatedInterest)}</td>
-                      <td>Detalles</td>
-                      <td><a href="#" className="text-primary underline">Más info</a></td>
+                      <td>{result.taxation}</td>
+                      <td>
+                        {result.url && (
+                          <a 
+                            href={result.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-primary underline"
+                          >
+                            Más info
+                          </a>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -336,7 +349,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

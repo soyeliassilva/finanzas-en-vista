@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockProducts } from '../data/mockProducts';
 import { GoalType, Product } from '../types';
 import { ChevronRight } from 'lucide-react';
+import { useSimulator } from '../context/SimulatorContext';
 
 interface ProductSelectionProps {
   selectedGoal: GoalType | null;
@@ -17,14 +17,27 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   setSelectedProducts
 }) => {
   const navigate = useNavigate();
+  const { allProducts, loading, error } = useSimulator();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [multiplica, setMultiplica] = useState<Product | null>(null);
   
   useEffect(() => {
-    if (selectedGoal) {
-      const products = mockProducts.filter(product => product.goal === selectedGoal);
-      setFilteredProducts(products);
+    if (selectedGoal && allProducts.length > 0) {
+      // Filter products that match the selected goal
+      const goalProducts = allProducts.filter(product => product.goal === selectedGoal);
+      
+      // Check if "Plan Ahorro Multiplica" exists and always include it
+      const multiplicaPlan = allProducts.find(product => product.name === "Plan Ahorro Multiplica");
+      setMultiplica(multiplicaPlan || null);
+      
+      // Make sure "Plan Ahorro Multiplica" is not duplicated
+      const goalProductsFiltered = goalProducts.filter(
+        product => product.name !== "Plan Ahorro Multiplica"
+      );
+      
+      setFilteredProducts(goalProductsFiltered);
     }
-  }, [selectedGoal]);
+  }, [selectedGoal, allProducts]);
   
   const handleProductToggle = (product: Product) => {
     const isSelected = selectedProducts.some(p => p.id === product.id);
@@ -53,6 +66,27 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const isSelected = (productId: string) => {
     return selectedProducts.some(p => p.id === productId);
   };
+  
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-lg">Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-lg text-red-600">Error: {error}</p>
+          <p>Por favor, recargue la página o intente más tarde.</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -88,6 +122,62 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Always show Plan Ahorro Multiplica first if it exists */}
+          {multiplica && (
+            <div 
+              key={multiplica.id}
+              className={`product-card ${isSelected(multiplica.id) ? 'border-2 border-primary' : 'border border-neutral'}`}
+            >
+              <h3 className="text-lg font-bold mb-2">{multiplica.name}</h3>
+              <p className="text-sm mb-4">{multiplica.description}</p>
+              
+              <div className="space-y-2 mb-4">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+                  <p className="text-sm">{multiplica.yield}% de rentabilidad a cuenta</p>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+                  {multiplica.minTerm === 1 ? (
+                    <p className="text-sm">Plazo: {multiplica.minTerm} año</p>
+                  ) : (
+                    <p className="text-sm">
+                      Plazo: {multiplica.minTerm} - {multiplica.maxTerm || '∞'} años
+                    </p>
+                  )}
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+                  <p className="text-sm">
+                    Aportaciones desde {multiplica.minMonthlyDeposit}€
+                    {multiplica.minInitialDeposit > 0 && ` (inicial: ${multiplica.minInitialDeposit}€)`}
+                  </p>
+                </div>
+
+                {multiplica.conditions && (
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+                    <p className="text-sm">{multiplica.conditions}</p>
+                  </div>
+                )}
+              </div>
+              
+              <button 
+                className={isSelected(multiplica.id) ? "btn-primary w-full justify-center" : "btn-outline w-full justify-center"}
+                onClick={() => handleProductToggle(multiplica)}
+              >
+                {isSelected(multiplica.id) ? (
+                  'Producto seleccionado'
+                ) : (
+                  <>Seleccionar producto <ChevronRight size={18} /></>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Show filtered products */}
           {filteredProducts.map((product) => (
             <div 
               key={product.id} 
@@ -120,6 +210,13 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
                     {product.minInitialDeposit > 0 && ` (inicial: ${product.minInitialDeposit}€)`}
                   </p>
                 </div>
+
+                {product.conditions && (
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+                    <p className="text-sm">{product.conditions}</p>
+                  </div>
+                )}
               </div>
               
               <button 

@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType } from '../types';
+import { useSimulator } from '../context/SimulatorContext';
 
 interface GoalSelectionProps {
   selectedGoal: GoalType | null;
@@ -10,12 +11,34 @@ interface GoalSelectionProps {
 
 const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelectedGoal }) => {
   const navigate = useNavigate();
+  const { availableGoals, loading, error } = useSimulator();
   
   const handleContinue = () => {
     if (selectedGoal) {
       navigate('/productos');
     }
   };
+  
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-lg">Cargando objetivos de inversión...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-lg text-red-600">Error: {error}</p>
+          <p>Por favor, recargue la página o intente más tarde.</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -31,53 +54,19 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
         <h3 className="text-lg font-bold mb-4">Selecciona tu necesidad</h3>
         
         <div className="space-y-2">
-          <div className="radio-option">
-            <div 
-              className={`radio-circle cursor-pointer`}
-              onClick={() => setSelectedGoal('maxima_disponibilidad')}
-            >
-              {selectedGoal === 'maxima_disponibilidad' && <div className="radio-selected" />}
+          {availableGoals.map((goal) => (
+            <div className="radio-option" key={goal}>
+              <div 
+                className={`radio-circle cursor-pointer`}
+                onClick={() => setSelectedGoal(goal)}
+              >
+                {selectedGoal === goal && <div className="radio-selected" />}
+              </div>
+              <label className="cursor-pointer" onClick={() => setSelectedGoal(goal)}>
+                {goal}
+              </label>
             </div>
-            <label className="cursor-pointer" onClick={() => setSelectedGoal('maxima_disponibilidad')}>
-              Máxima disponibilidad
-            </label>
-          </div>
-          
-          <div className="radio-option">
-            <div 
-              className={`radio-circle cursor-pointer`}
-              onClick={() => setSelectedGoal('maximizar_beneficios')}
-            >
-              {selectedGoal === 'maximizar_beneficios' && <div className="radio-selected" />}
-            </div>
-            <label className="cursor-pointer" onClick={() => setSelectedGoal('maximizar_beneficios')}>
-              Maximizar beneficios fiscales
-            </label>
-          </div>
-          
-          <div className="radio-option">
-            <div 
-              className={`radio-circle cursor-pointer`}
-              onClick={() => setSelectedGoal('ahorrar_jubilacion')}
-            >
-              {selectedGoal === 'ahorrar_jubilacion' && <div className="radio-selected" />}
-            </div>
-            <label className="cursor-pointer" onClick={() => setSelectedGoal('ahorrar_jubilacion')}>
-              Ahorrar para la jubilación
-            </label>
-          </div>
-          
-          <div className="radio-option">
-            <div 
-              className={`radio-circle cursor-pointer`}
-              onClick={() => setSelectedGoal('mas_retorno')}
-            >
-              {selectedGoal === 'mas_retorno' && <div className="radio-selected" />}
-            </div>
-            <label className="cursor-pointer" onClick={() => setSelectedGoal('mas_retorno')}>
-              Más retorno de inversión a largo plazo
-            </label>
-          </div>
+          ))}
         </div>
         
         <div className="mt-8">
