@@ -148,7 +148,9 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
 
   // --- Dynamic grid columns based on product count ---
   const gridColsStyle = {
-    gridTemplateColumns: `repeat(${selectedProducts.length}, minmax(0, 1fr))`,
+    // Only set gridTemplateColumns for medium screens and above
+    // On mobile, Tailwind's grid-cols-1 takes effect.
+    ['--md-cols' as string]: `repeat(${selectedProducts.length}, minmax(0, 1fr))`
   };
 
   return (
@@ -160,7 +162,6 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
             Descubre la rentabilidad de los productos seleccionados
           </h2>
         </div>
-
         {/* Render FORM PER PRODUCT */}
         <form
           onSubmit={e => {
@@ -169,7 +170,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
           }}
         >
           <div
-            className={`grid grid-cols-1 gap-4 mb-6`}
+            className={`grid grid-cols-1 md:gap-4 gap-4 mb-6 md:grid-cols-[var(--md-cols)]`}
             style={gridColsStyle}
           >
             {selectedProducts.map((product) => {
@@ -195,7 +196,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
           </div>
         </form>
       </div>
-
+      
       {calculationPerformed && results.length > 0 && (
         <div className="animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
