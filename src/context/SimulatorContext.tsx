@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GoalType, Product } from '../types';
 import { toast } from 'sonner';
@@ -53,13 +54,23 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         yield: Number(item.product_annual_yield),
         yield5PlusYears: item.product_annual_yield_5_plus_years ? Number(item.product_annual_yield_5_plus_years) : undefined,
         yield10PlusYears: item.product_annual_yield_10_plus_years ? Number(item.product_annual_yield_10_plus_years) : undefined,
+        
+        // Original properties (for backward compatibility)
         minInitialDeposit: Number(item.product_initial_contribution_min),
         maxInitialDeposit: item.product_initial_contribution_max ? Number(item.product_initial_contribution_max) : undefined,
         minMonthlyDeposit: Number(item.product_monthly_contribution_min),
         maxMonthlyDeposit: item.product_monthly_contribution_max ? Number(item.product_monthly_contribution_max) : undefined,
-        product_duration_months_min: item.product_duration_months_min ? Number(item.product_duration_months_min) : undefined,
         minTerm: item.product_duration_months_min ? Number(item.product_duration_months_min) / 12 : 1,
         maxTotalContribution: item.product_total_contribution_max ? Number(item.product_total_contribution_max) : undefined,
+        
+        // Supabase column names (added to match the updated Product interface)
+        product_initial_contribution_min: Number(item.product_initial_contribution_min),
+        product_initial_contribution_max: item.product_initial_contribution_max ? Number(item.product_initial_contribution_max) : undefined,
+        product_monthly_contribution_min: Number(item.product_monthly_contribution_min),
+        product_monthly_contribution_max: item.product_monthly_contribution_max ? Number(item.product_monthly_contribution_max) : undefined,
+        product_duration_months_min: item.product_duration_months_min ? Number(item.product_duration_months_min) : undefined,
+        product_total_contribution_max: item.product_total_contribution_max ? Number(item.product_total_contribution_max) : undefined,
+        
         goal: item.product_goal,
         taxation: item.product_tax_treatment,
         disclaimer: item.product_disclaimer,
