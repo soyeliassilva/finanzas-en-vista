@@ -1,6 +1,9 @@
 
 import React, { useMemo } from "react";
 import { Product } from "../types";
+import YieldRatesInfo from "../components/simulation/YieldRatesInfo";
+import ContributionLimit from "../components/simulation/ContributionLimit";
+import AmountInput from "../components/simulation/AmountInput";
 
 interface SimulationProductFormProps {
   product: Product;
@@ -62,110 +65,52 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
     <div className="form-group border rounded-lg p-4 shadow-sm bg-white">
       <h4 className="font-bold mb-2 text-base text-primary">{product.name}</h4>
       
-      {(product.yield5PlusYears !== undefined || product.yield10PlusYears !== undefined) && (
-        <div className="mb-3 px-3 py-2 bg-primary/10 rounded-md text-xs">
-          <p className="font-semibold mb-1">Rentabilidad aplicada: {appliedYield}%</p>
-          <ul className="list-disc list-inside">
-            {product.yield !== undefined && <li>Base: {product.yield}%</li>}
-            {product.yield5PlusYears !== undefined && <li>Plazo ≥ 5 años: {product.yield5PlusYears}%</li>}
-            {product.yield10PlusYears !== undefined && <li>Plazo ≥ 10 años: {product.yield10PlusYears}%</li>}
-          </ul>
-        </div>
-      )}
+      <YieldRatesInfo product={product} appliedYield={appliedYield} />
       
-      <label htmlFor={`initialDeposit_${product.id}`} className="form-label">
-        Aportación inicial
-        <span className="block text-xs text-muted-foreground">
-          Mínimo: {minInitial}€ - Máximo: {formatMax(product.maxInitialDeposit)}
-        </span>
-      </label>
-      <div className="relative mb-3">
-        <input
-          type="number"
-          id={`initialDeposit_${product.id}`}
-          value={initialDepositValue}
-          onChange={e =>
-            onInputChange(product.id, "initialDeposit", Number(e.target.value))
-          }
-          className="form-input w-full"
-          placeholder={`${minInitial}€`}
-          min={minInitial}
-          max={
-            product.maxInitialDeposit === undefined || product.maxInitialDeposit === null
-              ? undefined
-              : product.maxInitialDeposit
-          }
-        />
-        <span className="absolute right-3 top-2">€</span>
-      </div>
+      <AmountInput
+        id={`initialDeposit_${product.id}`}
+        value={initialDepositValue}
+        onChange={(value) => onInputChange(product.id, "initialDeposit", value)}
+        min={minInitial}
+        max={product.maxInitialDeposit}
+        placeholder={`${minInitial}€`}
+        label="Aportación inicial"
+        sublabel={`Mínimo: ${minInitial}€ - Máximo: ${formatMax(product.maxInitialDeposit)}`}
+      />
 
-      <label htmlFor={`termYears_${product.id}`} className="form-label">
-        Plazo de vencimiento
-        <span className="block text-xs text-muted-foreground">
-          Mínimo: {minTermYears} {minTermYears === 1 ? 'año' : 'años'}
-        </span>
-      </label>
-      <div className="relative mb-3">
-        <input
-          type="number"
-          id={`termYears_${product.id}`}
-          value={termYearsValue}
-          onChange={e =>
-            onInputChange(product.id, "termYears", Number(e.target.value))
-          }
-          className="form-input w-full"
-          placeholder={`${minTermYears} años`}
-          min={minTermYears}
-        />
-        <span className="absolute right-3 top-2">años</span>
-      </div>
+      <AmountInput
+        id={`termYears_${product.id}`}
+        value={termYearsValue}
+        onChange={(value) => onInputChange(product.id, "termYears", value)}
+        min={minTermYears}
+        placeholder={`${minTermYears} años`}
+        label="Plazo de vencimiento"
+        sublabel={`Mínimo: ${minTermYears} ${minTermYears === 1 ? 'año' : 'años'}`}
+        unit="años"
+      />
 
-      <label htmlFor={`monthlyDeposit_${product.id}`} className="form-label">
-        Aportación periódica mensual*
-        <span className="block text-xs text-muted-foreground">
-          {isMonthlyFixedNone
-            ? "Este producto no admite aportaciones mensuales"
-            : <>Mínimo: {minMonthly}€ - Máximo: {formatMax(product.maxMonthlyDeposit)}</>
-          }
-        </span>
-      </label>
-      <div className="relative mb-3">
-        <input
-          type="number"
-          id={`monthlyDeposit_${product.id}`}
-          value={monthlyDepositValue}
-          onChange={e =>
-            onInputChange(product.id, "monthlyDeposit", Number(e.target.value))
-          }
-          className="form-input w-full"
-          placeholder={
-            isMonthlyFixedNone
-              ? "No disponible"
-              : `${minMonthly}€`
-          }
-          min={minMonthly}
-          max={
-            product.maxMonthlyDeposit === undefined || product.maxMonthlyDeposit === null
-              ? undefined
-              : product.maxMonthlyDeposit
-          }
-          disabled={isMonthlyFixedNone}
-        />
-        <span className="absolute right-3 top-2">€</span>
-      </div>
+      <AmountInput
+        id={`monthlyDeposit_${product.id}`}
+        value={monthlyDepositValue}
+        onChange={(value) => onInputChange(product.id, "monthlyDeposit", value)}
+        min={minMonthly}
+        max={product.maxMonthlyDeposit}
+        placeholder={isMonthlyFixedNone ? "No disponible" : `${minMonthly}€`}
+        label="Aportación periódica mensual*"
+        sublabel={isMonthlyFixedNone
+          ? "Este producto no admite aportaciones mensuales"
+          : `Mínimo: ${minMonthly}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`
+        }
+        disabled={isMonthlyFixedNone}
+      />
       
-      {product.maxTotalContribution && (
-        <div className={`text-xs p-2 rounded mt-2 ${exceedsMaxContribution ? 'bg-red-100 text-red-600' : 'bg-gray-100'}`}>
-          <p className="font-semibold">Aportación máxima total: {product.maxTotalContribution.toLocaleString()}€</p>
-          <p>Aportación planificada: {totalPlannedContribution.toLocaleString()}€ 
-          {exceedsMaxContribution && 
-            ' (se respetará el límite máximo en los cálculos)'}
-          </p>
-        </div>
-      )}
+      <ContributionLimit 
+        product={product}
+        totalPlannedContribution={totalPlannedContribution}
+        exceedsMaxContribution={exceedsMaxContribution}
+      />
     </div>
   );
 };
 
 export default SimulationProductForm;
-
