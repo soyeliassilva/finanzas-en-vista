@@ -32,7 +32,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
     minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
 
   // Calculate minimum term in years from product_duration_months_min
-  const minTermMonths = product.minTerm ?? 5;
+  const minTermMonths = product.product_duration_months_min ?? 12; // Default to 1 year if not specified
   const minTermYears = Math.ceil(minTermMonths / 12);
 
   // Use default value if value is zero/empty

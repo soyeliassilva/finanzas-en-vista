@@ -37,8 +37,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
     return <p className="text-sm">{product.yield}% de rentabilidad a cuenta</p>;
   };
 
-  // Convert minTerm from months to years
-  const minTermYears = product.minTerm ? Math.ceil(product.minTerm / 12) : 1;
+  // Convert duration from months to years
+  const minTermYears = product.product_duration_months_min 
+    ? Math.ceil(product.product_duration_months_min / 12) 
+    : 1;
 
   return (
     <div
