@@ -39,23 +39,18 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   const minTermMonths = product.product_duration_months_min ?? 12; // Default to 1 year if not specified
   const minTermYears = Math.ceil(minTermMonths / 12);
 
-  // DEFAULT ALL VALUES TO MINIMUM VALUES
-  const initialDepositValue = minInitial;
-  const termYearsValue = minTermYears;
-  const monthlyDepositValue = isMonthlyFixedNone ? 0 : minMonthly;
-
   // Determine which yield rate applies based on term
   const appliedYield = useMemo(() => {
-    if (termYearsValue >= 10 && product.yield10PlusYears !== undefined) {
+    if (values.termYears >= 10 && product.yield10PlusYears !== undefined) {
       return product.yield10PlusYears;
-    } else if (termYearsValue >= 5 && product.yield5PlusYears !== undefined) {
+    } else if (values.termYears >= 5 && product.yield5PlusYears !== undefined) {
       return product.yield5PlusYears;
     }
     return product.yield;
-  }, [product, termYearsValue]);
+  }, [product, values.termYears]);
 
-  // Calculate total planned contribution
-  const totalPlannedContribution = initialDepositValue + (monthlyDepositValue * termYearsValue * 12);
+  // Calculate total planned contribution using actual values
+  const totalPlannedContribution = values.initialDeposit + (values.monthlyDeposit * values.termYears * 12);
   
   // Check if total contribution exceeds max allowed
   const exceedsMaxContribution = product.maxTotalContribution !== undefined && 
@@ -69,7 +64,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
       
       <AmountInput
         id={`initialDeposit_${product.id}`}
-        value={initialDepositValue}
+        value={values.initialDeposit}
         onChange={(value) => onInputChange(product.id, "initialDeposit", value)}
         min={minInitial}
         max={product.maxInitialDeposit}
@@ -80,7 +75,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
 
       <AmountInput
         id={`termYears_${product.id}`}
-        value={termYearsValue}
+        value={values.termYears}
         onChange={(value) => onInputChange(product.id, "termYears", value)}
         min={minTermYears}
         placeholder={`${minTermYears} años`}
@@ -91,7 +86,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
 
       <AmountInput
         id={`monthlyDeposit_${product.id}`}
-        value={monthlyDepositValue}
+        value={values.monthlyDeposit}
         onChange={(value) => onInputChange(product.id, "monthlyDeposit", value)}
         min={minMonthly}
         max={product.maxMonthlyDeposit}
@@ -114,3 +109,4 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
 };
 
 export default SimulationProductForm;
+
