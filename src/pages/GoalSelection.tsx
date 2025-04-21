@@ -53,10 +53,10 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
         
         <h3 className="text-lg font-bold mb-4">Selecciona tu necesidad</h3>
         
-        <div className="space-y-4">
+        <div className="space-y-2">
           {availableGoals.map((goal) => (
             <div
-              className="radio-option h-16 rounded-lg px-4 py-2 bg-white border border-neutral transition-all duration-150 cursor-pointer flex items-center gap-2 my-2"
+              className="radio-option h-16 rounded-lg px-4 py-2 bg-white border border-neutral transition-all duration-150 cursor-pointer flex items-center gap-2 my-1"
               style={{ minHeight: "4rem" }}
               key={goal}
               onClick={() => setSelectedGoal(goal)}
@@ -102,3 +102,4 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
 };
 
 export default GoalSelection;
+
