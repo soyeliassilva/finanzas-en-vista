@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
@@ -9,26 +8,12 @@ import SimulationSummary from './SimulationSummary';
 import SimulationForm from '../components/simulation/SimulationForm';
 import SimulationResultsTable from '../components/simulation/SimulationResultsTable';
 import { useSimulationCalculations } from '../hooks/useSimulationCalculations';
+import { getProductDefaultFormValue } from '../utils/productUtils';
 
 type FormValues = {
   initialDeposit: number;
   monthlyDeposit: number;
   termYears: number;
-};
-
-const getProductDefaultFormValue = (product: Product) => {
-  const minInitial = product.minInitialDeposit ?? 0;
-  const minMonthly = product.minMonthlyDeposit ?? 0;
-  const minTermMonths = product.minTerm ?? 5;
-  const minTermYears = Math.ceil(minTermMonths / 12);
-
-  const isMonthlyFixedNone = minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
-
-  return {
-    initialDeposit: minInitial,
-    monthlyDeposit: isMonthlyFixedNone ? 0 : minMonthly,
-    termYears: minTermYears,
-  };
 };
 
 const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProducts }) => {
