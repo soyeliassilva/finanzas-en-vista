@@ -1,4 +1,3 @@
-
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { SimulationResult } from "../types";
@@ -19,7 +18,11 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
     <div className="mb-4">
       <div className="flex justify-between items-center">
         <p className="font-bold">Importe total al rescate de los tres productos</p>
-        <p className="text-2xl font-bold">{formatCurrency(getTotalAmount())}</p>
+        <p className="text-2xl font-bold">
+          {formatCurrency(
+            results.reduce((total, result) => total + result.finalAmount, 0)
+          )}
+        </p>
       </div>
     </div>
 
