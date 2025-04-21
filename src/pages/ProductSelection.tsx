@@ -22,18 +22,12 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   
   useEffect(() => {
     if (selectedGoal && allProducts.length > 0) {
-      // Filter products that match the selected goal
       const goalProducts = allProducts.filter(product => product.goal === selectedGoal);
-      
-      // Check if "Plan Ahorro Multiplica" exists and always include it
       const multiplicaPlan = allProducts.find(product => product.name === "Plan Ahorro Multiplica");
       setMultiplica(multiplicaPlan || null);
-      
-      // Make sure "Plan Ahorro Multiplica" is not duplicated
       const goalProductsFiltered = goalProducts.filter(
         product => product.name !== "Plan Ahorro Multiplica"
       );
-      
       setFilteredProducts(goalProductsFiltered);
     }
   }, [selectedGoal, allProducts]);
@@ -42,10 +36,8 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
     const isSelected = selectedProducts.some(p => p.id === product.id);
     
     if (isSelected) {
-      // Remove product
       setSelectedProducts(selectedProducts.filter(p => p.id !== product.id));
     } else {
-      // Add product if less than 3 are selected
       if (selectedProducts.length < 3) {
         setSelectedProducts([...selectedProducts, product]);
       }
@@ -116,15 +108,12 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
           </p>
         </div>
         
-        {/* Hide the instruction if 3 or fewer products available for this goal */}
         {(() => {
-          // Count all products for this goal including multiplica if it belongs, or just multiplica if only it exists
           let numForGoal = filteredProducts.length;
           if (multiplica) {
-            // If multiplica matches this goal or is always shown, increment
             numForGoal += 1;
           }
-          if (numForGoal > 3) {
+          if (numForGoal >= 4) {
             return (
               <h3 className="text-lg font-bold mb-4">
                 Selecciona hasta 3 productos para comparar su rentabilidad
@@ -139,7 +128,6 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {/* Always show Plan Ahorro Multiplica first if it exists */}
           {multiplica && (
             <div 
               key={multiplica.id}
@@ -194,7 +182,6 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
             </div>
           )}
 
-          {/* Show filtered products */}
           {filteredProducts.map((product) => (
             <div 
               key={product.id} 

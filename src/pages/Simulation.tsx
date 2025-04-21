@@ -143,6 +143,14 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
     return highest;
   };
 
+  // --- Update: dynamic grid columns based on product count ---
+  const gridColsClass =
+    selectedProducts.length === 3
+      ? "md:grid-cols-3"
+      : selectedProducts.length === 2
+      ? "md:grid-cols-2"
+      : "md:grid-cols-1";
+
   return (
     <div className="container mx-auto px-4 pb-10">
       <div className="step-container active-step mb-6">
@@ -160,7 +168,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
             handleCalculate();
           }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className={`grid grid-cols-1 ${gridColsClass} gap-4 mb-6`}>
             {selectedProducts.map((product, idx) => {
               const values = productInputs[product.id] || defaultFormValue;
               return (
