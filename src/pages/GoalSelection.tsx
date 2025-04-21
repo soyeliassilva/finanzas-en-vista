@@ -39,7 +39,8 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
       </div>
     );
   }
-  
+
+  // Use a minHeight for each goal and equal padding
   return (
     <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6">
       <div className="md:col-span-4 step-container active-step">
@@ -53,16 +54,22 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
         
         <h3 className="text-lg font-bold mb-4">Selecciona tu necesidad</h3>
         
-        <div className="space-y-2">
+        <div className="space-y-3">
           {availableGoals.map((goal) => (
-            <div className="radio-option" key={goal}>
+            <div
+              className={`radio-option bg-white rounded-lg shadow-sm border transition-all cursor-pointer min-h-[64px] flex items-center px-4 py-4 ${
+                selectedGoal === goal ? 'ring-2 ring-primary/70' : 'hover:ring-1 hover:ring-primary/30'
+              }`}
+              key={goal}
+              style={{ minHeight: '64px', marginBottom: '0px' }}
+              onClick={() => setSelectedGoal(goal)}
+            >
               <div 
-                className={`radio-circle cursor-pointer`}
-                onClick={() => setSelectedGoal(goal)}
+                className={`radio-circle mr-3`}
               >
                 {selectedGoal === goal && <div className="radio-selected" />}
               </div>
-              <label className="cursor-pointer" onClick={() => setSelectedGoal(goal)}>
+              <label className="cursor-pointer select-none w-full text-base font-medium" style={{ marginBottom: 0 }}>
                 {goal}
               </label>
             </div>
