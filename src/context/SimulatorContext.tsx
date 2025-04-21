@@ -1,13 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { GoalType, Product } from '../types';
 import { toast } from 'sonner';
-
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '@/integrations/supabase/client';
 
 interface SimulatorContextType {
   selectedGoal: GoalType | null;
@@ -56,7 +51,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       // Transform Supabase data to match our Product interface
       const transformedProducts: Product[] = productsData.map((item: any) => ({
-        id: item.uuid,
+        id: item.id,
         name: item.product_name,
         description: item.product_description,
         yield: Number(item.product_annual_yield),
