@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
 import { Mail } from 'lucide-react';
@@ -29,9 +29,15 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
 
   const [productInputs, setProductInputs] = useState<Record<string, FormValues>>(initialInputs);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setProductInputs(initialInputs);
   }, [initialInputs]);
+
+  useEffect(() => {
+    if (selectedProducts.length > 0) {
+      calculateResults(initialInputs);
+    }
+  }, [selectedProducts, initialInputs, calculateResults]);
 
   const handleInputChange = (productId: string, field: keyof FormValues, value: number) => {
     setProductInputs((prev) => ({
