@@ -45,10 +45,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
         </div>
       )}
     </div>
-    <div className="mt-auto pt-4">
+    <div className="mt-auto pt-4 px-5 pb-5">
       <button
         className={isSelected ? "btn-primary w-full justify-center" : "btn-outline w-full justify-center"}
-        style={{ position: "absolute", bottom: "1.25rem", left: "1.25rem", right: "1.25rem" }}
         onClick={() => onToggle(product)}
       >
         {isSelected ? 'Producto seleccionado' : <>Seleccionar producto <ChevronRight size={18} /></>}
