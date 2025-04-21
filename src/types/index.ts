@@ -1,4 +1,3 @@
-
 export type GoalType = string;
 
 export interface Product {
@@ -8,13 +7,23 @@ export interface Product {
   yield: number;
   yield5PlusYears?: number;
   yield10PlusYears?: number;
+  
+  // Original properties (keeping for backward compatibility)
   minInitialDeposit: number;
   maxInitialDeposit?: number;
   minMonthlyDeposit: number;
   maxMonthlyDeposit?: number;
-  product_duration_months_min?: number; // Added the missing property
-  minTerm: number; // Keep this for backward compatibility
+  minTerm: number;
   maxTotalContribution?: number;
+  
+  // Supabase column names
+  product_initial_contribution_min: number;
+  product_initial_contribution_max?: number;
+  product_monthly_contribution_min: number;
+  product_monthly_contribution_max?: number;
+  product_duration_months_min?: number;
+  product_total_contribution_max?: number;
+  
   goal: GoalType;
   taxation: string;
   disclaimer?: string;

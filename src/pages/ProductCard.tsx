@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Product } from '../types';
@@ -68,7 +69,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
             </p>
           </div>
         )}
-        {(product.product_monthly_contribution_min !== 0 || product.product_monthly_contribution_max !== 0) && (
+        {(product.product_monthly_contribution_min !== 0 || (product.product_monthly_contribution_max !== null && product.product_monthly_contribution_max !== 0)) && (
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
             <p className="text-sm">
