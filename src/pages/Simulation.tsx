@@ -255,7 +255,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
                 <div className="font-bold py-2 px-4 border-b border-neutral bg-light">Más info</div>
                 
                 {results.map((result, index) => (
-                  <React.Fragment key={result.productId}>
+                  <div key={result.productId} className="contents">
                     <div className="flex items-center gap-2 py-2 px-4 border-b border-neutral">
                       <div
                         className="w-3 h-3 rounded-full"
@@ -279,7 +279,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
                         </a>
                       )}
                     </div>
-                  </React.Fragment>
+                  </div>
                 ))}
               </div>
             </div>
