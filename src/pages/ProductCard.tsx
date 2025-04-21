@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Product } from '../types';
@@ -38,6 +37,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
     return <p className="text-sm">{product.yield}% de rentabilidad a cuenta</p>;
   };
 
+  // Convert minTerm from months to years
+  const minTermYears = product.minTerm ? Math.ceil(product.minTerm / 12) : 1;
+  const maxTermYears = product.maxTerm ? Math.ceil(product.maxTerm / 12) : undefined;
+
   return (
     <div
       className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
@@ -52,11 +55,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
         </div>
         <div className="flex items-start">
           <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-          {product.minTerm === 1 ? (
-            <p className="text-sm">Plazo: {product.minTerm} año</p>
+          {maxTermYears ? (
+            <p className="text-sm">
+              Plazo: {minTermYears} - {maxTermYears} {maxTermYears === 1 ? 'año' : 'años'}
+            </p>
           ) : (
             <p className="text-sm">
-              Plazo: {product.minTerm} - {product.maxTerm || '∞'} años
+              Plazo: {minTermYears} {minTermYears === 1 ? 'año' : 'años'} o más
             </p>
           )}
         </div>

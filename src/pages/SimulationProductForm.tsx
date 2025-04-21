@@ -31,22 +31,20 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   const isMonthlyFixedNone =
     minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
 
-  // minTerm from product_duration_months_min (as years, rounded up)
+  // Calculate minimum term in years from product_duration_months_min
   const minTermMonths = product.minTerm ?? 5;
   const minTermYears = Math.ceil(minTermMonths / 12);
+  const maxTermYears = product.maxTerm ? Math.ceil(product.maxTerm / 12) : undefined;
 
   // Use default value if value is zero/empty
-  const initialDepositValue =
-    values.initialDeposit === 0 ? minInitial : values.initialDeposit;
-  const termYearsValue =
-    values.termYears === 0 ? minTermYears : values.termYears;
-  const monthlyDepositValue =
-    isMonthlyFixedNone
-      ? 0
-      : values.monthlyDeposit === 0
-        ? minMonthly
-        : values.monthlyDeposit;
-        
+  const initialDepositValue = values.initialDeposit === 0 ? minInitial : values.initialDeposit;
+  const termYearsValue = values.termYears === 0 ? minTermYears : values.termYears;
+  const monthlyDepositValue = isMonthlyFixedNone
+    ? 0
+    : values.monthlyDeposit === 0
+      ? minMonthly
+      : values.monthlyDeposit;
+
   // Determine which yield rate applies based on term
   const appliedYield = useMemo(() => {
     if (termYearsValue >= 10 && product.yield10PlusYears !== undefined) {
@@ -106,7 +104,11 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
       </div>
 
       <label htmlFor={`termYears_${product.id}`} className="form-label">
-        Plazo de vencimiento*
+        Plazo de vencimiento
+        <span className="block text-xs text-muted-foreground">
+          Mínimo: {minTermYears} {minTermYears === 1 ? 'año' : 'años'}
+          {maxTermYears ? ` - Máximo: ${maxTermYears} ${maxTermYears === 1 ? 'año' : 'años'}` : ''}
+        </span>
       </label>
       <div className="relative mb-3">
         <input
@@ -119,7 +121,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
           className="form-input w-full"
           placeholder={`${minTermYears} años`}
           min={minTermYears}
-          max={product.maxTerm ? Math.ceil(product.maxTerm / 12) : undefined}
+          max={maxTermYears}
         />
         <span className="absolute right-3 top-2">años</span>
       </div>
