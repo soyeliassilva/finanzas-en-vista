@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product, SimulationResult } from '../types';
 import { calculateFutureValue, formatCurrency } from '../utils/calculator';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ChevronRight, Mail } from 'lucide-react';
 import SimulationProductForm from './SimulationProductForm';
 import SimulationChart from './SimulationChart';
@@ -26,23 +25,45 @@ const defaultFormValue: FormValues = {
   termYears: 1,
 };
 
-const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
+const getProductDefaultFormValue = (product: Product) => {
+  const minInitial = product.minInitialDeposit ?? 0;
+  const minMonthly = product.minMonthlyDeposit ?? 0;
+  const minTermMonths = product.minTerm ?? 5;
+  const minTermYears = Math.ceil(minTermMonths / 12);
+
+  const isMonthlyFixedNone = minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
+
+  return {
+    initialDeposit: minInitial,
+    monthlyDeposit: isMonthlyFixedNone ? 0 : minMonthly,
+    termYears: minTermYears,
+  };
+};
+
+const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProducts }) => {
   const navigate = useNavigate();
 
-  // Track form state per product ID
-  const [productInputs, setProductInputs] = useState<Record<string, FormValues>>(
+  const initialInputs = useMemo(
     () =>
       Object.fromEntries(
         selectedProducts.map((prod) => [
           prod.id,
-          { ...defaultFormValue }
+          getProductDefaultFormValue(prod),
         ])
-      )
+      ),
+    [selectedProducts]
   );
+
+  const [productInputs, setProductInputs] = useState<Record<string, FormValues>>(initialInputs);
   const [results, setResults] = useState<SimulationResult[]>([]);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
 
-  // Input handlers
+  React.useEffect(() => {
+    setProductInputs(initialInputs);
+    setResults([]);
+    setCalculationPerformed(false);
+  }, [initialInputs]);
+
   const handleInputChange = (productId: string, field: keyof FormValues, value: number) => {
     setProductInputs((prev) => ({
       ...prev,
@@ -54,7 +75,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
     if (selectedProducts.length === 0) return;
 
     const newResults = selectedProducts.map(product => {
-      const { initialDeposit, monthlyDeposit, termYears } = productInputs[product.id] || defaultFormValue;
+      const { initialDeposit, monthlyDeposit, termYears } = productInputs[product.id] || getProductDefaultFormValue(product);
       const { finalAmount, monthlyData } = calculateFutureValue(
         initialDeposit,
         monthlyDeposit,
@@ -103,7 +124,6 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
     window.open(typeformUrl, '_blank');
   };
 
-  // Generate chart data based on results
   const generateChartData = () => {
     if (results.length === 0) return [];
 
@@ -123,7 +143,6 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
       chartData.push(dataPoint);
     }
 
-    // Add last month if not already
     if (!chartData.some(d => d.month === maxMonths)) {
       const lastDataPoint: any = { month: maxMonths };
       results.forEach((result) => {
@@ -146,10 +165,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
     return highest;
   };
 
-  // --- Dynamic grid columns based on product count ---
   const gridColsStyle = {
-    // Only set gridTemplateColumns for medium screens and above
-    // On mobile, Tailwind's grid-cols-1 takes effect.
     ['--md-cols' as string]: `repeat(${selectedProducts.length}, minmax(0, 1fr))`
   };
 
@@ -162,7 +178,6 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
             Descubre la rentabilidad de los productos seleccionados
           </h2>
         </div>
-        {/* Render FORM PER PRODUCT */}
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -174,7 +189,7 @@ const Simulation: React.FC<SimulationProps> = ({ selectedProducts }) => {
             style={gridColsStyle}
           >
             {selectedProducts.map((product) => {
-              const values = productInputs[product.id] || defaultFormValue;
+              const values = productInputs[product.id] || getProductDefaultFormValue(product);
               return (
                 <SimulationProductForm
                   key={product.id}
