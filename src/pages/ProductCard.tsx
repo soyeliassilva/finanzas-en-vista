@@ -60,17 +60,32 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
             Plazo: {minTermYears} {minTermYears === 1 ? 'año' : 'años'} o más
           </p>
         </div>
-        <div className="flex items-start">
-          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-          <p className="text-sm">
-            Aportaciones desde {product.minMonthlyDeposit}€
-            {product.minInitialDeposit > 0 && ` (inicial: ${product.minInitialDeposit}€)`}
-          </p>
-        </div>
+        {product.minInitialDeposit > 0 && (
+          <div className="flex items-start">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <p className="text-sm">
+              Aportación inicial desde {product.minInitialDeposit}€
+            </p>
+          </div>
+        )}
+        {(product.minMonthlyDeposit !== 0 || product.maxMonthlyDeposit !== 0) && (
+          <div className="flex items-start">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <p className="text-sm">
+              {product.minMonthlyDeposit !== 0
+                ? `Aportaciones mensuales desde ${product.minMonthlyDeposit}€`
+                : product.maxMonthlyDeposit === null
+                ? "Aportaciones mensuales sin límites"
+                : `Con aportaciones mensuales de hasta ${product.maxMonthlyDeposit}€`}
+            </p>
+          </div>
+        )}
         {product.maxTotalContribution && (
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-            <p className="text-sm">Aportación máxima total: {product.maxTotalContribution.toLocaleString()}€</p>
+            <p className="text-sm">
+              Contribución máxima: {product.maxTotalContribution.toLocaleString()}€
+            </p>
           </div>
         )}
         {product.conditions && (
