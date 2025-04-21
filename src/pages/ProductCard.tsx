@@ -39,7 +39,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
 
   // Convert minTerm from months to years
   const minTermYears = product.minTerm ? Math.ceil(product.minTerm / 12) : 1;
-  const maxTermYears = product.maxTerm ? Math.ceil(product.maxTerm / 12) : undefined;
 
   return (
     <div
@@ -55,15 +54,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
         </div>
         <div className="flex items-start">
           <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-          {maxTermYears ? (
-            <p className="text-sm">
-              Plazo: {minTermYears} - {maxTermYears} {maxTermYears === 1 ? 'año' : 'años'}
-            </p>
-          ) : (
-            <p className="text-sm">
-              Plazo: {minTermYears} {minTermYears === 1 ? 'año' : 'años'} o más
-            </p>
-          )}
+          <p className="text-sm">
+            Plazo: {minTermYears} {minTermYears === 1 ? 'año' : 'años'} o más
+          </p>
         </div>
         <div className="flex items-start">
           <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>

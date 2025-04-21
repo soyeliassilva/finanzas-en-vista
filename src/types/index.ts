@@ -1,4 +1,3 @@
-
 export type GoalType = string;
 
 export interface Product {
@@ -13,7 +12,6 @@ export interface Product {
   minMonthlyDeposit: number;
   maxMonthlyDeposit?: number;
   minTerm: number;
-  maxTerm?: number;
   maxTotalContribution?: number;
   goal: GoalType;
   taxation: string;

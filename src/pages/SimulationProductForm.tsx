@@ -34,7 +34,6 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   // Calculate minimum term in years from product_duration_months_min
   const minTermMonths = product.minTerm ?? 5;
   const minTermYears = Math.ceil(minTermMonths / 12);
-  const maxTermYears = product.maxTerm ? Math.ceil(product.maxTerm / 12) : undefined;
 
   // Use default value if value is zero/empty
   const initialDepositValue = values.initialDeposit === 0 ? minInitial : values.initialDeposit;
@@ -107,7 +106,6 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         Plazo de vencimiento
         <span className="block text-xs text-muted-foreground">
           Mínimo: {minTermYears} {minTermYears === 1 ? 'año' : 'años'}
-          {maxTermYears ? ` - Máximo: ${maxTermYears} ${maxTermYears === 1 ? 'año' : 'años'}` : ''}
         </span>
       </label>
       <div className="relative mb-3">
@@ -121,7 +119,6 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
           className="form-input w-full"
           placeholder={`${minTermYears} años`}
           min={minTermYears}
-          max={maxTermYears}
         />
         <span className="absolute right-3 top-2">años</span>
       </div>
