@@ -10,7 +10,6 @@ export const mockProducts: Product[] = [
     minInitialDeposit: 0,
     minMonthlyDeposit: 30,
     minTerm: 1,
-    maxTerm: 30,
     goal: 'ahorrar_jubilacion',
     taxation: 'El rescate tributa como rendimientos del capital en el IRPF',
     disclaimer: 'Rentabilidad a cuenta del 3,5% con posibilidad de bonus adicional según resultados.'
@@ -23,7 +22,6 @@ export const mockProducts: Product[] = [
     minInitialDeposit: 0,
     minMonthlyDeposit: 60,
     minTerm: 1,
-    maxTerm: 25,
     goal: 'maxima_disponibilidad',
     taxation: 'El rescate tributa como rendimientos del capital en el IRPF',
     disclaimer: 'Alta rentabilidad del 3,25% con disponibilidad inmediata.'
