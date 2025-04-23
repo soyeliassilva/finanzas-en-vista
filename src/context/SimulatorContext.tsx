@@ -93,7 +93,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         // Check if we have overrides for this product
         if (overrides[productId]) {
-          console.log(`[SimulatorContext] Applying overrides for product ${productId} (${item.product_name})`);
+          console.log(`[SimulatorContext] Found overrides for product ${productId} (${item.product_name}):`, overrides[productId]);
           
           Object.entries(overrides[productId]).forEach(([column, value]) => {
             let newValue: any = value;
@@ -103,17 +103,18 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               newValue = Number(value);
               console.log(`[SimulatorContext] Converting override value to number: ${column} = ${newValue}`);
             }
-            
+
+            // Handle direct column mapping and derived fields
             if (column in productObj) {
               const oldValue = (productObj as any)[column];
               (productObj as any)[column] = newValue;
               overriddenFields.push(column);
-              console.log(`[SimulatorContext] Override applied: ${column} changed from ${oldValue} to ${newValue}`);
+              console.log(`[SimulatorContext] Direct override applied: ${column} changed from ${oldValue} to ${newValue}`);
 
-              // Handle derived fields
-              if (column === "product_annual_yield") {
+              // Also update the corresponding derived field if it exists
+              if (column === 'product_annual_yield') {
                 productObj.yield = Number(newValue);
-                overriddenFields.push("yield");
+                overriddenFields.push('yield');
                 console.log(`[SimulatorContext] Derived override: yield = ${productObj.yield}`);
               }
               if (column === "product_annual_yield_5_plus_years") {
@@ -158,18 +159,18 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               }
             }
           });
-        }
 
-        if (overriddenFields.length > 0) {
-          productObj.__overriddenFields = overriddenFields;
-          console.log(`[SimulatorContext] Product ${productObj.name} (id: ${productId}) overridden:`, overriddenFields);
-          console.log(`[SimulatorContext] Final overridden product:`, productObj);
+          if (overriddenFields.length > 0) {
+            productObj.__overriddenFields = overriddenFields;
+            console.log(`[SimulatorContext] Product ${productObj.name} (id: ${productId}) overridden fields:`, overriddenFields);
+            console.log(`[SimulatorContext] Final overridden product:`, productObj);
+          }
         }
 
         return productObj;
       });
 
-      console.log("All products (name -> id):", transformedProducts.map(p => ({ name: p.name, id: p.id })));
+      console.log("[SimulatorContext] All products (name -> id):", transformedProducts.map(p => ({ name: p.name, id: p.id })));
 
       const overriddenProductsCount = transformedProducts.filter(
         p => Array.isArray((p as any).__overriddenFields) && (p as any).__overriddenFields.length > 0
@@ -179,9 +180,8 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         toast.success(`${overriddenProductsCount} producto(s) modificado(s) por parámetros en la URL.`);
       }
 
-      const goals = Array.from(new Set(transformedProducts.map(p => p.goal)));
       setAllProducts(transformedProducts);
-      setAvailableGoals(goals);
+      setAvailableGoals(Array.from(new Set(transformedProducts.map(p => p.goal))));
       setLoading(false);
     } catch (error: any) {
       console.error("Error fetching products:", error);
