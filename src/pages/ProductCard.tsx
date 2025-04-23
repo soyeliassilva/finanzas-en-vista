@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Product } from '../types';
-import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
   product: Product;
@@ -11,9 +10,6 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle }) => {
-  const [showDebug, setShowDebug] = useState(false);
-  const hasOverrides = Array.isArray((product as any).__overriddenFields) && (product as any).__overriddenFields.length > 0;
-
   // Determine which yield rate to display
   const displayYield = () => {
     if (product.yield10PlusYears || product.yield5PlusYears) {
@@ -51,17 +47,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
     <div
       className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
       style={{ minHeight: '320px' }}
-      data-product-id={product.id}
     >
-      <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-        {product.name}
-        {/* Badge if overridden */}
-        {hasOverrides && (
-          <Badge className="ml-1 bg-yellow-400 text-black" variant="outline">
-            Modificado
-          </Badge>
-        )}
-      </h3>
+      <h3 className="text-lg font-bold mb-2">{product.name}</h3>
       <p className="text-sm mb-4">{product.description}</p>
       <div className="space-y-2 mb-4">
         <div className="flex items-start">
@@ -105,33 +92,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           </div>
         )}
       </div>
-
-      {/* Debug overrides details - improved for better visibility */}
-      {hasOverrides && (
-        <div className="mb-2 border border-yellow-400 p-2 rounded-md bg-yellow-50">
-          <button className="text-xs text-blue-700 underline cursor-pointer mb-1 font-bold" onClick={() => setShowDebug((s) => !s)}>
-            {showDebug ? "Ocultar detalles modificados" : "Ver valores modificados"}
-          </button>
-          {showDebug && (
-            <>
-              <ul className="text-xs text-neutral-700 mt-1">
-                {((product as any).__overriddenFields as string[]).map(f => (
-                  <li key={f} className="font-semibold">
-                    <span className="font-mono">{f}</span>
-                    {((product as any)[f] !== undefined) ? (
-                      <>: <span className="font-mono bg-yellow-100 px-1">{JSON.stringify((product as any)[f])}</span></>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-1 p-2 bg-neutral-100 border rounded text-xs font-mono overflow-auto max-h-40">
-                <pre>{JSON.stringify(product, null, 2)}</pre>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-      
       <div className="mt-auto pt-4">
         <button
           className={isSelected ? "btn-primary w-full justify-center" : "btn-outline w-full justify-center"}

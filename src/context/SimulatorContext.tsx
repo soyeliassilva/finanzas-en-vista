@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GoalType, Product } from '../types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useProductOverrides } from '../hooks/useProductOverrides';
 
 interface SimulatorContextType {
   selectedGoal: GoalType | null;
@@ -14,7 +13,6 @@ interface SimulatorContextType {
   availableGoals: GoalType[];
   loading: boolean;
   error: string | null;
-  refetchData: () => Promise<void>;
 }
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
@@ -26,162 +24,65 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [availableGoals, setAvailableGoals] = useState<GoalType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const overrides = useProductOverrides();
-
-  useEffect(() => {
-    console.log("[SimulatorContext] Incoming overrides from URL:", overrides);
-    
-    // When overrides change, we need to refetch products
-    fetchProducts();
-  }, [overrides]);
-
+  
   const handleGoalChange = (goal: GoalType) => {
     setSelectedGoal(goal);
     setSelectedProducts([]);
   };
-
+  
   const fetchProducts = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log("[SimulatorContext] Fetching products...");
-      
       const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select('*');
-
+      
       if (productsError) {
         throw productsError;
       }
+      
       if (!productsData || productsData.length === 0) {
         throw new Error('No products found in the database');
       }
-
-      console.log("[SimulatorContext] Products fetched:", productsData.length);
       
-      const transformedProducts: Product[] = productsData.map((item: any) => {
-        const productId = item.id;
-        let productObj: Product & { __overriddenFields?: string[] } = {
-          id: item.id,
-          name: item.product_name,
-          description: item.product_description,
-          yield: Number(item.product_annual_yield),
-          yield5PlusYears: item.product_annual_yield_5_plus_years ? Number(item.product_annual_yield_5_plus_years) : undefined,
-          yield10PlusYears: item.product_annual_yield_10_plus_years ? Number(item.product_annual_yield_10_plus_years) : undefined,
-          minInitialDeposit: Number(item.product_initial_contribution_min),
-          maxInitialDeposit: item.product_initial_contribution_max ? Number(item.product_initial_contribution_max) : undefined,
-          minMonthlyDeposit: Number(item.product_monthly_contribution_min),
-          maxMonthlyDeposit: item.product_monthly_contribution_max ? Number(item.product_monthly_contribution_max) : undefined,
-          minTerm: item.product_duration_months_min ? Number(item.product_duration_months_min) / 12 : 1,
-          maxTotalContribution: item.product_total_contribution_max ? Number(item.product_total_contribution_max) : undefined,
-          product_initial_contribution_min: Number(item.product_initial_contribution_min),
-          product_initial_contribution_max: item.product_initial_contribution_max ? Number(item.product_initial_contribution_max) : undefined,
-          product_monthly_contribution_min: Number(item.product_monthly_contribution_min),
-          product_monthly_contribution_max: item.product_monthly_contribution_max ? Number(item.product_monthly_contribution_max) : undefined,
-          product_duration_months_min: item.product_duration_months_min ? Number(item.product_duration_months_min) : undefined,
-          product_total_contribution_max: item.product_total_contribution_max ? Number(item.product_total_contribution_max) : undefined,
-          goal: item.product_goal,
-          taxation: item.product_tax_treatment,
-          disclaimer: item.product_disclaimer,
-          url: item.product_url,
-          conditions: item.product_conditions,
-          terms: item.product_terms,
-        };
-
-        const overriddenFields: string[] = [];
-
-        // Check if we have overrides for this product
-        if (overrides[productId]) {
-          console.log(`[SimulatorContext] Found overrides for product ${productId} (${item.product_name}):`, overrides[productId]);
-          
-          Object.entries(overrides[productId]).forEach(([column, value]) => {
-            let newValue: any = value;
-            
-            // Convert numeric strings to numbers
-            if (/^(\d+(\.\d+)?)$/.test(value)) {
-              newValue = Number(value);
-              console.log(`[SimulatorContext] Converting override value to number: ${column} = ${newValue}`);
-            }
-
-            // Handle direct column mapping and derived fields
-            if (column in productObj) {
-              const oldValue = (productObj as any)[column];
-              (productObj as any)[column] = newValue;
-              overriddenFields.push(column);
-              console.log(`[SimulatorContext] Direct override applied: ${column} changed from ${oldValue} to ${newValue}`);
-
-              // Also update the corresponding derived field if it exists
-              if (column === 'product_annual_yield') {
-                productObj.yield = Number(newValue);
-                overriddenFields.push('yield');
-                console.log(`[SimulatorContext] Derived override: yield = ${productObj.yield}`);
-              }
-              if (column === "product_annual_yield_5_plus_years") {
-                productObj.yield5PlusYears = Number(newValue);
-                overriddenFields.push("yield5PlusYears");
-                console.log(`[SimulatorContext] Derived override: yield5PlusYears = ${productObj.yield5PlusYears}`);
-              }
-              if (column === "product_annual_yield_10_plus_years") {
-                productObj.yield10PlusYears = Number(newValue);
-                overriddenFields.push("yield10PlusYears");
-                console.log(`[SimulatorContext] Derived override: yield10PlusYears = ${productObj.yield10PlusYears}`);
-              }
-              if (column === "product_initial_contribution_min") {
-                productObj.minInitialDeposit = Number(newValue);
-                overriddenFields.push("minInitialDeposit");
-                console.log(`[SimulatorContext] Derived override: minInitialDeposit = ${productObj.minInitialDeposit}`);
-              }
-              if (column === "product_initial_contribution_max") {
-                productObj.maxInitialDeposit = Number(newValue);
-                overriddenFields.push("maxInitialDeposit");
-                console.log(`[SimulatorContext] Derived override: maxInitialDeposit = ${productObj.maxInitialDeposit}`);
-              }
-              if (column === "product_monthly_contribution_min") {
-                productObj.minMonthlyDeposit = Number(newValue);
-                overriddenFields.push("minMonthlyDeposit");
-                console.log(`[SimulatorContext] Derived override: minMonthlyDeposit = ${productObj.minMonthlyDeposit}`);
-              }
-              if (column === "product_monthly_contribution_max") {
-                productObj.maxMonthlyDeposit = Number(newValue);
-                overriddenFields.push("maxMonthlyDeposit");
-                console.log(`[SimulatorContext] Derived override: maxMonthlyDeposit = ${productObj.maxMonthlyDeposit}`);
-              }
-              if (column === "product_duration_months_min") {
-                productObj.minTerm = Number(newValue) / 12;
-                overriddenFields.push("minTerm");
-                console.log(`[SimulatorContext] Derived override: minTerm = ${productObj.minTerm}`);
-              }
-              if (column === "product_total_contribution_max") {
-                productObj.maxTotalContribution = Number(newValue);
-                overriddenFields.push("maxTotalContribution");
-                console.log(`[SimulatorContext] Derived override: maxTotalContribution = ${productObj.maxTotalContribution}`);
-              }
-            }
-          });
-
-          if (overriddenFields.length > 0) {
-            productObj.__overriddenFields = overriddenFields;
-            console.log(`[SimulatorContext] Product ${productObj.name} (id: ${productId}) overridden fields:`, overriddenFields);
-            console.log(`[SimulatorContext] Final overridden product:`, productObj);
-          }
-        }
-
-        return productObj;
-      });
-
-      console.log("[SimulatorContext] All products (name -> id):", transformedProducts.map(p => ({ name: p.name, id: p.id })));
-
-      const overriddenProductsCount = transformedProducts.filter(
-        p => Array.isArray((p as any).__overriddenFields) && (p as any).__overriddenFields.length > 0
-      ).length;
+      const transformedProducts: Product[] = productsData.map((item: any) => ({
+        id: item.id,
+        name: item.product_name,
+        description: item.product_description,
+        yield: Number(item.product_annual_yield),
+        yield5PlusYears: item.product_annual_yield_5_plus_years ? Number(item.product_annual_yield_5_plus_years) : undefined,
+        yield10PlusYears: item.product_annual_yield_10_plus_years ? Number(item.product_annual_yield_10_plus_years) : undefined,
+        
+        // Original properties (for backward compatibility)
+        minInitialDeposit: Number(item.product_initial_contribution_min),
+        maxInitialDeposit: item.product_initial_contribution_max ? Number(item.product_initial_contribution_max) : undefined,
+        minMonthlyDeposit: Number(item.product_monthly_contribution_min),
+        maxMonthlyDeposit: item.product_monthly_contribution_max ? Number(item.product_monthly_contribution_max) : undefined,
+        minTerm: item.product_duration_months_min ? Number(item.product_duration_months_min) / 12 : 1,
+        maxTotalContribution: item.product_total_contribution_max ? Number(item.product_total_contribution_max) : undefined,
+        
+        // Supabase column names (added to match the updated Product interface)
+        product_initial_contribution_min: Number(item.product_initial_contribution_min),
+        product_initial_contribution_max: item.product_initial_contribution_max ? Number(item.product_initial_contribution_max) : undefined,
+        product_monthly_contribution_min: Number(item.product_monthly_contribution_min),
+        product_monthly_contribution_max: item.product_monthly_contribution_max ? Number(item.product_monthly_contribution_max) : undefined,
+        product_duration_months_min: item.product_duration_months_min ? Number(item.product_duration_months_min) : undefined,
+        product_total_contribution_max: item.product_total_contribution_max ? Number(item.product_total_contribution_max) : undefined,
+        
+        goal: item.product_goal,
+        taxation: item.product_tax_treatment,
+        disclaimer: item.product_disclaimer,
+        url: item.product_url,
+        conditions: item.product_conditions,
+        terms: item.product_terms
+      }));
       
-      if (overriddenProductsCount > 0) {
-        toast.success(`${overriddenProductsCount} producto(s) modificado(s) por parámetros en la URL.`);
-      }
-
+      const goals = Array.from(new Set(transformedProducts.map(p => p.goal)));
+      
       setAllProducts(transformedProducts);
-      setAvailableGoals(Array.from(new Set(transformedProducts.map(p => p.goal))));
+      setAvailableGoals(goals);
       setLoading(false);
     } catch (error: any) {
       console.error("Error fetching products:", error);
@@ -190,14 +91,11 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       toast.error('Error al cargar los productos. Por favor, intente nuevamente.');
     }
   };
-
-  // This exposes a refetch method that can be called from outside the context
-  const refetchData = fetchProducts;
-
+  
   useEffect(() => {
     fetchProducts();
   }, []);
-
+  
   const value = {
     selectedGoal,
     setSelectedGoal: handleGoalChange,
@@ -206,10 +104,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     allProducts,
     availableGoals,
     loading,
-    error,
-    refetchData
+    error
   };
-
+  
   return <SimulatorContext.Provider value={value}>{children}</SimulatorContext.Provider>;
 };
 

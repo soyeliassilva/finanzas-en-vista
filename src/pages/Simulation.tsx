@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
@@ -59,8 +60,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
   };
 
   const handleBack = () => {
-    const search = window.location.search || '';
-    navigate('/productos' + search);
+    navigate('/productos');
   };
 
   const handleContactAdvisor = () => {

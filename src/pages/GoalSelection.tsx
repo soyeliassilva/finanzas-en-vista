@@ -1,12 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType } from '../types';
 import { useSimulator } from '../context/SimulatorContext';
-
-function getCurrentSearch() {
-  return window.location.search || '';
-}
 
 interface GoalSelectionProps {
   selectedGoal: GoalType | null;
@@ -19,7 +14,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   
   const handleContinue = () => {
     if (selectedGoal) {
-      navigate('/productos' + getCurrentSearch());
+      navigate('/productos');
     }
   };
   
