@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
@@ -8,6 +9,10 @@ import LoadingSpinner from '../components/LoadingSpinner';
 
 interface IndexProps {
   step?: string;
+}
+
+function getCurrentSearch() {
+  return window.location.search || '';
 }
 
 const Index: React.FC<IndexProps> = ({ step }) => {
@@ -23,14 +28,15 @@ const Index: React.FC<IndexProps> = ({ step }) => {
   useEffect(() => {
     // Redirect if trying to access a step without completing previous steps
     if (!loading) {
+      const search = getCurrentSearch();
       if (step === 'productos' && !selectedGoal) {
-        navigate('/');
+        navigate('/' + search, { replace: true });
       }
       
       if (step === 'simulacion' && selectedProducts.length === 0) {
-        navigate('/productos');
+        navigate('/productos' + search, { replace: true });
         if (!selectedGoal) {
-          navigate('/');
+          navigate('/' + search, { replace: true });
         }
       }
     }
@@ -63,3 +69,4 @@ const Index: React.FC<IndexProps> = ({ step }) => {
 };
 
 export default Index;
+

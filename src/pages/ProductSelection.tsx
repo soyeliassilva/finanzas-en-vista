@@ -6,6 +6,10 @@ import { useSimulator } from '../context/SimulatorContext';
 import ProductCard from './ProductCard';
 import ProductSelectionHeader, { Step2Instructions } from './ProductSelectionHeader';
 
+function getCurrentSearch() {
+  return window.location.search || '';
+}
+
 interface ProductSelectionProps {
   selectedGoal: GoalType | null;
   selectedProducts: Product[];
@@ -47,12 +51,12 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
 
   const handleContinue = () => {
     if (selectedProducts.length > 0) {
-      navigate('/simulacion');
+      navigate('/simulacion' + getCurrentSearch());
     }
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/' + getCurrentSearch());
   };
 
   const isSelected = (productId: string) => {
