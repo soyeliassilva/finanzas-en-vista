@@ -26,6 +26,10 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [error, setError] = useState<string | null>(null);
   const overrides = useProductOverrides();
 
+  useEffect(() => {
+    console.log("[SimulatorContext] Incoming overrides from URL:", overrides);
+  }, [overrides]);
+
   const handleGoalChange = (goal: GoalType) => {
     setSelectedGoal(goal);
     setSelectedProducts([]);
@@ -48,7 +52,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       const transformedProducts: Product[] = productsData.map((item: any) => {
         const productId = item.id;
-        let productObj = {
+        let productObj: Product & { __overriddenFields?: string[] } = {
           id: item.id,
           name: item.product_name,
           description: item.product_description,
@@ -75,27 +79,69 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           terms: item.product_terms,
         };
 
+        const overriddenFields: string[] = [];
+
         if (overrides[productId]) {
           Object.entries(overrides[productId]).forEach(([column, value]) => {
             let newValue: any = value;
             if (/^(\d+(\.\d+)?)$/.test(value)) newValue = Number(value);
             if (column in productObj) {
               (productObj as any)[column] = newValue;
-              if (column === "product_annual_yield") productObj.yield = Number(newValue);
-              if (column === "product_annual_yield_5_plus_years") productObj.yield5PlusYears = Number(newValue);
-              if (column === "product_annual_yield_10_plus_years") productObj.yield10PlusYears = Number(newValue);
-              if (column === "product_initial_contribution_min") productObj.minInitialDeposit = Number(newValue);
-              if (column === "product_initial_contribution_max") productObj.maxInitialDeposit = Number(newValue);
-              if (column === "product_monthly_contribution_min") productObj.minMonthlyDeposit = Number(newValue);
-              if (column === "product_monthly_contribution_max") productObj.maxMonthlyDeposit = Number(newValue);
-              if (column === "product_duration_months_min") productObj.minTerm = Number(newValue) / 12;
-              if (column === "product_total_contribution_max") productObj.maxTotalContribution = Number(newValue);
+              overriddenFields.push(column);
+
+              if (column === "product_annual_yield") {
+                productObj.yield = Number(newValue);
+                overriddenFields.push("yield");
+              }
+              if (column === "product_annual_yield_5_plus_years") {
+                productObj.yield5PlusYears = Number(newValue);
+                overriddenFields.push("yield5PlusYears");
+              }
+              if (column === "product_annual_yield_10_plus_years") {
+                productObj.yield10PlusYears = Number(newValue);
+                overriddenFields.push("yield10PlusYears");
+              }
+              if (column === "product_initial_contribution_min") {
+                productObj.minInitialDeposit = Number(newValue);
+                overriddenFields.push("minInitialDeposit");
+              }
+              if (column === "product_initial_contribution_max") {
+                productObj.maxInitialDeposit = Number(newValue);
+                overriddenFields.push("maxInitialDeposit");
+              }
+              if (column === "product_monthly_contribution_min") {
+                productObj.minMonthlyDeposit = Number(newValue);
+                overriddenFields.push("minMonthlyDeposit");
+              }
+              if (column === "product_monthly_contribution_max") {
+                productObj.maxMonthlyDeposit = Number(newValue);
+                overriddenFields.push("maxMonthlyDeposit");
+              }
+              if (column === "product_duration_months_min") {
+                productObj.minTerm = Number(newValue) / 12;
+                overriddenFields.push("minTerm");
+              }
+              if (column === "product_total_contribution_max") {
+                productObj.maxTotalContribution = Number(newValue);
+                overriddenFields.push("maxTotalContribution");
+              }
             }
           });
         }
 
+        if (overriddenFields.length > 0) {
+          productObj.__overriddenFields = overriddenFields;
+          console.log(`[product override] Product ${productObj.name} (id: ${productId}) overridden:`, overriddenFields, productObj);
+        }
+
         return productObj;
       });
+
+      console.log("All products (name -> id):", transformedProducts.map(p => ({ name: p.name, id: p.id })));
+
+      if (transformedProducts.some(p => Array.isArray((p as any).__overriddenFields) && (p as any).__overriddenFields.length > 0)) {
+        toast.info("Algunos productos han sido modificados por parámetros en la URL.");
+      }
 
       const goals = Array.from(new Set(transformedProducts.map(p => p.goal)));
       setAllProducts(transformedProducts);
