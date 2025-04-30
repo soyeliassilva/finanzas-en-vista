@@ -1,3 +1,4 @@
+
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { SimulationResult } from "../types";
@@ -26,15 +27,16 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
       </div>
     </div>
 
-    <div className="h-72 mt-6">
+    <div className="h-[calc(100%-120px)] min-h-[400px] mt-6">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#CFCFCF" />
           <XAxis 
             dataKey="month"
+            ticks={chartData.filter(d => d.month % 12 === 0).map(d => d.month)}
             tickFormatter={(value) => {
-              if (value === 0) return '0';
-              return `${Math.floor(value / 12)} años`;
+              if (value === 0) return '0 años';
+              return value === 12 ? '1 año' : `${Math.floor(value / 12)} años`;
             }}
             tick={{ fontSize: 12 }}
           />
@@ -49,7 +51,9 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
             formatter={(value: any) => [`${formatCurrency(value)}`, '']}
             labelFormatter={(label) => {
               if (label === 0) return 'Inicio';
-              return `Mes ${label} (${Math.floor(label / 12)} años${label % 12 > 0 ? ` ${label % 12} meses` : ''})`;
+              return label === 12 
+                ? `Mes ${label} (1 año)` 
+                : `Mes ${label} (${Math.floor(label / 12)} años)`;
             }}
           />
           <Legend />

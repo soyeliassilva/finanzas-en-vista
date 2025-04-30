@@ -93,23 +93,37 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     const maxMonths = Math.max(...results.map(r => r.termYears * 12));
     const chartData = [];
 
-    for (let month = 0; month <= maxMonths; month += maxMonths > 60 ? 12 : 6) {
-      const dataPoint: any = { month };
+    // Add initial point (month 0)
+    const initialDataPoint: any = { month: 0 };
+    results.forEach((result) => {
+      const monthData = result.monthlyData.find(m => m.month === 0);
+      if (monthData) {
+        initialDataPoint[result.name] = monthData.value;
+      }
+    });
+    chartData.push(initialDataPoint);
 
+    // Add yearly data points
+    for (let year = 1; year <= Math.ceil(maxMonths / 12); year++) {
+      const month = year * 12;
+      if (month > maxMonths) break;
+      
+      const dataPoint: any = { month };
       results.forEach((result) => {
         const monthData = result.monthlyData.find(m => m.month === month);
         if (monthData) {
           dataPoint[result.name] = monthData.value;
         }
       });
-
       chartData.push(dataPoint);
     }
 
-    if (!chartData.some(d => d.month === maxMonths)) {
-      const lastDataPoint: any = { month: maxMonths };
+    // Make sure the last point is included if it's not exactly on a year boundary
+    const lastMonth = maxMonths;
+    if (lastMonth % 12 !== 0 && !chartData.some(d => d.month === lastMonth)) {
+      const lastDataPoint: any = { month: lastMonth };
       results.forEach((result) => {
-        const monthData = result.monthlyData.find(m => m.month === maxMonths);
+        const monthData = result.monthlyData.find(m => m.month === lastMonth);
         if (monthData) {
           lastDataPoint[result.name] = monthData.value;
         }
