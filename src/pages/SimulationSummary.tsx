@@ -18,7 +18,7 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
 
       {results.map((result, index) => {
         // Calculate the actual contributions based on limits
-        const isPIASMutualidad = result.productId === "pias-mutualidad";
+        const isPIASMutualidad = result.productId === "6d65d7f1-835d-4e19-8625-b61abd881c4c";
         let totalContributions = result.initialDeposit;
         
         if (isPIASMutualidad) {

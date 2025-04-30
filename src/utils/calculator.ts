@@ -26,7 +26,7 @@ export const calculateFutureValue = (
   let totalContributions = initial;
   
   // For PIAS Mutualidad with annual contribution limit
-  const isPIASMutualidad = productId === "pias-mutualidad";
+  const isPIASMutualidad = productId === "6d65d7f1-835d-4e19-8625-b61abd881c4c";
   const annualLimit = isPIASMutualidad ? 8000 : Infinity;
   
   // Track current year's contributions for PIAS Mutualidad

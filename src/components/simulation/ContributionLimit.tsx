@@ -14,7 +14,7 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
   exceedsMaxContribution 
 }) => {
   // Special handling for PIAS Mutualidad - annual contribution limit
-  const isPIASMutualidad = product.id === "pias-mutualidad";
+  const isPIASMutualidad = product.id === "6d65d7f1-835d-4e19-8625-b61abd881c4c";
   
   if (!product.maxTotalContribution && !isPIASMutualidad) {
     return null;

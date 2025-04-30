@@ -41,7 +41,7 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
 
       // Calculate actual contributions considering limits
       let totalContributions = initialDeposit;
-      const isPIASMutualidad = product.id === "pias-mutualidad";
+      const isPIASMutualidad = product.id === "6d65d7f1-835d-4e19-8625-b61abd881c4c";
       
       if (isPIASMutualidad) {
         // For PIAS Mutualidad, calculate first year contributions (respecting 8000€ limit)
