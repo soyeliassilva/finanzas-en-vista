@@ -36,6 +36,8 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
   const resultsRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
   const [summaryHeight, setSummaryHeight] = useState<number | null>(null);
+  const [isResizing, setIsResizing] = useState<boolean>(false);
+  const resizeTimeoutRef = useRef<number | null>(null);
   
   const initialInputs = useMemo(
     () => Object.fromEntries(
@@ -50,14 +52,26 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     setProductInputs(initialInputs);
   }, [initialInputs]);
 
-  // Effect to measure and set the summary height
+  // Effect to measure and set the summary height with debouncing
   useEffect(() => {
     if (!calculationPerformed || !summaryRef.current) return;
     
     const updateHeight = () => {
       if (summaryRef.current) {
-        const height = summaryRef.current.offsetHeight;
-        setSummaryHeight(height);
+        setIsResizing(true);
+        
+        // Clear any existing timeout
+        if (resizeTimeoutRef.current) {
+          window.clearTimeout(resizeTimeoutRef.current);
+        }
+        
+        // Set a timeout to avoid rapid updates
+        resizeTimeoutRef.current = window.setTimeout(() => {
+          const height = summaryRef.current?.offsetHeight || 400;
+          setSummaryHeight(height);
+          setIsResizing(false);
+          resizeTimeoutRef.current = null;
+        }, 100);
       }
     };
 
@@ -66,21 +80,34 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     
     // Setup resize observer for dynamic height changes
     const resizeObserver = new ResizeObserver(() => {
-      updateHeight();
+      if (!isResizing) {
+        updateHeight();
+      }
     });
     
     resizeObserver.observe(summaryRef.current);
     
     // Window resize handler
-    window.addEventListener('resize', updateHeight);
+    const handleResize = () => {
+      if (!isResizing) {
+        updateHeight();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
     
     return () => {
       if (summaryRef.current) {
         resizeObserver.unobserve(summaryRef.current);
       }
-      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('resize', handleResize);
+      
+      // Clear timeout if component unmounts
+      if (resizeTimeoutRef.current) {
+        window.clearTimeout(resizeTimeoutRef.current);
+      }
     };
-  }, [calculationPerformed, results]);
+  }, [calculationPerformed, isResizing]);
 
   const handleInputChange = (productId: string, field: keyof FormValues, value: number) => {
     setProductInputs((prev) => ({

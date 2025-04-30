@@ -14,8 +14,8 @@ interface SimulationChartProps {
 }
 
 const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, getTotalAmount, summaryHeight }) => {
-  // Determine chart height based on summary height, with a minimum fallback
-  const chartHeight = summaryHeight || 400;
+  // Calculate a reasonable chart height with a maximum limit to prevent infinite growth
+  const chartHeight = summaryHeight ? Math.min(summaryHeight - 80, 800) : 400;
   
   return (
     <div className="md:col-span-7 step-container">
@@ -32,7 +32,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
         </div>
       </div>
 
-      <div style={{ height: `${chartHeight - 120}px` }} className="min-h-[300px] mt-6">
+      <div style={{ height: `${chartHeight}px` }} className="min-h-[300px] mt-6">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#CFCFCF" />
