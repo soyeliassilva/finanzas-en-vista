@@ -32,6 +32,11 @@ const SimulationSummary: React.FC<SimulationSummaryProps> = ({ results, handleCo
           </div>
 
           <div className="flex justify-between">
+            <span>Intereses brutos generados</span>
+            <span className="font-bold">{formatCurrency(result.generatedInterest)}</span>
+          </div>
+          
+          <div className="flex justify-between">
             <span>Importe total al rescate</span>
             <span className="font-bold">{formatCurrency(result.finalAmount)}</span>
           </div>
@@ -39,11 +44,6 @@ const SimulationSummary: React.FC<SimulationSummaryProps> = ({ results, handleCo
           <div className="flex justify-between">
             <span>Rentabilidad</span>
             <span className="font-bold">{result.yield}%</span>
-          </div>
-          
-          <div className="flex justify-between">
-            <span>Intereses brutos generados</span>
-            <span className="font-bold">{formatCurrency(result.generatedInterest)}</span>
           </div>
           
           <div className="mt-2 text-sm">

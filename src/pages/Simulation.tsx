@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
 import { Mail } from 'lucide-react';
@@ -33,6 +33,7 @@ const getProductDefaultFormValue = (product: Product) => {
 const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProducts }) => {
   const navigate = useNavigate();
   const { results, calculationPerformed, calculateResults } = useSimulationCalculations(selectedProducts);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const initialInputs = useMemo(
     () => Object.fromEntries(
@@ -56,6 +57,13 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
 
   const handleCalculate = () => {
     calculateResults(productInputs);
+    
+    // Add a slight delay to ensure results are rendered before scrolling
+    setTimeout(() => {
+      if (resultsRef.current) {
+        resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const handleBack = () => {
@@ -130,7 +138,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
       />
       
       {calculationPerformed && results.length > 0 && (
-        <div className="animate-fade-in">
+        <div className="animate-fade-in" ref={resultsRef}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             <SimulationSummary results={results} handleContactAdvisor={handleContactAdvisor} />
             <SimulationChart results={results} chartData={chartData} getTotalAmount={getTotalAmount} />
