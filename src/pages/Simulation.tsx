@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
 import { Mail } from 'lucide-react';
@@ -34,7 +34,9 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
   const navigate = useNavigate();
   const { results, calculationPerformed, calculateResults } = useSimulationCalculations(selectedProducts);
   const resultsRef = useRef<HTMLDivElement>(null);
-
+  const summaryRef = useRef<HTMLDivElement>(null);
+  const [summaryHeight, setSummaryHeight] = useState<number | null>(null);
+  
   const initialInputs = useMemo(
     () => Object.fromEntries(
       selectedProducts.map((prod) => [prod.id, getProductDefaultFormValue(prod)])
@@ -47,6 +49,38 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
   React.useEffect(() => {
     setProductInputs(initialInputs);
   }, [initialInputs]);
+
+  // Effect to measure and set the summary height
+  useEffect(() => {
+    if (!calculationPerformed || !summaryRef.current) return;
+    
+    const updateHeight = () => {
+      if (summaryRef.current) {
+        const height = summaryRef.current.offsetHeight;
+        setSummaryHeight(height);
+      }
+    };
+
+    // Initial measurement
+    updateHeight();
+    
+    // Setup resize observer for dynamic height changes
+    const resizeObserver = new ResizeObserver(() => {
+      updateHeight();
+    });
+    
+    resizeObserver.observe(summaryRef.current);
+    
+    // Window resize handler
+    window.addEventListener('resize', updateHeight);
+    
+    return () => {
+      if (summaryRef.current) {
+        resizeObserver.unobserve(summaryRef.current);
+      }
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, [calculationPerformed, results]);
 
   const handleInputChange = (productId: string, field: keyof FormValues, value: number) => {
     setProductInputs((prev) => ({
@@ -154,8 +188,17 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
       {calculationPerformed && results.length > 0 && (
         <div className="animate-fade-in" ref={resultsRef}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <SimulationSummary results={results} handleContactAdvisor={handleContactAdvisor} />
-            <SimulationChart results={results} chartData={chartData} getTotalAmount={getTotalAmount} />
+            <SimulationSummary 
+              results={results} 
+              handleContactAdvisor={handleContactAdvisor}
+              ref={summaryRef} 
+            />
+            <SimulationChart 
+              results={results} 
+              chartData={chartData} 
+              getTotalAmount={getTotalAmount}
+              summaryHeight={summaryHeight} 
+            />
           </div>
         </div>
       )}
