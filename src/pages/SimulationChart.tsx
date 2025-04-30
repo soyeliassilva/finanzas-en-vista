@@ -5,6 +5,8 @@ import { SimulationResult } from "../types";
 import { formatCurrency } from "../utils/calculator";
 
 const chartColors = ['#004236', '#D1A4C4', '#B9EDAA'];
+const MAX_CHART_HEIGHT = 700; // Maximum height cap to prevent infinite growth
+const MIN_CHART_HEIGHT = 300; // Minimum height to ensure the chart is visible
 
 interface SimulationChartProps {
   results: SimulationResult[];
@@ -17,7 +19,8 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
   const headerRef = useRef<HTMLHeadingElement>(null);
   const summaryInfoRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
-  const [chartHeight, setChartHeight] = useState<number>(400);
+  const [chartHeight, setChartHeight] = useState<number>(MIN_CHART_HEIGHT);
+  const lastHeightRef = useRef<number>(MIN_CHART_HEIGHT);
   
   // Calculate chart height based on summary height and other elements' heights
   useEffect(() => {
@@ -31,10 +34,20 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
     const marginsAndPaddings = 16 + 24 + 16 + 20;
     
     // Calculate available height for the chart
-    const availableHeight = summaryHeight - headerHeight - summaryInfoHeight - footerHeight - marginsAndPaddings;
+    let newHeight = Math.min(
+      summaryHeight - headerHeight - summaryInfoHeight - footerHeight - marginsAndPaddings,
+      MAX_CHART_HEIGHT
+    );
     
     // Set a minimum height to prevent too small charts
-    setChartHeight(Math.max(availableHeight, 300));
+    newHeight = Math.max(newHeight, MIN_CHART_HEIGHT);
+    
+    // Only update if the height change is significant (more than 5px)
+    // This helps break the feedback loop
+    if (Math.abs(newHeight - lastHeightRef.current) > 5) {
+      lastHeightRef.current = newHeight;
+      setChartHeight(newHeight);
+    }
   }, [summaryHeight]);
 
   return (
@@ -52,7 +65,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
         </div>
       </div>
 
-      <div style={{ height: `${chartHeight}px` }} className="min-h-[300px] mt-6">
+      <div style={{ height: `${chartHeight}px` }} className="min-h-[300px] max-h-[700px] mt-6">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#CFCFCF" />

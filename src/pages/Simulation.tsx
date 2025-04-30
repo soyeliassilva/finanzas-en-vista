@@ -37,6 +37,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
   const [summaryHeight, setSummaryHeight] = useState<number | null>(null);
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const resizeTimeoutRef = useRef<number | null>(null);
+  const previousHeightRef = useRef<number | null>(null);
   
   const initialInputs = useMemo(
     () => Object.fromEntries(
@@ -51,7 +52,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     setProductInputs(initialInputs);
   }, [initialInputs]);
 
-  // Effect to measure and set the summary height with debouncing
+  // Effect to measure and set the summary height with improved debouncing
   useEffect(() => {
     if (!calculationPerformed || !summaryRef.current) return;
     
@@ -67,10 +68,18 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
         // Set a timeout to avoid rapid updates
         resizeTimeoutRef.current = window.setTimeout(() => {
           const height = summaryRef.current?.offsetHeight || 400;
-          setSummaryHeight(height);
+          
+          // Only update if height has changed significantly (more than 10px)
+          // This helps break potential feedback loops
+          if (previousHeightRef.current === null || 
+              Math.abs(previousHeightRef.current - height) > 10) {
+            previousHeightRef.current = height;
+            setSummaryHeight(height);
+          }
+          
           setIsResizing(false);
           resizeTimeoutRef.current = null;
-        }, 100);
+        }, 250); // Longer timeout for more stability
       }
     };
 
