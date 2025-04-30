@@ -1,3 +1,4 @@
+
 export type GoalType = string;
 
 export interface Product {
@@ -45,4 +46,5 @@ export interface SimulationResult {
   monthlyData: { month: number; value: number }[];
   taxation: string;
   url?: string;
+  disclaimer?: string;
 }

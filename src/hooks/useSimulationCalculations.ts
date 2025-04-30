@@ -53,7 +53,8 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
         )),
         monthlyData,
         taxation: product.taxation,
-        url: product.url
+        url: product.url,
+        disclaimer: product.disclaimer
       };
     });
 

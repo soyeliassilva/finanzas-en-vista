@@ -24,6 +24,11 @@ const SimulationSummary: React.FC<SimulationSummaryProps> = ({ results, handleCo
         
         <div className="ml-5 space-y-2">
           <div className="flex justify-between">
+            <span>Aportación total</span>
+            <span className="font-bold">{formatCurrency(result.initialDeposit + (result.monthlyDeposit * result.termMonths))}</span>
+          </div>
+
+          <div className="flex justify-between">
             <span>Importe total al rescate</span>
             <span className="font-bold">{formatCurrency(result.finalAmount)}</span>
           </div>
@@ -42,6 +47,13 @@ const SimulationSummary: React.FC<SimulationSummaryProps> = ({ results, handleCo
             <p className="font-bold mb-1">Detalles fiscalidad del producto</p>
             <p>{result.taxation}</p>
           </div>
+
+          {result.disclaimer && (
+            <div className="mt-2 text-sm">
+              <p className="font-bold mb-1">Información adicional</p>
+              <p>{result.disclaimer}</p>
+            </div>
+          )}
         </div>
       </div>
     ))}
