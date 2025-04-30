@@ -28,8 +28,9 @@ export const calculateFutureValue = (
   // For PIAS Mutualidad with annual contribution limit
   const isPIASMutualidad = productId === "pias-mutualidad";
   const annualLimit = isPIASMutualidad ? 8000 : Infinity;
-  let currentYearContributions = initial; // Track contributions for the current year
-  let currentYear = 1; // Start with year 1
+  
+  // Track current year's contributions for PIAS Mutualidad
+  let currentYearContributions = initial; // Start with initial contribution
   
   for (let month = 0; month <= months; month++) {
     if (month === 0) {
@@ -40,19 +41,31 @@ export const calculateFutureValue = (
     // Calculate monthly compounding - add interest to current value
     currentValue = currentValue * (1 + monthlyRate);
     
-    // Check if we're starting a new year (every 12 months)
-    if (isPIASMutualidad && month % 12 === 0) {
-      currentYear++;
-      currentYearContributions = 0; // Reset annual contribution counter for new year
-    }
-    
-    // Special handling for PIAS Mutualidad
+    // Special handling for PIAS Mutualidad annual limit
     let monthlyContribution = monthly;
+    
     if (isPIASMutualidad) {
-      // Check if adding this month's contribution would exceed the annual limit
-      if (currentYearContributions + monthly > annualLimit) {
-        monthlyContribution = Math.max(0, annualLimit - currentYearContributions);
+      // Check if we're starting a new year (every 12 months)
+      if (month % 12 === 0 && month > 0) {
+        // Reset annual contribution counter for new year
+        currentYearContributions = 0;
       }
+      
+      // First year special handling (month 1 to 12)
+      if (month <= 12) {
+        // Check if adding this month's contribution would exceed the annual limit
+        if (currentYearContributions >= annualLimit) {
+          // Already reached annual limit, no contribution this month
+          monthlyContribution = 0;
+        } else {
+          // Calculate how much more can be contributed this month
+          const remainingAllowance = annualLimit - currentYearContributions;
+          monthlyContribution = Math.min(monthly, remainingAllowance);
+        }
+      }
+      // For subsequent years, the full monthly contribution is allowed
+      
+      // Update current year's contribution tracking
       currentYearContributions += monthlyContribution;
     }
     

@@ -39,6 +39,32 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
         product.id
       );
 
+      // Calculate actual contributions considering limits
+      let totalContributions = initialDeposit;
+      const isPIASMutualidad = product.id === "pias-mutualidad";
+      
+      if (isPIASMutualidad) {
+        // For PIAS Mutualidad, calculate first year contributions (respecting 8000€ limit)
+        const firstYearAllowance = Math.max(0, 8000 - initialDeposit);
+        const firstYearMonthlyTotal = Math.min(firstYearAllowance, monthlyDeposit * 12);
+        
+        // Remaining years with full monthly contributions
+        const remainingMonths = (termYears - 1) * 12;
+        const remainingContributions = remainingMonths * monthlyDeposit;
+        
+        totalContributions += firstYearMonthlyTotal + remainingContributions;
+      } else {
+        // For other products, apply only the maxTotalContribution limit
+        const maxMonthlyTotal = product.maxTotalContribution 
+          ? Math.min(
+              monthlyDeposit * termYears * 12,
+              Math.max(0, product.maxTotalContribution - initialDeposit)
+            )
+          : monthlyDeposit * termYears * 12;
+          
+        totalContributions += maxMonthlyTotal;
+      }
+
       return {
         productId: product.id,
         name: product.name,
@@ -48,10 +74,7 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
         termMonths: termYears * 12,
         yield: applicableYield,
         finalAmount,
-        generatedInterest: finalAmount - (initialDeposit + Math.min(
-          monthlyDeposit * termYears * 12,
-          (product.maxTotalContribution ? product.maxTotalContribution - initialDeposit : Infinity)
-        )),
+        generatedInterest: finalAmount - totalContributions,
         monthlyData,
         taxation: product.taxation,
         url: product.url,
