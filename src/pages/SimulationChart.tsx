@@ -38,7 +38,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
   }, [summaryHeight]);
 
   return (
-    <div className="md:col-span-7 step-container">
+    <div className="md:col-span-7 step-container h-full">
       <h3 ref={headerRef} className="text-xl font-bold mb-4">Previsión de rentabilidad</h3>
 
       <div ref={summaryInfoRef} className="mb-4">

@@ -13,7 +13,7 @@ interface SimulationSummaryProps {
 
 const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
   ({ results, handleContactAdvisor }, ref) => (
-    <div className="md:col-span-5 step-container" ref={ref}>
+    <div className="md:col-span-5 step-container h-full" ref={ref}>
       <h3 className="text-xl font-bold mb-4">Resumen del producto</h3>
 
       {results.map((result, index) => (

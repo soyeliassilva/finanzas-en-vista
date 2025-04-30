@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
@@ -214,7 +213,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
       
       {calculationPerformed && results.length > 0 && (
         <div className="animate-fade-in" ref={resultsRef}>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:grid-flow-col auto-rows-fr">
             <SimulationSummary 
               results={results} 
               handleContactAdvisor={handleContactAdvisor}
