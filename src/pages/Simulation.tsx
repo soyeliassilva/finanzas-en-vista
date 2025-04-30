@@ -7,7 +7,6 @@ import SimulationProductForm from './SimulationProductForm';
 import SimulationChart from './SimulationChart';
 import SimulationSummary from './SimulationSummary';
 import SimulationForm from '../components/simulation/SimulationForm';
-import SimulationResultsTable from '../components/simulation/SimulationResultsTable';
 import { useSimulationCalculations } from '../hooks/useSimulationCalculations';
 
 type FormValues = {
@@ -138,9 +137,6 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
           </div>
           
           <div className="step-container">
-            <h3 className="text-xl font-bold mb-4">Resumen de los productos comparados</h3>
-            <SimulationResultsTable results={results} />
-            
             <div className="mt-8 flex justify-center">
               <button className="btn-primary" onClick={handleContactAdvisor}>
                 Contacta con nuestro gestor <Mail size={18} />
