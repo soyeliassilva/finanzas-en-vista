@@ -50,13 +50,18 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
     }
   }, [summaryHeight]);
 
+  // Determine the appropriate text based on number of products
+  const totalAmountText = results.length === 1
+    ? "Importe total al rescate del producto"
+    : "Importe total al rescate de los productos";
+
   return (
     <div className="md:col-span-7 step-container h-full">
       <h3 ref={headerRef} className="text-xl font-bold mb-4">Previsión de rentabilidad</h3>
 
       <div ref={summaryInfoRef} className="mb-4">
         <div className="flex justify-between items-center">
-          <p className="font-bold">Importe total al rescate de los tres productos</p>
+          <p className="font-bold">{totalAmountText}</p>
           <p className="text-2xl font-bold">
             {formatCurrency(
               results.reduce((total, result) => total + result.finalAmount, 0)
