@@ -1,4 +1,3 @@
-
 export type GoalType = string;
 
 export interface Product {
@@ -47,4 +46,5 @@ export interface SimulationResult {
   taxation: string;
   url?: string;
   disclaimer?: string;
+  maxTotalContribution?: number;
 }

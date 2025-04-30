@@ -25,7 +25,10 @@ const SimulationSummary: React.FC<SimulationSummaryProps> = ({ results, handleCo
         <div className="ml-5 space-y-2">
           <div className="flex justify-between">
             <span>Aportación total</span>
-            <span className="font-bold">{formatCurrency(result.initialDeposit + (result.monthlyDeposit * result.termMonths))}</span>
+            <span className="font-bold">{formatCurrency(result.initialDeposit + Math.min(
+              result.monthlyDeposit * result.termMonths,
+              (result.maxTotalContribution ? result.maxTotalContribution - result.initialDeposit : Infinity)
+            ))}</span>
           </div>
 
           <div className="flex justify-between">
