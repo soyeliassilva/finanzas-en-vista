@@ -1,43 +1,15 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
-import { Mail } from 'lucide-react';
-import SimulationProductForm from './SimulationProductForm';
-import SimulationChart from './SimulationChart';
-import SimulationSummary from './SimulationSummary';
 import SimulationForm from '../components/simulation/SimulationForm';
+import SimulationResults from '../components/simulation/SimulationResults';
 import { useSimulationCalculations } from '../hooks/useSimulationCalculations';
-
-type FormValues = {
-  initialDeposit: number;
-  monthlyDeposit: number;
-  termYears: number;
-};
-
-const getProductDefaultFormValue = (product: Product) => {
-  const minInitial = product.minInitialDeposit ?? 0;
-  const minMonthly = product.minMonthlyDeposit ?? 0;
-  const minTermMonths = product.minTerm ?? 5;
-  const minTermYears = Math.ceil(minTermMonths / 12);
-
-  const isMonthlyFixedNone = minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
-
-  return {
-    initialDeposit: minInitial,
-    monthlyDeposit: isMonthlyFixedNone ? 0 : minMonthly,
-    termYears: minTermYears,
-  };
-};
+import { getProductDefaultFormValue, FormValues } from '../utils/simulationUtils';
 
 const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProducts }) => {
   const navigate = useNavigate();
   const { results, calculationPerformed, calculateResults } = useSimulationCalculations(selectedProducts);
-  const resultsRef = useRef<HTMLDivElement>(null);
-  const summaryRef = useRef<HTMLDivElement>(null);
-  const [summaryHeight, setSummaryHeight] = useState<number | null>(null);
-  const [isResizing, setIsResizing] = useState<boolean>(false);
-  const resizeTimeoutRef = useRef<number | null>(null);
-  const previousHeightRef = useRef<number | null>(null);
   
   const initialInputs = useMemo(
     () => Object.fromEntries(
@@ -48,74 +20,9 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
 
   const [productInputs, setProductInputs] = useState<Record<string, FormValues>>(initialInputs);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setProductInputs(initialInputs);
   }, [initialInputs]);
-
-  // Effect to measure and set the summary height with improved debouncing
-  useEffect(() => {
-    if (!calculationPerformed || !summaryRef.current) return;
-    
-    const updateHeight = () => {
-      if (summaryRef.current) {
-        setIsResizing(true);
-        
-        // Clear any existing timeout
-        if (resizeTimeoutRef.current) {
-          window.clearTimeout(resizeTimeoutRef.current);
-        }
-        
-        // Set a timeout to avoid rapid updates
-        resizeTimeoutRef.current = window.setTimeout(() => {
-          const height = summaryRef.current?.offsetHeight || 400;
-          
-          // Only update if height has changed significantly (more than 10px)
-          // This helps break potential feedback loops
-          if (previousHeightRef.current === null || 
-              Math.abs(previousHeightRef.current - height) > 10) {
-            previousHeightRef.current = height;
-            setSummaryHeight(height);
-          }
-          
-          setIsResizing(false);
-          resizeTimeoutRef.current = null;
-        }, 250); // Longer timeout for more stability
-      }
-    };
-
-    // Initial measurement
-    updateHeight();
-    
-    // Setup resize observer for dynamic height changes
-    const resizeObserver = new ResizeObserver(() => {
-      if (!isResizing) {
-        updateHeight();
-      }
-    });
-    
-    resizeObserver.observe(summaryRef.current);
-    
-    // Window resize handler
-    const handleResize = () => {
-      if (!isResizing) {
-        updateHeight();
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      if (summaryRef.current) {
-        resizeObserver.unobserve(summaryRef.current);
-      }
-      window.removeEventListener('resize', handleResize);
-      
-      // Clear timeout if component unmounts
-      if (resizeTimeoutRef.current) {
-        window.clearTimeout(resizeTimeoutRef.current);
-      }
-    };
-  }, [calculationPerformed, isResizing]);
 
   const handleInputChange = (productId: string, field: keyof FormValues, value: number) => {
     setProductInputs((prev) => ({
@@ -129,8 +36,9 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     
     // Add a slight delay to ensure results are rendered before scrolling
     setTimeout(() => {
-      if (resultsRef.current) {
-        resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const resultsElement = document.querySelector('.animate-fade-in');
+      if (resultsElement) {
+        resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 100);
   };
@@ -156,60 +64,6 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
     window.open(typeformUrl, '_blank');
   };
 
-  const generateChartData = () => {
-    if (results.length === 0) return [];
-
-    const maxMonths = Math.max(...results.map(r => r.termYears * 12));
-    const chartData = [];
-
-    // Add initial point (month 0)
-    const initialDataPoint: any = { month: 0 };
-    results.forEach((result) => {
-      const monthData = result.monthlyData.find(m => m.month === 0);
-      if (monthData) {
-        initialDataPoint[result.name] = monthData.value;
-      }
-    });
-    chartData.push(initialDataPoint);
-
-    // Add yearly data points
-    for (let year = 1; year <= Math.ceil(maxMonths / 12); year++) {
-      const month = year * 12;
-      if (month > maxMonths) break;
-      
-      const dataPoint: any = { month };
-      results.forEach((result) => {
-        const monthData = result.monthlyData.find(m => m.month === month);
-        if (monthData) {
-          dataPoint[result.name] = monthData.value;
-        }
-      });
-      chartData.push(dataPoint);
-    }
-
-    // Make sure the last point is included if it's not exactly on a year boundary
-    const lastMonth = maxMonths;
-    if (lastMonth % 12 !== 0 && !chartData.some(d => d.month === lastMonth)) {
-      const lastDataPoint: any = { month: lastMonth };
-      results.forEach((result) => {
-        const monthData = result.monthlyData.find(m => m.month === lastMonth);
-        if (monthData) {
-          lastDataPoint[result.name] = monthData.value;
-        }
-      });
-      chartData.push(lastDataPoint);
-    }
-
-    return chartData;
-  };
-
-  const chartData = generateChartData();
-
-  const getTotalAmount = () => {
-    if (results.length === 0) return 0;
-    return Math.max(...results.map(r => r.finalAmount));
-  };
-
   return (
     <div className="container mx-auto px-4">
       <SimulationForm
@@ -220,23 +74,11 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
         onBack={handleBack}
       />
       
-      {calculationPerformed && results.length > 0 && (
-        <div className="animate-fade-in" ref={resultsRef}>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:grid-flow-col auto-rows-fr">
-            <SimulationSummary 
-              results={results} 
-              handleContactAdvisor={handleContactAdvisor}
-              ref={summaryRef} 
-            />
-            <SimulationChart 
-              results={results} 
-              chartData={chartData} 
-              getTotalAmount={getTotalAmount}
-              summaryHeight={summaryHeight} 
-            />
-          </div>
-        </div>
-      )}
+      <SimulationResults 
+        results={results}
+        calculationPerformed={calculationPerformed}
+        handleContactAdvisor={handleContactAdvisor}
+      />
     </div>
   );
 };
