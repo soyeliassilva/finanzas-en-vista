@@ -48,11 +48,31 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
         const firstYearAllowance = Math.max(0, 8000 - initialDeposit);
         const firstYearMonthlyTotal = Math.min(firstYearAllowance, monthlyDeposit * 12);
         
-        // Remaining years with full monthly contributions
-        const remainingMonths = (termYears - 1) * 12;
-        const remainingContributions = remainingMonths * monthlyDeposit;
+        // Calculate how many months will have contributions in the first year
+        let contributingMonthsFirstYear = 0;
+        if (monthlyDeposit > 0) {
+          contributingMonthsFirstYear = Math.min(12, Math.ceil(firstYearAllowance / monthlyDeposit));
+        }
         
-        totalContributions += firstYearMonthlyTotal + remainingContributions;
+        // Calculate actual first year monthly contributions
+        let actualFirstYearMonthlyTotal = 0;
+        if (contributingMonthsFirstYear > 0) {
+          // Handle partial contribution for the last contributing month
+          if (firstYearAllowance % monthlyDeposit !== 0 && firstYearAllowance < monthlyDeposit * contributingMonthsFirstYear) {
+            const fullMonths = Math.floor(firstYearAllowance / monthlyDeposit);
+            const partialAmount = firstYearAllowance % monthlyDeposit;
+            actualFirstYearMonthlyTotal = (fullMonths * monthlyDeposit) + partialAmount;
+          } else {
+            actualFirstYearMonthlyTotal = contributingMonthsFirstYear * monthlyDeposit;
+          }
+        }
+        
+        // Remaining years with full monthly contributions
+        const remainingYears = termYears - 1;
+        const remainingContributions = remainingYears * 12 * monthlyDeposit;
+        
+        // Total contributions is initial + first year monthly (capped) + remaining years
+        totalContributions = initialDeposit + Math.min(actualFirstYearMonthlyTotal, firstYearAllowance) + remainingContributions;
       } else {
         // For other products, apply only the maxTotalContribution limit
         const maxMonthlyTotal = product.maxTotalContribution 

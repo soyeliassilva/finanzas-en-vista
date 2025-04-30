@@ -31,6 +31,7 @@ export const calculateFutureValue = (
   
   // Track current year's contributions for PIAS Mutualidad
   let currentYearContributions = initial; // Start with initial contribution
+  let currentYear = 1;
   
   for (let month = 0; month <= months; month++) {
     if (month === 0) {
@@ -41,18 +42,21 @@ export const calculateFutureValue = (
     // Calculate monthly compounding - add interest to current value
     currentValue = currentValue * (1 + monthlyRate);
     
+    // Check if we're starting a new year (every 12 months)
+    if (month % 12 === 0) {
+      currentYear++;
+      // Reset annual contribution counter for new year (year 2 and beyond)
+      if (isPIASMutualidad && month > 0) {
+        currentYearContributions = 0;
+      }
+    }
+    
     // Special handling for PIAS Mutualidad annual limit
     let monthlyContribution = monthly;
     
     if (isPIASMutualidad) {
-      // Check if we're starting a new year (every 12 months)
-      if (month % 12 === 0 && month > 0) {
-        // Reset annual contribution counter for new year
-        currentYearContributions = 0;
-      }
-      
       // First year special handling (month 1 to 12)
-      if (month <= 12) {
+      if (currentYear === 1) {
         // Check if adding this month's contribution would exceed the annual limit
         if (currentYearContributions >= annualLimit) {
           // Already reached annual limit, no contribution this month
@@ -62,11 +66,10 @@ export const calculateFutureValue = (
           const remainingAllowance = annualLimit - currentYearContributions;
           monthlyContribution = Math.min(monthly, remainingAllowance);
         }
+        // Update current year's contribution tracking
+        currentYearContributions += monthlyContribution;
       }
       // For subsequent years, the full monthly contribution is allowed
-      
-      // Update current year's contribution tracking
-      currentYearContributions += monthlyContribution;
     }
     
     // Add monthly contribution if we haven't hit the max total contribution limit

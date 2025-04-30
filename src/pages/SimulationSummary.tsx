@@ -24,13 +24,29 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
         if (isPIASMutualidad) {
           // For PIAS Mutualidad, calculate first year contributions (respecting 8000€ limit)
           const firstYearAllowance = Math.max(0, 8000 - result.initialDeposit);
-          const firstYearMonthlyTotal = Math.min(firstYearAllowance, result.monthlyDeposit * 12);
+          
+          // Calculate how many months will have contributions in the first year
+          let contributingMonthsFirstYear = 0;
+          let actualFirstYearMonthlyTotal = 0;
+          
+          if (result.monthlyDeposit > 0 && firstYearAllowance > 0) {
+            contributingMonthsFirstYear = Math.min(12, Math.ceil(firstYearAllowance / result.monthlyDeposit));
+            
+            // Handle partial contribution for the last contributing month
+            if (firstYearAllowance % result.monthlyDeposit !== 0 && firstYearAllowance < result.monthlyDeposit * contributingMonthsFirstYear) {
+              const fullMonths = Math.floor(firstYearAllowance / result.monthlyDeposit);
+              const partialAmount = firstYearAllowance % result.monthlyDeposit;
+              actualFirstYearMonthlyTotal = (fullMonths * result.monthlyDeposit) + partialAmount;
+            } else {
+              actualFirstYearMonthlyTotal = Math.min(firstYearAllowance, contributingMonthsFirstYear * result.monthlyDeposit);
+            }
+          }
           
           // Remaining years with full monthly contributions
-          const remainingMonths = (result.termYears - 1) * 12;
-          const remainingContributions = remainingMonths * result.monthlyDeposit;
+          const remainingYears = result.termYears - 1;
+          const remainingContributions = remainingYears * 12 * result.monthlyDeposit;
           
-          totalContributions += firstYearMonthlyTotal + remainingContributions;
+          totalContributions += actualFirstYearMonthlyTotal + remainingContributions;
         } else if (result.maxTotalContribution) {
           // For products with max total contribution
           totalContributions += Math.min(

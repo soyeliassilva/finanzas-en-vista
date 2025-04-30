@@ -20,9 +20,13 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
     return null;
   }
 
-  // For PIAS Mutualidad, calculate total first year contribution
-  const firstYearContribution = isPIASMutualidad ? 
-    Math.min(product.minInitialDeposit + (product.minMonthlyDeposit * 12), 8000) : 0;
+  // For PIAS Mutualidad, calculate available contribution room in first year
+  const firstYearAllowance = isPIASMutualidad ? Math.max(0, 8000 - product.minInitialDeposit) : 0;
+  
+  // Calculate potential monthly contributions based on the allowance
+  const potentialMonthsWithContributions = product.minMonthlyDeposit > 0 
+    ? Math.floor(firstYearAllowance / product.minMonthlyDeposit)
+    : 0;
     
   return (
     <div className={`text-xs p-2 rounded mt-2 ${exceedsMaxContribution ? 'bg-red-100 text-red-600' : 'bg-gray-100'}`}>
@@ -31,12 +35,27 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
           <p className="font-semibold mb-1">
             Límite de aportación anual: 8.000€
           </p>
-          <p className="mt-1 text-xs italic">
+          <p className="mt-1 text-xs">
             En el primer año, la suma de aportación inicial y mensual está limitada a 8.000€.
-            {product.minInitialDeposit >= 8000 && 
-              ' Como la aportación inicial es de 8.000€ o más, no habrá aportaciones mensuales en el primer año.'}
-            {product.minInitialDeposit < 8000 && 
-              ' Las aportaciones mensuales se reanudarán en el segundo año si se alcanza este límite.'}
+          </p>
+          {product.minInitialDeposit >= 8000 && (
+            <p className="mt-1 text-xs italic">
+              Con una aportación inicial de {product.minInitialDeposit.toLocaleString()}€, 
+              no habrá aportaciones mensuales durante el primer año.
+            </p>
+          )}
+          {product.minInitialDeposit < 8000 && product.minMonthlyDeposit > 0 && (
+            <p className="mt-1 text-xs italic">
+              Con una aportación inicial de {product.minInitialDeposit.toLocaleString()}€, 
+              podrá realizar hasta {potentialMonthsWithContributions} {potentialMonthsWithContributions === 1 ? 'aportación mensual' : 'aportaciones mensuales'} 
+              completas durante el primer año.
+              {firstYearAllowance % product.minMonthlyDeposit !== 0 && potentialMonthsWithContributions < 12 && (
+                ` La última aportación será parcial de ${(firstYearAllowance % product.minMonthlyDeposit).toLocaleString()}€.`
+              )}
+            </p>
+          )}
+          <p className="mt-1 text-xs">
+            A partir del segundo año, las aportaciones mensuales se reanudarán normalmente.
           </p>
         </>
       )}
