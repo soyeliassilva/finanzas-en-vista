@@ -79,10 +79,33 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         terms: item.product_terms
       }));
       
+      // Get unique goals from the products
       const goals = Array.from(new Set(transformedProducts.map(p => p.goal)));
       
+      // Order goals according to the specified priority
+      const orderedGoals = [...goals].sort((a, b) => {
+        const priorityOrder: { [key: string]: number } = {
+          "Disponibilidad": 0,
+          "Fiscalidad": 1,
+          "Jubilación": 2,
+          "Inversión": 3
+        };
+        
+        // If both goals are in the priority list, sort by their priority
+        if (a in priorityOrder && b in priorityOrder) {
+          return priorityOrder[a] - priorityOrder[b];
+        }
+        
+        // If only one goal is in the priority list, it comes first
+        if (a in priorityOrder) return -1;
+        if (b in priorityOrder) return 1;
+        
+        // If neither is in the priority list, maintain original order
+        return goals.indexOf(a) - goals.indexOf(b);
+      });
+      
       setAllProducts(transformedProducts);
-      setAvailableGoals(goals);
+      setAvailableGoals(orderedGoals);
       setLoading(false);
     } catch (error: any) {
       console.error("Error fetching products:", error);
