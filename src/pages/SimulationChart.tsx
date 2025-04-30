@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { SimulationResult } from "../types";
 import { formatCurrency } from "../utils/calculator";
@@ -14,14 +14,34 @@ interface SimulationChartProps {
 }
 
 const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, getTotalAmount, summaryHeight }) => {
-  // Calculate a reasonable chart height with a maximum limit to prevent infinite growth
-  const chartHeight = summaryHeight ? Math.min(summaryHeight - 80, 800) : 400;
+  const headerRef = useRef<HTMLHeadingElement>(null);
+  const summaryInfoRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [chartHeight, setChartHeight] = useState<number>(400);
   
+  // Calculate chart height based on summary height and other elements' heights
+  useEffect(() => {
+    if (!summaryHeight) return;
+    
+    const headerHeight = headerRef.current?.offsetHeight || 0;
+    const summaryInfoHeight = summaryInfoRef.current?.offsetHeight || 0;
+    const footerHeight = footerRef.current?.offsetHeight || 0;
+    
+    // Account for margins/paddings: mb-4 (16px) + mt-6 (24px) + mt-4 (16px) + additional buffer (20px)
+    const marginsAndPaddings = 16 + 24 + 16 + 20;
+    
+    // Calculate available height for the chart
+    const availableHeight = summaryHeight - headerHeight - summaryInfoHeight - footerHeight - marginsAndPaddings;
+    
+    // Set a minimum height to prevent too small charts
+    setChartHeight(Math.max(availableHeight, 300));
+  }, [summaryHeight]);
+
   return (
     <div className="md:col-span-7 step-container">
-      <h3 className="text-xl font-bold mb-4">Previsión de rentabilidad</h3>
+      <h3 ref={headerRef} className="text-xl font-bold mb-4">Previsión de rentabilidad</h3>
 
-      <div className="mb-4">
+      <div ref={summaryInfoRef} className="mb-4">
         <div className="flex justify-between items-center">
           <p className="font-bold">Importe total al rescate de los tres productos</p>
           <p className="text-2xl font-bold">
@@ -77,7 +97,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 text-xs text-right">
+      <div ref={footerRef} className="mt-4 text-xs text-right">
         <p>El rescate tributa como rendimientos del capital en el IRPF</p>
       </div>
     </div>
