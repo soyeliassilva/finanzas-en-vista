@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
@@ -134,14 +133,6 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
             <SimulationSummary results={results} handleContactAdvisor={handleContactAdvisor} />
             <SimulationChart results={results} chartData={chartData} getTotalAmount={getTotalAmount} />
-          </div>
-          
-          <div className="step-container">
-            <div className="mt-8 flex justify-center">
-              <button className="btn-primary" onClick={handleContactAdvisor}>
-                Contacta con nuestro gestor <Mail size={18} />
-              </button>
-            </div>
           </div>
         </div>
       )}
