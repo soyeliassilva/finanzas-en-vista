@@ -35,7 +35,8 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
         monthlyDeposit,
         termYears,
         applicableYield,
-        product.maxTotalContribution
+        product.maxTotalContribution,
+        product.id
       );
 
       return {
