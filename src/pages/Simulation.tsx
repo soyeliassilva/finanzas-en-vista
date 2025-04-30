@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../types';
@@ -119,7 +120,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
   };
 
   return (
-    <div className="container mx-auto px-4 pb-10">
+    <div className="container mx-auto px-4">
       <SimulationForm
         selectedProducts={selectedProducts}
         productInputs={productInputs}
@@ -130,7 +131,7 @@ const Simulation: React.FC<{ selectedProducts: Product[] }> = ({ selectedProduct
       
       {calculationPerformed && results.length > 0 && (
         <div className="animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             <SimulationSummary results={results} handleContactAdvisor={handleContactAdvisor} />
             <SimulationChart results={results} chartData={chartData} getTotalAmount={getTotalAmount} />
           </div>
