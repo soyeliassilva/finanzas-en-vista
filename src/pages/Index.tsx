@@ -1,9 +1,11 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
 import GoalSelection from './GoalSelection';
 import ProductSelection from './ProductSelection';
-import Simulation from './Simulation';
+import SimulationFormPage from './SimulationFormPage';
+import SimulationResultsPage from './SimulationResultsPage';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface IndexProps {
@@ -27,7 +29,7 @@ const Index: React.FC<IndexProps> = ({ step }) => {
         navigate('/');
       }
       
-      if (step === 'simulacion' && selectedProducts.length === 0) {
+      if ((step === 'simulacion-form' || step === 'simulacion-results') && selectedProducts.length === 0) {
         navigate('/productos');
         if (!selectedGoal) {
           navigate('/');
@@ -44,8 +46,12 @@ const Index: React.FC<IndexProps> = ({ step }) => {
     );
   }
   
-  if (step === 'simulacion') {
-    return <Simulation selectedProducts={selectedProducts} />;
+  if (step === 'simulacion-results') {
+    return <SimulationResultsPage />;
+  }
+  
+  if (step === 'simulacion-form') {
+    return <SimulationFormPage />;
   }
   
   if (step === 'productos') {

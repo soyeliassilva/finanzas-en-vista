@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SimulatorProvider } from "./context/SimulatorContext";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import SimulationFormPage from "./pages/SimulationFormPage";
+import SimulationResultsPage from "./pages/SimulationResultsPage";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +22,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/productos" element={<Index step="productos" />} />
-            <Route path="/simulacion" element={<Index step="simulacion" />} />
+            <Route path="/simulacion" element={<Navigate to="/simulacion/form" replace />} />
+            <Route path="/simulacion/form" element={<Index step="simulacion-form" />} />
+            <Route path="/simulacion/results" element={<Index step="simulacion-results" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

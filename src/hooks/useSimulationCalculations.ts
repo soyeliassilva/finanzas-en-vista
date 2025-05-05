@@ -2,15 +2,9 @@
 import { useState } from 'react';
 import { Product, SimulationResult } from '../types';
 import { calculateFutureValue } from '../utils/calculator';
-
-type FormValues = {
-  initialDeposit: number;
-  monthlyDeposit: number;
-  termYears: number;
-};
+import { SimulationFormValues } from '../context/SimulatorContext';
 
 export const useSimulationCalculations = (selectedProducts: Product[]) => {
-  const [results, setResults] = useState<SimulationResult[]>([]);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
 
   const getApplicableYield = (product: Product, termYears: number) => {
@@ -22,8 +16,8 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
     return product.yield;
   };
 
-  const calculateResults = (productInputs: Record<string, FormValues>) => {
-    if (selectedProducts.length === 0) return;
+  const calculateResults = (productInputs: Record<string, SimulationFormValues>): SimulationResult[] => {
+    if (selectedProducts.length === 0) return [];
 
     const newResults = selectedProducts.map(product => {
       const { initialDeposit, monthlyDeposit, termYears } = productInputs[product.id] || 
@@ -103,12 +97,11 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
       };
     });
 
-    setResults(newResults);
     setCalculationPerformed(true);
+    return newResults;
   };
 
   return {
-    results,
     calculationPerformed,
     calculateResults,
   };

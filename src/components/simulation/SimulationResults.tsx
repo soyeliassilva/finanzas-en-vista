@@ -5,17 +5,20 @@ import SimulationChart from '../../pages/SimulationChart';
 import SimulationSummary from '../../pages/SimulationSummary';
 import { useChartDataGenerator } from '../../hooks/useChartDataGenerator';
 import { useResponsiveHeights } from '../../hooks/useResponsiveHeights';
+import { ChevronLeft } from 'lucide-react';
 
 interface SimulationResultsProps {
   results: SimulationResult[];
   calculationPerformed: boolean;
   handleContactAdvisor: () => void;
+  handleBack: () => void;
 }
 
 const SimulationResults: React.FC<SimulationResultsProps> = ({ 
   results, 
   calculationPerformed, 
-  handleContactAdvisor 
+  handleContactAdvisor,
+  handleBack
 }) => {
   const { generateChartData, getTotalAmount } = useChartDataGenerator();
   const { summaryRef, summaryHeight } = useResponsiveHeights(calculationPerformed);
@@ -27,7 +30,14 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
   }
 
   return (
-    <div className="animate-fade-in" ref={resultsRef}>
+    <div ref={resultsRef}>
+      <div className="mb-6">
+        <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 4</h3>
+        <h2 className="text-3xl text-primary mb-4">
+          Resultados de tu simulación
+        </h2>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:grid-flow-col auto-rows-fr">
         <SimulationSummary 
           results={results} 
@@ -40,6 +50,12 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
           getTotalAmount={() => getTotalAmount(results)}
           summaryHeight={summaryHeight} 
         />
+      </div>
+      
+      <div className="mt-6">
+        <button className="btn-outline" type="button" onClick={handleBack}>
+          <ChevronLeft size={18} /> Volver a la simulación
+        </button>
       </div>
     </div>
   );

@@ -1,8 +1,14 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { GoalType, Product } from '../types';
+import { GoalType, Product, SimulationResult } from '../types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+
+// Type definition for the form values
+export type SimulationFormValues = {
+  initialDeposit: number;
+  monthlyDeposit: number;
+  termYears: number;
+};
 
 interface SimulatorContextType {
   selectedGoal: GoalType | null;
@@ -13,6 +19,13 @@ interface SimulatorContextType {
   availableGoals: GoalType[];
   loading: boolean;
   error: string | null;
+  // New simulation state
+  productInputs: Record<string, SimulationFormValues>;
+  setProductInputs: React.Dispatch<React.SetStateAction<Record<string, SimulationFormValues>>>;
+  simulationResults: SimulationResult[];
+  setSimulationResults: React.Dispatch<React.SetStateAction<SimulationResult[]>>;
+  calculationPerformed: boolean;
+  setCalculationPerformed: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
@@ -25,9 +38,18 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
+  // New simulation state
+  const [productInputs, setProductInputs] = useState<Record<string, SimulationFormValues>>({});
+  const [simulationResults, setSimulationResults] = useState<SimulationResult[]>([]);
+  const [calculationPerformed, setCalculationPerformed] = useState<boolean>(false);
+  
   const handleGoalChange = (goal: GoalType) => {
     setSelectedGoal(goal);
     setSelectedProducts([]);
+    // Reset simulation state when goal changes
+    setProductInputs({});
+    setSimulationResults([]);
+    setCalculationPerformed(false);
   };
   
   const fetchProducts = async () => {
@@ -127,7 +149,14 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     allProducts,
     availableGoals,
     loading,
-    error
+    error,
+    // Expose new simulation state
+    productInputs,
+    setProductInputs,
+    simulationResults,
+    setSimulationResults,
+    calculationPerformed,
+    setCalculationPerformed
   };
   
   return <SimulatorContext.Provider value={value}>{children}</SimulatorContext.Provider>;
