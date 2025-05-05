@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Product } from '../types';
@@ -58,14 +57,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
           {displayYield()}
         </div>
-        <div className="flex items-start">
-          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-          <p className="text-sm">
-            {isPlanAhorroMultiplica 
-              ? "Plazo: 1 año" 
-              : `Plazo: ${minTermYears} ${minTermYears === 1 ? 'año' : 'años'} o más`}
-          </p>
-        </div>
+        {isPlanAhorroMultiplica && (
+          <div className="flex items-start">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <p className="text-sm">Plazo: 1 año</p>
+          </div>
+        )}
         {product.product_initial_contribution_min > 0 && (
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
