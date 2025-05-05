@@ -60,6 +60,23 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   const exceedsMaxContribution = product.maxTotalContribution !== undefined && 
     totalPlannedContribution > product.maxTotalContribution;
 
+  // Custom validation for Plan Ahorro Flexible monthly deposits
+  const validateFlexibleMonthlyDeposit = (value: number): { isValid: boolean; errorMessage: string | null } => {
+    if (isPlanAhorroFlexible) {
+      // Allow 0 or >= minimum monthly deposit (60€)
+      if (value === 0 || value >= (product.minMonthlyDeposit ?? 60)) {
+        return { isValid: true, errorMessage: null };
+      }
+      return { 
+        isValid: false, 
+        errorMessage: `Para este producto, puedes elegir 0€ (sin aportación) o mínimo ${product.minMonthlyDeposit ?? 60}€` 
+      };
+    }
+    
+    // Default validation (not Plan Ahorro Flexible)
+    return { isValid: true, errorMessage: null };
+  };
+
   // Generate the monthly contribution sublabel text
   const getMonthlyContributionSublabel = () => {
     if (isMonthlyFixedNone) {
@@ -67,7 +84,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
     }
     
     if (isPlanAhorroFlexible) {
-      return `Opcional: Sin aportación o mínimo ${product.minMonthlyDeposit}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
+      return `Opcional: Sin aportación (0€) o mínimo ${product.minMonthlyDeposit}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
     }
     
     return `Mínimo: ${minMonthly}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
@@ -111,6 +128,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         label="Aportación periódica mensual*"
         sublabel={getMonthlyContributionSublabel()}
         disabled={isMonthlyFixedNone}
+        customValidation={isPlanAhorroFlexible ? validateFlexibleMonthlyDeposit : undefined}
       />
       
       <ContributionLimit 

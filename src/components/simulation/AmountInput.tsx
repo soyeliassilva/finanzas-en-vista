@@ -13,6 +13,7 @@ interface AmountInputProps {
   sublabel: string;
   disabled?: boolean;
   unit?: string;
+  customValidation?: (value: number) => { isValid: boolean; errorMessage: string | null };
 }
 
 const AmountInput: React.FC<AmountInputProps> = ({
@@ -25,7 +26,8 @@ const AmountInput: React.FC<AmountInputProps> = ({
   label,
   sublabel,
   disabled = false,
-  unit = '€'
+  unit = '€',
+  customValidation
 }) => {
   // State to track the displayed value as a string (allows for empty input)
   const [displayValue, setDisplayValue] = useState<string>(value.toString());
@@ -67,20 +69,31 @@ const AmountInput: React.FC<AmountInputProps> = ({
 
     const numValue = Number(displayValue);
     
-    // Validate against min
-    if (numValue < min) {
-      setError(`El valor mínimo permitido es ${min}${unit}`);
-      setDisplayValue(min.toString());
-      onChange(min);
-      return;
-    }
-    
-    // Validate against max (if provided)
-    if (max !== undefined && numValue > max) {
-      setError(`El valor máximo permitido es ${max}${unit}`);
-      setDisplayValue(max.toString());
-      onChange(max);
-      return;
+    // Apply custom validation if provided
+    if (customValidation) {
+      const validationResult = customValidation(numValue);
+      if (!validationResult.isValid) {
+        setError(validationResult.errorMessage);
+        // For custom validation, let's reset to the current value to avoid ui/ux confusion
+        return;
+      }
+    } else {
+      // Standard min/max validation
+      // Validate against min
+      if (numValue < min) {
+        setError(`El valor mínimo permitido es ${min}${unit}`);
+        setDisplayValue(min.toString());
+        onChange(min);
+        return;
+      }
+      
+      // Validate against max (if provided)
+      if (max !== undefined && numValue > max) {
+        setError(`El valor máximo permitido es ${max}${unit}`);
+        setDisplayValue(max.toString());
+        onChange(max);
+        return;
+      }
     }
     
     // Valid value - update parent and clear any errors
