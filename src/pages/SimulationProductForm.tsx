@@ -27,15 +27,21 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   values,
   onInputChange,
 }) => {
+  // Plan Ahorro Flexible ID
+  const PLAN_AHORRO_FLEXIBLE_ID = "230e8acf-4d50-42ab-bff0-7ed5933d00d4";
+  const isPlanAhorroFlexible = product.id === PLAN_AHORRO_FLEXIBLE_ID;
+  
   // Validation minimums
   const minInitial = product.minInitialDeposit ?? 0;
-  const minMonthly = product.minMonthlyDeposit ?? 0;
+  const minMonthly = isPlanAhorroFlexible ? 0 : (product.minMonthlyDeposit ?? 0);
   const minTermMonths = product.product_duration_months_min ?? 12;
   const minTermYears = Math.ceil(minTermMonths / 12);
 
   // min/max monthly 0 disables field
   const isMonthlyFixedNone =
-    minMonthly === 0 && (product.maxMonthlyDeposit ?? 0) === 0;
+    !isPlanAhorroFlexible && 
+    minMonthly === 0 && 
+    (product.maxMonthlyDeposit ?? 0) === 0;
 
   // Determine which yield rate applies based on term from props
   const appliedYield = useMemo(() => {
@@ -53,6 +59,19 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   // Check if total contribution exceeds max allowed
   const exceedsMaxContribution = product.maxTotalContribution !== undefined && 
     totalPlannedContribution > product.maxTotalContribution;
+
+  // Generate the monthly contribution sublabel text
+  const getMonthlyContributionSublabel = () => {
+    if (isMonthlyFixedNone) {
+      return "Este producto no admite aportaciones mensuales";
+    }
+    
+    if (isPlanAhorroFlexible) {
+      return `Opcional: Sin aportación o mínimo ${product.minMonthlyDeposit}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
+    }
+    
+    return `Mínimo: ${minMonthly}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
+  };
 
   return (
     <div className="form-group border rounded-lg p-4 shadow-sm bg-white">
@@ -90,10 +109,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         max={product.maxMonthlyDeposit}
         placeholder={isMonthlyFixedNone ? "No disponible" : `${minMonthly}€`}
         label="Aportación periódica mensual*"
-        sublabel={isMonthlyFixedNone
-          ? "Este producto no admite aportaciones mensuales"
-          : `Mínimo: ${minMonthly}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`
-        }
+        sublabel={getMonthlyContributionSublabel()}
         disabled={isMonthlyFixedNone}
       />
       
