@@ -98,12 +98,32 @@ export const formatNumber = (value: number): string => {
 
 // Format currency with Spanish locale (€ symbol, no decimals)
 export const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat('es-ES', {
+  // Enhanced formatting to ensure proper thousand separators
+  // First, try using the standard Intl.NumberFormat
+  const formattedValue = new Intl.NumberFormat('es-ES', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(value);
+
+  // If value is 1000 or greater, it should have a thousand separator
+  if (value >= 1000) {
+    // Check if the formatted value already has a thousand separator
+    // In Spanish locale, formatted value should include a dot as thousand separator
+    const numericPart = formattedValue.replace(/[^0-9]/g, '');
+    
+    // If the formatted value doesn't have the correct number of digits (indicating missing separators)
+    // then manually format it
+    if (numericPart.length === String(Math.floor(value)).length) {
+      // Format the number part manually to ensure proper thousand separators
+      const numberPart = formatNumber(value);
+      // Reconstruct the currency string with the proper format (adding the € symbol)
+      return `${numberPart} €`;
+    }
+  }
+  
+  return formattedValue;
 };
 
 // Format percentage with Spanish locale (comma as decimal separator)
