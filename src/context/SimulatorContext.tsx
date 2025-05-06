@@ -1,7 +1,9 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GoalType, Product, SimulationResult } from '../types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { parseProductOverrides, applyOverridesToProducts, getCurrentUrlParams } from '../utils/urlParamsUtils';
 
 // Type definition for the form values
 export type SimulationFormValues = {
@@ -34,6 +36,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [selectedGoal, setSelectedGoal] = useState<GoalType | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [rawProducts, setRawProducts] = useState<Product[]>([]);
   const [availableGoals, setAvailableGoals] = useState<GoalType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +53,63 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setProductInputs({});
     setSimulationResults([]);
     setCalculationPerformed(false);
+  };
+  
+  // Apply product overrides from URL parameters
+  const applyProductOverrides = () => {
+    if (rawProducts.length === 0) return;
+    
+    // Get URL parameters
+    const urlParams = getCurrentUrlParams();
+    
+    // Parse product overrides from URL
+    const overrides = parseProductOverrides(urlParams);
+    
+    // Apply overrides to products
+    const processedProducts = applyOverridesToProducts(rawProducts, overrides);
+    
+    // Set the modified products
+    setAllProducts(processedProducts);
+    
+    // If there are selected products, update them with overrides as well
+    if (selectedProducts.length > 0) {
+      const updatedSelectedProducts = selectedProducts.map(selectedProduct => {
+        const updatedProduct = processedProducts.find(p => p.id === selectedProduct.id);
+        return updatedProduct || selectedProduct;
+      }).filter(product => {
+        // Filter out any products that may have been hidden by URL params
+        return processedProducts.some(p => p.id === product.id);
+      });
+      
+      setSelectedProducts(updatedSelectedProducts);
+    }
+    
+    // Also update product goals based on processed products
+    const goals = Array.from(new Set(processedProducts.map(p => p.goal)));
+    
+    // Order goals according to the specified priority
+    const orderedGoals = [...goals].sort((a, b) => {
+      const priorityOrder: { [key: string]: number } = {
+        "Disponibilidad": 0,
+        "Fiscalidad": 1,
+        "Jubilación": 2,
+        "Inversión": 3
+      };
+      
+      // If both goals are in the priority list, sort by their priority
+      if (a in priorityOrder && b in priorityOrder) {
+        return priorityOrder[a] - priorityOrder[b];
+      }
+      
+      // If only one goal is in the priority list, it comes first
+      if (a in priorityOrder) return -1;
+      if (b in priorityOrder) return 1;
+      
+      // If neither is in the priority list, maintain original order
+      return goals.indexOf(a) - goals.indexOf(b);
+    });
+    
+    setAvailableGoals(orderedGoals);
   };
   
   const fetchProducts = async () => {
@@ -101,33 +161,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         terms: item.product_terms
       }));
       
-      // Get unique goals from the products
-      const goals = Array.from(new Set(transformedProducts.map(p => p.goal)));
-      
-      // Order goals according to the specified priority
-      const orderedGoals = [...goals].sort((a, b) => {
-        const priorityOrder: { [key: string]: number } = {
-          "Disponibilidad": 0,
-          "Fiscalidad": 1,
-          "Jubilación": 2,
-          "Inversión": 3
-        };
-        
-        // If both goals are in the priority list, sort by their priority
-        if (a in priorityOrder && b in priorityOrder) {
-          return priorityOrder[a] - priorityOrder[b];
-        }
-        
-        // If only one goal is in the priority list, it comes first
-        if (a in priorityOrder) return -1;
-        if (b in priorityOrder) return 1;
-        
-        // If neither is in the priority list, maintain original order
-        return goals.indexOf(a) - goals.indexOf(b);
-      });
-      
-      setAllProducts(transformedProducts);
-      setAvailableGoals(orderedGoals);
+      // Store raw products from Supabase
+      setRawProducts(transformedProducts);
+
       setLoading(false);
     } catch (error: any) {
       console.error("Error fetching products:", error);
@@ -137,9 +173,15 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
   
+  // Effect to fetch products on mount
   useEffect(() => {
     fetchProducts();
   }, []);
+  
+  // Effect to apply URL parameter overrides whenever raw products change
+  useEffect(() => {
+    applyProductOverrides();
+  }, [rawProducts]);
   
   const value = {
     selectedGoal,
@@ -150,7 +192,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     availableGoals,
     loading,
     error,
-    // Expose new simulation state
+    // Expose simulation state
     productInputs,
     setProductInputs,
     simulationResults,

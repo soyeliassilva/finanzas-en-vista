@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
@@ -7,6 +6,7 @@ import ProductSelection from './ProductSelection';
 import SimulationFormPage from './SimulationFormPage';
 import SimulationResultsPage from './SimulationResultsPage';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { preserveUrlParams } from '../utils/urlParamsUtils';
 
 interface IndexProps {
   step?: string;
@@ -26,13 +26,13 @@ const Index: React.FC<IndexProps> = ({ step }) => {
     // Redirect if trying to access a step without completing previous steps
     if (!loading) {
       if (step === 'productos' && !selectedGoal) {
-        navigate('/');
+        navigate(preserveUrlParams('/'));
       }
       
       if ((step === 'simulacion-form' || step === 'simulacion-results') && selectedProducts.length === 0) {
-        navigate('/productos');
+        navigate(preserveUrlParams('/productos'));
         if (!selectedGoal) {
-          navigate('/');
+          navigate(preserveUrlParams('/'));
         }
       }
     }

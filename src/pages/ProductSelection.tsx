@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType, Product } from '../types';
 import { useSimulator } from '../context/SimulatorContext';
 import ProductCard from './ProductCard';
 import ProductSelectionHeader, { Step2Instructions } from './ProductSelectionHeader';
+import { preserveUrlParams } from '../utils/urlParamsUtils';
 
 interface ProductSelectionProps {
   selectedGoal: GoalType | null;
@@ -47,12 +47,12 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
 
   const handleContinue = () => {
     if (selectedProducts.length > 0) {
-      navigate('/simulacion');
+      navigate(preserveUrlParams('/simulacion'));
     }
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate(preserveUrlParams('/'));
   };
 
   const isSelected = (productId: string) => {
