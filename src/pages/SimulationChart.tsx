@@ -50,10 +50,8 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
     }
   }, [summaryHeight]);
 
-  // Determine the appropriate text based on number of products
-  const totalAmountText = results.length === 1
-    ? "Importe total al rescate del producto"
-    : "Importe total al rescate de los productos";
+  // Changed to always use a single text regardless of number of products
+  const totalAmountText = "Importe total bruto";
 
   return (
     <div className="md:col-span-7 step-container h-full">
@@ -116,7 +114,8 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
       </div>
 
       <div ref={footerRef} className="mt-4 text-xs text-right">
-        <p>El rescate tributa como rendimientos del capital en el IRPF</p>
+        <p>Rentabilidades pasadas no presuponen rentabilidades futuras.</p>
+        <p>La información facilitada por este simulador es orientativa al basarse en hipótesis , por lo que su contenido no es vinculante y puede variar en consultas futuras</p>
       </div>
     </div>
   );

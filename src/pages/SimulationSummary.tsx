@@ -3,6 +3,12 @@ import React, { forwardRef } from "react";
 import { SimulationResult } from "../types";
 import { formatCurrency, formatPercentage } from "../utils/calculator";
 import { Mail } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../components/ui/accordion";
 
 const chartColors = ['#004236', '#D1A4C4', '#B9EDAA'];
 
@@ -77,7 +83,7 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
               </div>
               
               <div className="flex justify-between">
-                <span>Importe total al rescate</span>
+                <span>Importe total bruto</span>
                 <span className="font-bold">{formatCurrency(result.finalAmount)}</span>
               </div>
               
@@ -86,17 +92,18 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
                 <span className="font-bold">{formatPercentage(result.yield).replace(' %', '%')}</span>
               </div>
               
-              <div className="mt-2 text-sm">
-                <p className="font-bold mb-1">Detalles fiscalidad del producto</p>
-                <p>{result.taxation}</p>
+              <div className="mt-2">
+                <Accordion type="single" collapsible className="border-0 p-0">
+                  <AccordionItem value="taxation" className="border-0">
+                    <AccordionTrigger className="p-0 text-sm font-bold">
+                      Detalles fiscalidad del producto
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm pt-1">
+                      {result.taxation}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
-
-              {result.disclaimer && (
-                <div className="mt-2 text-sm">
-                  <p className="font-bold mb-1">Información adicional</p>
-                  <p>{result.disclaimer}</p>
-                </div>
-              )}
             </div>
           </div>
         );
