@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Product } from '../types';
+import { formatNumber, formatPercentage } from '../utils/calculator';
 
 interface ProductCardProps {
   product: Product;
@@ -12,29 +14,29 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
   // Determine which yield rate to display
   const displayYield = () => {
     if (product.yield10PlusYears || product.yield5PlusYears) {
-      let yieldText = `${product.yield}% de rentabilidad`;
+      let yieldText = `${formatPercentage(product.yield).replace(' %', '%')} de rentabilidad`;
       
       if (product.yield5PlusYears && product.yield10PlusYears) {
         return (
           <p className="text-sm">
-            {yieldText} (hasta {product.yield5PlusYears}% a 5 años, {product.yield10PlusYears}% a 10 años)
+            {yieldText} (hasta {formatPercentage(product.yield5PlusYears).replace(' %', '%')} a 5 años, {formatPercentage(product.yield10PlusYears).replace(' %', '%')} a 10 años)
           </p>
         );
       } else if (product.yield5PlusYears) {
         return (
           <p className="text-sm">
-            {yieldText} (hasta {product.yield5PlusYears}% a partir de 5 años)
+            {yieldText} (hasta {formatPercentage(product.yield5PlusYears).replace(' %', '%')} a partir de 5 años)
           </p>
         );
       } else if (product.yield10PlusYears) {
         return (
           <p className="text-sm">
-            {yieldText} (hasta {product.yield10PlusYears}% a partir de 10 años)
+            {yieldText} (hasta {formatPercentage(product.yield10PlusYears).replace(' %', '%')} a partir de 10 años)
           </p>
         );
       }
     }
-    return <p className="text-sm">{product.yield}% de rentabilidad a cuenta</p>;
+    return <p className="text-sm">{formatPercentage(product.yield).replace(' %', '%')} de rentabilidad a cuenta</p>;
   };
 
   // Convert duration from months to years
@@ -67,7 +69,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
             <p className="text-sm">
-              Aportación inicial desde {product.product_initial_contribution_min}€
+              Aportación inicial desde {formatNumber(product.product_initial_contribution_min)}€
             </p>
           </div>
         )}
@@ -78,10 +80,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
             <p className="text-sm">
               {product.product_monthly_contribution_min !== 0
-                ? `Aportaciones mensuales desde ${product.product_monthly_contribution_min}€`
+                ? `Aportaciones mensuales desde ${formatNumber(product.product_monthly_contribution_min)}€`
                 : product.product_monthly_contribution_max === null || product.product_monthly_contribution_max === undefined
                 ? "Aportaciones mensuales sin límites"
-                : `Con aportaciones mensuales de hasta ${product.product_monthly_contribution_max}€`}
+                : `Con aportaciones mensuales de hasta ${formatNumber(product.product_monthly_contribution_max)}€`}
             </p>
           </div>
         )}
@@ -89,7 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
             <p className="text-sm">
-              Contribución máxima: {product.product_total_contribution_max.toLocaleString()}€
+              Contribución máxima: {formatNumber(product.product_total_contribution_max)}€
             </p>
           </div>
         )}

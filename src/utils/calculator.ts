@@ -1,4 +1,3 @@
-
 import { SimulationResult } from '../types';
 
 // Calculates future value and monthly progression with variable yield rates and max contribution limits
@@ -87,6 +86,12 @@ export const calculateFutureValue = (
   };
 };
 
+// Format number with Spanish locale (dot as thousand separator)
+export const formatNumber = (value: number): string => {
+  return new Intl.NumberFormat('es-ES').format(value);
+};
+
+// Format currency with Spanish locale (€ symbol, no decimals)
 export const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-ES', {
     style: 'currency',
@@ -94,4 +99,13 @@ export const formatCurrency = (value: number): string => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(value);
+};
+
+// Format percentage with Spanish locale (comma as decimal separator)
+export const formatPercentage = (value: number): string => {
+  return new Intl.NumberFormat('es-ES', {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1
+  }).format(value / 100);
 };

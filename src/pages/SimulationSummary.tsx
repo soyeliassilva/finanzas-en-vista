@@ -1,7 +1,7 @@
 
 import React, { forwardRef } from "react";
 import { SimulationResult } from "../types";
-import { formatCurrency } from "../utils/calculator";
+import { formatCurrency, formatPercentage } from "../utils/calculator";
 import { Mail } from "lucide-react";
 
 const chartColors = ['#004236', '#D1A4C4', '#B9EDAA'];
@@ -83,7 +83,7 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
               
               <div className="flex justify-between">
                 <span>Rentabilidad</span>
-                <span className="font-bold">{result.yield}%</span>
+                <span className="font-bold">{formatPercentage(result.yield).replace(' %', '%')}</span>
               </div>
               
               <div className="mt-2 text-sm">

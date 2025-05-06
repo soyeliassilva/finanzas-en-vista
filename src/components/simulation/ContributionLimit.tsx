@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Product } from '../../types';
+import { formatNumber } from '../../utils/calculator';
 
 interface ContributionLimitProps {
   product: Product;
@@ -33,24 +34,24 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
       {isPIASMutualidad && (
         <>
           <p className="font-semibold mb-1">
-            Límite de aportación anual: 8.000€
+            Límite de aportación anual: {formatNumber(8000)}€
           </p>
           <p className="mt-1 text-xs">
-            En el primer año, la suma de aportación inicial y mensual está limitada a 8.000€.
+            En el primer año, la suma de aportación inicial y mensual está limitada a {formatNumber(8000)}€.
           </p>
           {product.minInitialDeposit >= 8000 && (
             <p className="mt-1 text-xs italic">
-              Con una aportación inicial de {product.minInitialDeposit.toLocaleString()}€, 
+              Con una aportación inicial de {formatNumber(product.minInitialDeposit)}€, 
               no habrá aportaciones mensuales durante el primer año.
             </p>
           )}
           {product.minInitialDeposit < 8000 && product.minMonthlyDeposit > 0 && (
             <p className="mt-1 text-xs italic">
-              Con una aportación inicial de {product.minInitialDeposit.toLocaleString()}€, 
+              Con una aportación inicial de {formatNumber(product.minInitialDeposit)}€, 
               podrá realizar hasta {potentialMonthsWithContributions} {potentialMonthsWithContributions === 1 ? 'aportación mensual' : 'aportaciones mensuales'} 
               completas durante el primer año.
               {firstYearAllowance % product.minMonthlyDeposit !== 0 && potentialMonthsWithContributions < 12 && (
-                ` La última aportación será parcial de ${(firstYearAllowance % product.minMonthlyDeposit).toLocaleString()}€.`
+                ` La última aportación será parcial de ${formatNumber(firstYearAllowance % product.minMonthlyDeposit)}€.`
               )}
             </p>
           )}
@@ -62,9 +63,9 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
       
       {product.maxTotalContribution && (
         <>
-          <p className="font-semibold">Aportación máxima total: {product.maxTotalContribution.toLocaleString()}€</p>
+          <p className="font-semibold">Aportación máxima total: {formatNumber(product.maxTotalContribution)}€</p>
           <p>
-            Aportación planificada: {totalPlannedContribution.toLocaleString()}€ 
+            Aportación planificada: {formatNumber(totalPlannedContribution)}€ 
             {exceedsMaxContribution && ' (se respetará el límite máximo en los cálculos)'}
           </p>
         </>

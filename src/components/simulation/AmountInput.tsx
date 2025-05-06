@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Input } from "../ui/input";
+import { formatNumber } from "../../utils/calculator";
 
 interface AmountInputProps {
   id: string;
@@ -30,27 +31,33 @@ const AmountInput: React.FC<AmountInputProps> = ({
   customValidation
 }) => {
   // State to track the displayed value as a string (allows for empty input)
-  const [displayValue, setDisplayValue] = useState<string>(value.toString());
+  const [displayValue, setDisplayValue] = useState<string>(
+    unit === '€' && value > 0 ? formatNumber(value) : value.toString()
+  );
   
   // State to track error messages
   const [error, setError] = useState<string | null>(null);
 
   // Update displayValue when the value prop changes (e.g., from parent)
   useEffect(() => {
-    setDisplayValue(value.toString());
-  }, [value]);
+    setDisplayValue(unit === '€' && value > 0 ? formatNumber(value) : value.toString());
+  }, [value, unit]);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     
-    // Allow empty string or numbers only
-    if (newValue === '' || /^\d*\.?\d*$/.test(newValue)) {
+    // Allow empty string or valid characters (numbers and Spanish separators)
+    if (newValue === '' || /^[\d.,]*$/.test(newValue)) {
       setDisplayValue(newValue);
       
       // Only update parent if we have a valid number
       if (newValue !== '') {
-        onChange(Number(newValue));
+        // Convert from Spanish format to number
+        const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(numericValue)) {
+          onChange(numericValue);
+        }
       }
       
       // Clear error when user starts typing
@@ -62,12 +69,21 @@ const AmountInput: React.FC<AmountInputProps> = ({
   const handleBlur = () => {
     // If empty, set to minimum value
     if (displayValue === '') {
-      setDisplayValue(min.toString());
+      const formattedMin = unit === '€' ? formatNumber(min) : min.toString();
+      setDisplayValue(formattedMin);
       onChange(min);
       return;
     }
 
-    const numValue = Number(displayValue);
+    // Convert from Spanish format to number
+    const numValue = parseFloat(displayValue.replace(/\./g, '').replace(',', '.'));
+    
+    if (isNaN(numValue)) {
+      setError(`Valor inválido`);
+      setDisplayValue(unit === '€' ? formatNumber(min) : min.toString());
+      onChange(min);
+      return;
+    }
     
     // Apply custom validation if provided
     if (customValidation) {
@@ -81,20 +97,24 @@ const AmountInput: React.FC<AmountInputProps> = ({
       // Standard min/max validation
       // Validate against min
       if (numValue < min) {
-        setError(`El valor mínimo permitido es ${min}${unit}`);
-        setDisplayValue(min.toString());
+        setError(`El valor mínimo permitido es ${formatNumber(min)}${unit}`);
+        setDisplayValue(unit === '€' ? formatNumber(min) : min.toString());
         onChange(min);
         return;
       }
       
       // Validate against max (if provided)
       if (max !== undefined && numValue > max) {
-        setError(`El valor máximo permitido es ${max}${unit}`);
-        setDisplayValue(max.toString());
+        setError(`El valor máximo permitido es ${formatNumber(max)}${unit}`);
+        setDisplayValue(unit === '€' ? formatNumber(max) : max.toString());
         onChange(max);
         return;
       }
     }
+    
+    // Format value for display
+    const formattedValue = unit === '€' ? formatNumber(numValue) : numValue.toString();
+    setDisplayValue(formattedValue);
     
     // Valid value - update parent and clear any errors
     setError(null);

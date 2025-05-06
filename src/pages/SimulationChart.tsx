@@ -91,7 +91,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
               tick={{ fontSize: 12 }}
             />
             <Tooltip 
-              formatter={(value: any) => [`${formatCurrency(value)}`, '']}
+              formatter={(value: any) => [formatCurrency(value), '']}
               labelFormatter={(label) => {
                 if (label === 0) return 'Inicio';
                 return label === 12 

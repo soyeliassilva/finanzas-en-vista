@@ -4,6 +4,7 @@ import { Product } from "../types";
 import YieldRatesInfo from "../components/simulation/YieldRatesInfo";
 import ContributionLimit from "../components/simulation/ContributionLimit";
 import AmountInput from "../components/simulation/AmountInput";
+import { formatNumber } from "../utils/calculator";
 
 interface SimulationProductFormProps {
   product: Product;
@@ -20,7 +21,7 @@ interface SimulationProductFormProps {
 }
 
 const formatMax = (max?: number) => 
-  max === undefined || max === null ? "Sin límite" : `${max}€`;
+  max === undefined || max === null ? "Sin límite" : `${formatNumber(max)}€`;
 
 const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   product,
@@ -69,7 +70,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
       }
       return { 
         isValid: false, 
-        errorMessage: `Para este producto, puedes elegir 0€ (sin aportación) o mínimo ${product.minMonthlyDeposit ?? 60}€` 
+        errorMessage: `Para este producto, puedes elegir 0€ (sin aportación) o mínimo ${formatNumber(product.minMonthlyDeposit ?? 60)}€` 
       };
     }
     
@@ -84,10 +85,10 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
     }
     
     if (isPlanAhorroFlexible) {
-      return `Opcional: Sin aportación (0€) o mínimo ${product.minMonthlyDeposit}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
+      return `Opcional: Sin aportación (0€) o mínimo ${formatNumber(product.minMonthlyDeposit)}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
     }
     
-    return `Mínimo: ${minMonthly}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
+    return `Mínimo: ${formatNumber(minMonthly)}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
   };
 
   return (
@@ -102,9 +103,9 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         onChange={(value) => onInputChange(product.id, "initialDeposit", value)}
         min={minInitial}
         max={product.maxInitialDeposit}
-        placeholder={`${minInitial}€`}
+        placeholder={`${formatNumber(minInitial)}€`}
         label="Aportación inicial"
-        sublabel={`Mínimo: ${minInitial}€ - Máximo: ${formatMax(product.maxInitialDeposit)}`}
+        sublabel={`Mínimo: ${formatNumber(minInitial)}€ - Máximo: ${formatMax(product.maxInitialDeposit)}`}
       />
 
       <AmountInput
@@ -112,7 +113,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         value={values.termYears}
         onChange={(value) => onInputChange(product.id, "termYears", value)}
         min={minTermYears}
-        placeholder={`${minTermYears} años`}
+        placeholder={`${formatNumber(minTermYears)} años`}
         label="Plazo de vencimiento"
         sublabel={`Mínimo: ${minTermYears} ${minTermYears === 1 ? 'año' : 'años'}`}
         unit="años"
@@ -124,7 +125,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         onChange={(value) => onInputChange(product.id, "monthlyDeposit", value)}
         min={minMonthly}
         max={product.maxMonthlyDeposit}
-        placeholder={isMonthlyFixedNone ? "No disponible" : `${minMonthly}€`}
+        placeholder={isMonthlyFixedNone ? "No disponible" : `${formatNumber(minMonthly)}€`}
         label="Aportación periódica mensual*"
         sublabel={getMonthlyContributionSublabel()}
         disabled={isMonthlyFixedNone}
