@@ -96,7 +96,7 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
                 <Accordion type="single" collapsible className="border-0 p-0">
                   <AccordionItem value="taxation" className="border-0">
                     <AccordionTrigger className="p-0 h-6 flex justify-between items-center">
-                      <span>Detalles fiscalidad del producto</span>
+                      <span className="font-mutualidad">Detalles fiscalidad del producto</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm pt-1">
                       {result.taxation}
