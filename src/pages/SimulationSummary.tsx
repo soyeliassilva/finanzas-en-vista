@@ -1,7 +1,7 @@
 
 import React, { forwardRef } from "react";
 import { SimulationResult } from "../types";
-import { formatCurrency, formatPercentage } from "../utils/calculator";
+import { formatCurrency, formatPercentage, formatNumber } from "../utils/calculator";
 import { Mail } from "lucide-react";
 import {
   Accordion,

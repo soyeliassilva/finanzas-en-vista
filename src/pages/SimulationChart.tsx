@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { SimulationResult } from "../types";
-import { formatCurrency } from "../utils/calculator";
+import { formatCurrency, formatNumber } from "../utils/calculator";
 
 const chartColors = ['#004236', '#D1A4C4', '#B9EDAA'];
 const MAX_CHART_HEIGHT = 700; // Maximum height cap to prevent infinite growth
@@ -83,7 +83,8 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
             />
             <YAxis 
               tickFormatter={(value) => {
-                return `${(value / 1000).toFixed(0)}k`;
+                // Using formatNumber to ensure Spanish locale formatting for thousands
+                return `${formatNumber(value / 1000)}k`;
               }}
               width={40}
               tick={{ fontSize: 12 }}
