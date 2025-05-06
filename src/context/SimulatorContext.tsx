@@ -65,8 +65,17 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Parse product overrides from URL
     const overrides = parseProductOverrides(urlParams);
     
+    console.log('URL Parameters:', urlParams);
+    console.log('Parsed Overrides:', overrides);
+    
     // Apply overrides to products
     const processedProducts = applyOverridesToProducts(rawProducts, overrides);
+    
+    // Log the first product before and after overrides for debugging
+    if (rawProducts.length > 0 && processedProducts.length > 0) {
+      console.log('First product before override:', rawProducts[0]);
+      console.log('First product after override:', processedProducts[0]);
+    }
     
     // Set the modified products
     setAllProducts(processedProducts);

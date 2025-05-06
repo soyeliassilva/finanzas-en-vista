@@ -1,3 +1,4 @@
+
 import { Product } from "../types";
 
 export type ProductOverride = {
@@ -5,6 +6,27 @@ export type ProductOverride = {
   field: string;
   value: any;
   hidden: boolean;
+};
+
+// Mapping between Supabase column names and Product interface properties
+const fieldMapping: Record<string, string> = {
+  'product_annual_yield': 'yield',
+  'product_annual_yield_5_plus_years': 'yield5PlusYears',
+  'product_annual_yield_10_plus_years': 'yield10PlusYears',
+  'product_initial_contribution_min': 'minInitialDeposit',
+  'product_initial_contribution_max': 'maxInitialDeposit',
+  'product_monthly_contribution_min': 'minMonthlyDeposit',
+  'product_monthly_contribution_max': 'maxMonthlyDeposit',
+  'product_duration_months_min': 'minTerm',
+  'product_total_contribution_max': 'maxTotalContribution',
+  'product_name': 'name',
+  'product_description': 'description',
+  'product_tax_treatment': 'taxation',
+  'product_disclaimer': 'disclaimer',
+  'product_url': 'url',
+  'product_conditions': 'conditions',
+  'product_terms': 'terms',
+  'product_goal': 'goal'
 };
 
 // Parse URL parameters to extract product overrides
@@ -89,6 +111,9 @@ export const applyOverridesToProducts = (products: Product[], overrides: Product
   const hiddenProductIds = overrides
     .filter(override => override.hidden)
     .map(override => override.productId);
+
+  console.log('Applying overrides:', overrides);
+  console.log('Hiding products:', hiddenProductIds);
   
   // Apply field overrides to remaining products
   return products
@@ -107,9 +132,31 @@ export const applyOverridesToProducts = (products: Product[], overrides: Product
       const overriddenProduct = { ...product };
       
       productOverrides.forEach(override => {
-        // Only override if the field exists on the product
-        if (override.field in overriddenProduct) {
+        // Map field name from Supabase column to Product property
+        const productField = fieldMapping[override.field] || override.field;
+        
+        // Log override application for debugging
+        console.log(`Applying override for product ${product.id}:`, {
+          originalField: override.field,
+          mappedField: productField,
+          value: override.value
+        });
+        
+        // Try to apply both to mapped field and original field
+        if (productField in overriddenProduct) {
+          (overriddenProduct as any)[productField] = override.value;
+          console.log(`Successfully applied override to field '${productField}'`);
+        } else if (override.field in overriddenProduct) {
           (overriddenProduct as any)[override.field] = override.value;
+          console.log(`Successfully applied override to original field '${override.field}'`);
+        } else {
+          console.warn(`Failed to apply override: field '${override.field}' not found in product`);
+        }
+
+        // Special handling for product_annual_yield -> yield conversion
+        if (override.field === 'product_annual_yield') {
+          overriddenProduct.yield = override.value;
+          console.log(`Applied product_annual_yield override to 'yield' property:`, override.value);
         }
       });
       
