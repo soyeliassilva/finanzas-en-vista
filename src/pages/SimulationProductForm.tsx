@@ -30,11 +30,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
 }) => {
   // Plan Ahorro Flexible ID
   const PLAN_AHORRO_FLEXIBLE_ID = "230e8acf-4d50-42ab-bff0-7ed5933d00d4";
-  // PPA Mutualidad ID
-  const PPA_MUTUALIDAD_ID = "9ec57a39-df3a-4a79-b845-887f3c3486e5";
-  
   const isPlanAhorroFlexible = product.id === PLAN_AHORRO_FLEXIBLE_ID;
-  const isPPAMutualidad = product.id === PPA_MUTUALIDAD_ID;
   
   // Validation minimums
   const minInitial = product.minInitialDeposit ?? 0;
@@ -90,10 +86,6 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
     
     if (isPlanAhorroFlexible) {
       return `Opcional: Sin aportación (0€) o mínimo ${formatNumber(product.minMonthlyDeposit)}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
-    }
-    
-    if (isPPAMutualidad) {
-      return `Mínimo: ${formatNumber(minMonthly)}€ - Máximo: Sin límite (Movilización de tu plan de pensiones)`;
     }
     
     return `Mínimo: ${formatNumber(minMonthly)}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
