@@ -25,18 +25,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
       } else if (product.yield5PlusYears) {
         return (
           <p className="text-sm">
-            {yieldText} (hasta {formatPercentage(product.yield5PlusYears).replace(' %', '%')} a partir de 5 años)
+            {yieldText} (hasta {formatPercentage(product.yield5PlusYears).replace(' %', '%')} a 5 años)
           </p>
         );
       } else if (product.yield10PlusYears) {
         return (
           <p className="text-sm">
-            {yieldText} (hasta {formatPercentage(product.yield10PlusYears).replace(' %', '%')} a partir de 10 años)
+            {yieldText} (hasta {formatPercentage(product.yield10PlusYears).replace(' %', '%')} a 10 años)
           </p>
         );
       }
     }
-    return <p className="text-sm">{formatPercentage(product.yield).replace(' %', '%')} de rentabilidad a cuenta</p>;
+    return <p className="text-sm">{formatPercentage(product.yield).replace(' %', '%')} de rentabilidad bruta</p>;
   };
 
   // Convert duration from months to years
