@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from "../ui/input";
 import { formatNumber } from "../../utils/calculator";
@@ -121,6 +120,25 @@ const AmountInput: React.FC<AmountInputProps> = ({
     onChange(numValue);
   };
 
+  // Determine the input mode based on the unit type
+  const getInputProps = () => {
+    if (unit === 'años') {
+      // For years, use numeric keyboard (integers only)
+      return {
+        inputMode: 'numeric' as const,
+        pattern: '[0-9]*'
+      };
+    } else {
+      // For monetary values, use decimal keyboard
+      return {
+        inputMode: 'decimal' as const,
+        pattern: '[0-9]*'
+      };
+    }
+  };
+
+  const inputProps = getInputProps();
+
   return (
     <>
       <label htmlFor={id} className="form-label">
@@ -137,6 +155,8 @@ const AmountInput: React.FC<AmountInputProps> = ({
           className={`${error ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
           placeholder={placeholder}
           disabled={disabled}
+          inputMode={inputProps.inputMode}
+          pattern={inputProps.pattern}
         />
         <span className="absolute right-3 top-2">{unit}</span>
       </div>
