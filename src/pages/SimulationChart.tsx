@@ -114,9 +114,8 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
         </ResponsiveContainer>
       </div>
 
-      <div ref={footerRef} className="mt-4 text-xs text-right">
-        <p>Rentabilidades pasadas no presuponen rentabilidades futuras.</p>
-        <p>La información facilitada por este simulador es orientativa al basarse en hipótesis , por lo que su contenido no es vinculante y puede variar en consultas futuras</p>
+      <div ref={footerRef} className="mt-4 text-xs text-left">
+        <p>Rentabilidades pasadas no presuponen rentabilidades futuras. La información facilitada por este simulador es orientativa al basarse en hipótesis , por lo que su contenido no es vinculante y puede variar en consultas futuras</p>
       </div>
     </div>
   );
