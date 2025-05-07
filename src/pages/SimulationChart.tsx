@@ -1,8 +1,9 @@
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { SimulationResult } from "../types";
 import { formatCurrency, formatNumber } from "../utils/calculator";
+import { useIsMobile } from "../hooks/use-mobile";
 
 const chartColors = ['#004236', '#D1A4C4', '#B9EDAA'];
 const MAX_CHART_HEIGHT = 700; // Maximum height cap to prevent infinite growth
@@ -21,34 +22,60 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
   const footerRef = useRef<HTMLDivElement>(null);
   const [chartHeight, setChartHeight] = useState<number>(MIN_CHART_HEIGHT);
   const lastHeightRef = useRef<number>(MIN_CHART_HEIGHT);
+  const isMobile = useIsMobile();
   
-  // Calculate chart height based on summary height and other elements' heights
+  // Calculate chart height based on number of products for desktop
+  // or based on summary height for mobile
   useEffect(() => {
-    if (!summaryHeight) return;
-    
-    const headerHeight = headerRef.current?.offsetHeight || 0;
-    const summaryInfoHeight = summaryInfoRef.current?.offsetHeight || 0;
-    const footerHeight = footerRef.current?.offsetHeight || 0;
-    
-    // Account for margins/paddings: mb-4 (16px) + mt-6 (24px) + mt-4 (16px) + additional buffer (20px)
-    const marginsAndPaddings = 16 + 24 + 16 + 20;
-    
-    // Calculate available height for the chart
-    let newHeight = Math.min(
-      summaryHeight - headerHeight - summaryInfoHeight - footerHeight - marginsAndPaddings,
-      MAX_CHART_HEIGHT
-    );
-    
-    // Set a minimum height to prevent too small charts
-    newHeight = Math.max(newHeight, MIN_CHART_HEIGHT);
-    
-    // Only update if the height change is significant (more than 5px)
-    // This helps break the feedback loop
-    if (Math.abs(newHeight - lastHeightRef.current) > 5) {
-      lastHeightRef.current = newHeight;
-      setChartHeight(newHeight);
+    if (isMobile) {
+      // Mobile height calculation (existing logic)
+      if (!summaryHeight) return;
+      
+      const headerHeight = headerRef.current?.offsetHeight || 0;
+      const summaryInfoHeight = summaryInfoRef.current?.offsetHeight || 0;
+      const footerHeight = footerRef.current?.offsetHeight || 0;
+      
+      // Account for margins/paddings: mb-4 (16px) + mt-6 (24px) + mt-4 (16px) + additional buffer (20px)
+      const marginsAndPaddings = 16 + 24 + 16 + 20;
+      
+      // Calculate available height for the chart
+      let newHeight = Math.min(
+        summaryHeight - headerHeight - summaryInfoHeight - footerHeight - marginsAndPaddings,
+        MAX_CHART_HEIGHT
+      );
+      
+      // Set a minimum height to prevent too small charts
+      newHeight = Math.max(newHeight, MIN_CHART_HEIGHT);
+      
+      // Only update if the height change is significant (more than 5px)
+      if (Math.abs(newHeight - lastHeightRef.current) > 5) {
+        lastHeightRef.current = newHeight;
+        setChartHeight(newHeight);
+      }
+    } else {
+      // Desktop height calculation based on number of products
+      const productsCount = results.length;
+      // Apply the formula: (188px * number_of_products - 40px)
+      const desktopHeight = Math.max(188 * productsCount - 40, MIN_CHART_HEIGHT);
+      // Cap the height if needed
+      const cappedHeight = Math.min(desktopHeight, MAX_CHART_HEIGHT);
+      setChartHeight(cappedHeight);
     }
-  }, [summaryHeight]);
+  }, [summaryHeight, isMobile, results.length]);
+
+  // Find the highest value in the chart data for Y-axis domain calculation
+  const maxDataValue = useMemo(() => {
+    let max = 0;
+    chartData.forEach(dataPoint => {
+      results.forEach(result => {
+        if (dataPoint[result.name] && dataPoint[result.name] > max) {
+          max = dataPoint[result.name];
+        }
+      });
+    });
+    // Add 10% padding to the top
+    return Math.ceil(max * 1.1);
+  }, [chartData, results]);
 
   // Changed to always use a single text regardless of number of products
   const totalAmountText = "Importe total bruto";
@@ -83,11 +110,13 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
             />
             <YAxis 
               tickFormatter={(value) => {
-                // Using formatNumber to ensure Spanish locale formatting for thousands
                 return `${formatNumber(value / 1000)}k`;
               }}
               width={40}
               tick={{ fontSize: 12 }}
+              domain={[0, maxDataValue]}
+              // Set interval property to prevent repetitive ticks
+              interval="preserveStartEnd"
             />
             <Tooltip 
               formatter={(value: any) => [formatCurrency(value), '']}
