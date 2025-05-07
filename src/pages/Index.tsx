@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
@@ -40,7 +41,7 @@ const Index: React.FC<IndexProps> = ({ step }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-[600px] flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
