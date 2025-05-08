@@ -36,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
         );
       }
     }
-    return <p className="text-sm">{formatPercentage(product.yield).replace(' %', '%')} de rentabilidad bruta</p>;
+    return <p className="text-sm">Rentabilidad: {formatPercentage(product.yield).replace(' %', '%')}</p>;
   };
 
   // Convert duration from months to years
