@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from "../ui/input";
 import { formatNumber } from "../../utils/calculator";
@@ -46,14 +47,14 @@ const AmountInput: React.FC<AmountInputProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     
-    // Allow empty string or valid characters (numbers and Spanish separators)
-    if (newValue === '' || /^[\d.,]*$/.test(newValue)) {
+    // Allow empty string or only digits and dots (for thousand separators)
+    if (newValue === '' || /^[\d.]*$/.test(newValue)) {
       setDisplayValue(newValue);
       
       // Only update parent if we have a valid number
       if (newValue !== '') {
-        // Convert from Spanish format to number
-        const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.'));
+        // Convert from Spanish format to number (remove dots as they are thousand separators)
+        const numericValue = parseInt(newValue.replace(/\./g, ''));
         if (!isNaN(numericValue)) {
           onChange(numericValue);
         }
@@ -74,8 +75,8 @@ const AmountInput: React.FC<AmountInputProps> = ({
       return;
     }
 
-    // Convert from Spanish format to number
-    const numValue = parseFloat(displayValue.replace(/\./g, '').replace(',', '.'));
+    // Convert from Spanish format to number (remove dots as they are thousand separators)
+    const numValue = parseInt(displayValue.replace(/\./g, ''));
     
     if (isNaN(numValue)) {
       setError(`Valor inválido`);
@@ -111,7 +112,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
       }
     }
     
-    // Format value for display
+    // Format value for display with thousand separators
     const formattedValue = unit === '€' ? formatNumber(numValue) : numValue.toString();
     setDisplayValue(formattedValue);
     
@@ -119,25 +120,6 @@ const AmountInput: React.FC<AmountInputProps> = ({
     setError(null);
     onChange(numValue);
   };
-
-  // Determine the input mode based on the unit type
-  const getInputProps = () => {
-    if (unit === 'años') {
-      // For years, use numeric keyboard (integers only)
-      return {
-        inputMode: 'numeric' as const,
-        pattern: '[0-9]*'
-      };
-    } else {
-      // For monetary values, use decimal keyboard
-      return {
-        inputMode: 'decimal' as const,
-        pattern: '[0-9]*'
-      };
-    }
-  };
-
-  const inputProps = getInputProps();
 
   return (
     <>
@@ -155,8 +137,9 @@ const AmountInput: React.FC<AmountInputProps> = ({
           className={`${error ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
           placeholder={placeholder}
           disabled={disabled}
-          inputMode={inputProps.inputMode}
-          pattern={inputProps.pattern}
+          inputMode="numeric"
+          // Allow only digits and dots for the pattern
+          pattern="[0-9.]*"
         />
         <span className="absolute right-3 top-2">{unit}</span>
       </div>
