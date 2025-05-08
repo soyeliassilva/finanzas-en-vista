@@ -99,10 +99,10 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Order goals according to the specified priority
     const orderedGoals = [...goals].sort((a, b) => {
       const priorityOrder: { [key: string]: number } = {
-        "Disponibilidad": 0,
-        "Fiscalidad": 1,
-        "Jubilación": 2,
-        "Inversión": 3
+        "Ahorrar y tener mi dinero disponible": 0,
+        "Ahorrar disfrutando de ventajas fiscales": 1,
+        "Ahorrar para cuando llegue la jubilación": 2,
+        "Ahorrar invirtiendo con más riesgo": 3
       };
       
       // If both goals are in the priority list, sort by their priority
