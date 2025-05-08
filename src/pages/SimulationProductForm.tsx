@@ -28,23 +28,34 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   values,
   onInputChange,
 }) => {
-  // Plan Ahorro Flexible ID
+  // Product IDs
   const PLAN_AHORRO_FLEXIBLE_ID = "230e8acf-4d50-42ab-bff0-7ed5933d00d4";
-  // PPA Mutualidad ID
   const PPA_MUTUALIDAD_ID = "9ec57a39-df3a-4a79-b845-887f3c3486e5";
+  const UNIT_LINKED_EXPLORA_EXPEDICION_ID = "a3ee24b6-b241-426e-9f25-9e41641c254b";
+  const UNIT_LINKED_EXPLORA_VIAJE_ID = "1286491a-b8fc-4187-9be9-d986c1028dd6";
+  
+  // Check if product allows optional contributions (0€)
+  const allowsOptionalContributions = [
+    PLAN_AHORRO_FLEXIBLE_ID,
+    UNIT_LINKED_EXPLORA_EXPEDICION_ID, 
+    UNIT_LINKED_EXPLORA_VIAJE_ID
+  ].includes(product.id);
   
   const isPlanAhorroFlexible = product.id === PLAN_AHORRO_FLEXIBLE_ID;
   const isPPAMutualidad = product.id === PPA_MUTUALIDAD_ID;
+  const isUnitLinkedExplora = product.id === UNIT_LINKED_EXPLORA_EXPEDICION_ID || 
+                              product.id === UNIT_LINKED_EXPLORA_VIAJE_ID;
   
   // Validation minimums
-  const minInitial = product.minInitialDeposit ?? 0;
-  const minMonthly = isPlanAhorroFlexible ? 0 : (product.minMonthlyDeposit ?? 0);
+  const minInitial = allowsOptionalContributions ? 0 : (product.minInitialDeposit ?? 0);
+  const minMonthly = allowsOptionalContributions ? 0 : (product.minMonthlyDeposit ?? 0);
   const minTermMonths = product.product_duration_months_min ?? 12;
   const minTermYears = Math.ceil(minTermMonths / 12);
 
   // min/max monthly 0 disables field
   const isMonthlyFixedNone =
     !isPlanAhorroFlexible && 
+    !isUnitLinkedExplora &&
     minMonthly === 0 && 
     (product.maxMonthlyDeposit ?? 0) === 0;
 
@@ -65,20 +76,23 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   const exceedsMaxContribution = product.maxTotalContribution !== undefined && 
     totalPlannedContribution > product.maxTotalContribution;
 
-  // Custom validation for Plan Ahorro Flexible monthly deposits
-  const validateFlexibleMonthlyDeposit = (value: number): { isValid: boolean; errorMessage: string | null } => {
-    if (isPlanAhorroFlexible) {
-      // Allow 0 or >= minimum monthly deposit (60€)
-      if (value === 0 || value >= (product.minMonthlyDeposit ?? 60)) {
+  // Custom validation for products with optional contributions
+  const validateOptionalContribution = (value: number, field: "initialDeposit" | "monthlyDeposit"): { isValid: boolean; errorMessage: string | null } => {
+    if (allowsOptionalContributions) {
+      const minValue = field === "initialDeposit" ? product.minInitialDeposit ?? 0 : product.minMonthlyDeposit ?? 0;
+      
+      // Allow 0 or >= minimum deposit
+      if (value === 0 || value >= minValue) {
         return { isValid: true, errorMessage: null };
       }
+      
       return { 
         isValid: false, 
-        errorMessage: `Para este producto, puedes elegir 0€ (sin aportación) o mínimo ${formatNumber(product.minMonthlyDeposit ?? 60)}€` 
+        errorMessage: `Para este producto, puedes elegir 0€ (sin aportación) o mínimo ${formatNumber(minValue)}€` 
       };
     }
     
-    // Default validation (not Plan Ahorro Flexible)
+    // Default validation (not a product with optional contributions)
     return { isValid: true, errorMessage: null };
   };
 
@@ -88,7 +102,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
       return "Este producto no admite aportaciones mensuales";
     }
     
-    if (isPlanAhorroFlexible) {
+    if (allowsOptionalContributions) {
       return `Opcional: Sin aportación (0€) o mínimo ${formatNumber(product.minMonthlyDeposit)}€ - Máximo: ${formatMax(product.maxMonthlyDeposit)}`;
     }
     
@@ -98,7 +112,11 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   // Generate the initial deposit sublabel text
   const getInitialDepositSublabel = () => {
     if (isPPAMutualidad) {
-      return `Mínimo: ${formatNumber(minInitial)}€ - Máximo: Sin límite (Movilización de tu plan de pensiones)`;
+      return `Mínimo: ${formatNumber(product.minInitialDeposit)}€ - Máximo: Sin límite (Movilización de tu plan de pensiones)`;
+    }
+    
+    if (allowsOptionalContributions) {
+      return `Opcional: Sin aportación (0€) o mínimo ${formatNumber(product.minInitialDeposit)}€ - Máximo: ${formatMax(product.maxInitialDeposit)}`;
     }
     
     return `Mínimo: ${formatNumber(minInitial)}€ - Máximo: ${formatMax(product.maxInitialDeposit)}`;
@@ -119,6 +137,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         placeholder={`${formatNumber(minInitial)}€`}
         label="Aportación inicial de capital"
         sublabel={getInitialDepositSublabel()}
+        customValidation={(value) => validateOptionalContribution(value, "initialDeposit")}
       />
 
       <AmountInput
@@ -142,7 +161,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         label="Aportación periódica mensual*"
         sublabel={getMonthlyContributionSublabel()}
         disabled={isMonthlyFixedNone}
-        customValidation={isPlanAhorroFlexible ? validateFlexibleMonthlyDeposit : undefined}
+        customValidation={(value) => validateOptionalContribution(value, "monthlyDeposit")}
       />
       
       <ContributionLimit 
