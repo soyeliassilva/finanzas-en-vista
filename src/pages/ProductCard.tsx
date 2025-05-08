@@ -14,7 +14,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
   // Determine which yield rate to display
   const displayYield = () => {
     if (product.yield10PlusYears || product.yield5PlusYears) {
-      let yieldText = `${formatPercentage(product.yield).replace(' %', '%')} de rentabilidad`;
+      let yieldText = `Rentabilidad: ${formatPercentage(product.yield).replace(' %', '%')}`;
       
       if (product.yield5PlusYears && product.yield10PlusYears) {
         return (
