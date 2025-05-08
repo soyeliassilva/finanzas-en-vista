@@ -117,7 +117,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         min={minInitial}
         max={product.maxInitialDeposit}
         placeholder={`${formatNumber(minInitial)}€`}
-        label="Aportación inicial"
+        label="Aportación inicial de capital"
         sublabel={getInitialDepositSublabel()}
       />
 
@@ -127,7 +127,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
         onChange={(value) => onInputChange(product.id, "termYears", value)}
         min={minTermYears}
         placeholder={`${formatNumber(minTermYears)} años`}
-        label="Plazo de vencimiento"
+        label="Tiempo que quieres mantener el ahorro"
         sublabel={`Mínimo: ${minTermYears} ${minTermYears === 1 ? 'año' : 'años'}`}
         unit="años"
       />

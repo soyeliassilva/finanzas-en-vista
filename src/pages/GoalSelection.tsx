@@ -46,7 +46,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
           <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 1</h3>
           <h2 className="text-3xl text-primary mb-4">Objetivo de ahorro</h2>
           <p className="text-sm">
-            Selecciona tu objetivo y compara productos para maximizar tus beneficios
+            Selecciona tu objetivo de ahorro
           </p>
         </div>
         
@@ -88,7 +88,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
             Compara los productos en función de tu objetivo
           </h2>
           <p className="text-sm">
-            Elige los productos a continuación para simular tu rentabilidad
+            Propuesta de productos para conseguir tu objetivo, elige los que quieras comparar
           </p>
         </div>
         

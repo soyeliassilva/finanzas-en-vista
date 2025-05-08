@@ -30,7 +30,7 @@ interface Step2InstructionsProps {
 export const Step2Instructions: React.FC<Step2InstructionsProps> = ({ show }) =>
   show ? (
     <h3 className="text-lg font-bold mb-4">
-      Selecciona hasta 3 productos para comparar su rentabilidad
+      Elige hasta 3 productos
     </h3>
   ) : null;
 
