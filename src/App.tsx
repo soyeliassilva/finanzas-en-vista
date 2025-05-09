@@ -10,13 +10,13 @@ import Index from "./pages/Index";
 import SimulationFormPage from "./pages/SimulationFormPage";
 import SimulationResultsPage from "./pages/SimulationResultsPage";
 import { preserveUrlParams } from "./utils/urlParamsUtils";
-import { useIframeResizer } from "./hooks/useIframeResizer";
+import { useIframeNavigation } from "./hooks/useIframeNavigation";
 
 const queryClient = new QueryClient();
 
-// Component that uses the iframe resizer hook
+// Component that uses the iframe navigation hook
 const IframeAwareApp = () => {
-  useIframeResizer();
+  useIframeNavigation();
   
   return (
     <>

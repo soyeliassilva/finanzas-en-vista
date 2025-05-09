@@ -3,6 +3,7 @@ import React from 'react';
 import { Product } from '../../types';
 import { ChevronRight } from 'lucide-react';
 import SimulationProductForm from '../../pages/SimulationProductForm';
+import { useIframeNavigation } from '../../hooks/useIframeNavigation';
 
 type FormValues = {
   initialDeposit: number;
@@ -25,8 +26,20 @@ const SimulationForm: React.FC<SimulationFormProps> = ({
   onCalculate,
   onBack,
 }) => {
+  const { sendHeight } = useIframeNavigation();
   const gridColsStyle = {
     ['--md-cols' as string]: `repeat(${selectedProducts.length}, minmax(0, 1fr))`
+  };
+
+  const handleCalculate = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onCalculate();
+    sendHeight();
+  };
+
+  const handleBack = () => {
+    onBack();
+    sendHeight();
   };
 
   return (
@@ -38,10 +51,7 @@ const SimulationForm: React.FC<SimulationFormProps> = ({
         </h2>
       </div>
       <form
-        onSubmit={e => {
-          e.preventDefault();
-          onCalculate();
-        }}
+        onSubmit={handleCalculate}
       >
         <div
           className={`grid grid-cols-1 md:gap-4 gap-4 mb-6 md:grid-cols-[var(--md-cols)]`}
@@ -58,7 +68,7 @@ const SimulationForm: React.FC<SimulationFormProps> = ({
         </div>
 
         <div className="flex justify-between">
-          <button className="btn-outline" type="button" onClick={onBack}>
+          <button className="btn-outline" type="button" onClick={handleBack}>
             Volver
           </button>
           <button className="btn-primary" type="submit">
