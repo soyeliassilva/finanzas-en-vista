@@ -6,7 +6,7 @@ import SimulationSummary from '../../pages/SimulationSummary';
 import { useChartDataGenerator } from '../../hooks/useChartDataGenerator';
 import { useResponsiveHeights } from '../../hooks/useResponsiveHeights';
 import { ChevronLeft } from 'lucide-react';
-import { useIframeNavigation } from '../../hooks/useIframeNavigation';
+import { useIframeResizer } from '../../hooks/useIframeResizer';
 
 interface SimulationResultsProps {
   results: SimulationResult[];
@@ -25,9 +25,9 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
   const { summaryRef, summaryHeight } = useResponsiveHeights(calculationPerformed);
   const resultsRef = useRef<HTMLDivElement>(null);
   const chartData = generateChartData(results);
-  const { sendHeight } = useIframeNavigation();
+  const { sendHeight } = useIframeResizer();
   
-  // Update iframe height when results are calculated
+  // Update iframe height when results are calculated or summary height changes
   useEffect(() => {
     if (calculationPerformed && results.length > 0) {
       // Wait for chart to render
@@ -37,12 +37,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [calculationPerformed, results.length, sendHeight]);
-
-  const handleBackClick = () => {
-    handleBack();
-    sendHeight();
-  };
+  }, [calculationPerformed, results.length, summaryHeight, sendHeight]);
 
   if (!calculationPerformed || results.length === 0) {
     return null;
@@ -72,7 +67,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
       </div>
       
       <div className="mt-6">
-        <button className="btn-outline" type="button" onClick={handleBackClick}>
+        <button className="btn-outline" type="button" onClick={handleBack}>
           <ChevronLeft size={18} /> Volver a la simulación
         </button>
       </div>
