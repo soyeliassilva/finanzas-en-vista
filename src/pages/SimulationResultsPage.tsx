@@ -20,7 +20,7 @@ const SimulationResultsPage: React.FC = () => {
       navigate('/simulacion/form');
     } else {
       // Send height update after results are loaded
-      setTimeout(() => sendHeight(), 300);
+      setTimeout(() => sendHeight("simulation_results"), 300);
     }
   }, [calculationPerformed, navigate, simulationResults.length, sendHeight]);
   
@@ -44,7 +44,7 @@ const SimulationResultsPage: React.FC = () => {
   const handleBack = () => {
     navigate('/simulacion/form');
     // Send height update after navigation
-    setTimeout(() => sendHeight(), 100);
+    setTimeout(() => sendHeight("simulation_form"), 100);
   };
 
   return (

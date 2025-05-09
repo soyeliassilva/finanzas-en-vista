@@ -51,14 +51,14 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
     if (selectedProducts.length > 0) {
       navigate(preserveUrlParams('/simulacion'));
       // Send height update after navigation
-      setTimeout(() => sendHeight(), 100);
+      setTimeout(() => sendHeight("simulation_form"), 100);
     }
   };
 
   const handleBack = () => {
     navigate(preserveUrlParams('/'));
     // Send height update after navigation
-    setTimeout(() => sendHeight(), 100);
+    setTimeout(() => sendHeight("goal_selection"), 100);
   };
 
   const isSelected = (productId: string) => {

@@ -19,7 +19,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
     if (selectedGoal) {
       navigate('/productos');
       // Send height update after navigation
-      setTimeout(() => sendHeight(), 100);
+      setTimeout(() => sendHeight("product_selection"), 100);
     }
   };
   

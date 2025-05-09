@@ -65,13 +65,13 @@ const SimulationFormPage: React.FC = () => {
     // Navigate to results page
     navigate('/simulacion/results');
     // Send height update after navigation
-    setTimeout(() => sendHeight(), 100);
+    setTimeout(() => sendHeight("simulation_results"), 100);
   };
 
   const handleBack = () => {
     navigate('/productos');
     // Send height update after navigation
-    setTimeout(() => sendHeight(), 100);
+    setTimeout(() => sendHeight("product_selection"), 100);
   };
 
   return (

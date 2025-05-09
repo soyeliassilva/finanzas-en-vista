@@ -9,27 +9,30 @@ import { useEffect, useRef } from 'react';
  * - When explicitly called (navigation events)
  * 
  * Optimized to:
- * - Only send height if it has changed from previous value
+ * - Include step name alongside height in messages
+ * - Only send height if it or step has changed from previous value
  * - Only send on explicit calls and horizontal resizes
- * - Exclude any non-height related messages
  */
 export const useIframeResizer = () => {
   const isInIframe = window !== window.parent;
   const resizeTimeoutRef = useRef<number | null>(null);
   const lastSentHeightRef = useRef<number>(0); // Track last sent height
+  const lastSentStepRef = useRef<string | null>(null); // Track last sent step
 
   // Send the current height to the parent window if it has changed
-  const sendHeight = () => {
+  const sendHeight = (step?: string) => {
     if (!isInIframe) return;
     
     try {
       const height = document.body.scrollHeight;
+      const message = step ? { height, step } : { height };
       
-      // Only send if height has changed
-      if (height !== lastSentHeightRef.current) {
-        window.parent.postMessage({ height }, '*');
-        console.log(`Sent height update: ${height}px`);
+      // Only send if height or step has changed
+      if (height !== lastSentHeightRef.current || step !== lastSentStepRef.current) {
+        window.parent.postMessage(message, '*');
+        console.log(`Sent height update: ${height}px, step: ${step || 'not specified'}`);
         lastSentHeightRef.current = height; // Update last sent height
+        if (step) lastSentStepRef.current = step; // Update last sent step
       }
     } catch (error) {
       console.error('Error sending height message:', error);
@@ -43,7 +46,7 @@ export const useIframeResizer = () => {
     }
     
     resizeTimeoutRef.current = window.setTimeout(() => {
-      sendHeight();
+      sendHeight(lastSentStepRef.current || undefined);
       resizeTimeoutRef.current = null;
     }, 100);
   };
@@ -53,7 +56,7 @@ export const useIframeResizer = () => {
     if (!isInIframe) return;
     
     // Send initial height on load
-    sendHeight();
+    sendHeight("init");
     
     // Handle window resize events
     const handleResize = () => {

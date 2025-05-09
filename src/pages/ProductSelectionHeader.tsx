@@ -12,7 +12,7 @@ const ProductSelectionHeader: React.FC<ProductSelectionHeaderProps> = ({ onBack 
   const handleBack = () => {
     onBack();
     // Send height update after navigation
-    setTimeout(() => sendHeight(), 100);
+    setTimeout(() => sendHeight("goal_selection"), 100);
   };
   
   return (

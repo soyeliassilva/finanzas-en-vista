@@ -32,7 +32,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
     if (calculationPerformed && results.length > 0) {
       // Wait for chart to render then send height
       const timer = setTimeout(() => {
-        sendHeight();
+        sendHeight("simulation_results");
       }, 500);
       
       return () => clearTimeout(timer);

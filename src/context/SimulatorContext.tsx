@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GoalType, Product, SimulationResult } from '../types';
 import { toast } from 'sonner';
@@ -46,12 +47,14 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [simulationResults, setSimulationResults] = useState<SimulationResult[]>([]);
   const [calculationPerformed, setCalculationPerformed] = useState<boolean>(false);
   
+  const { sendHeight } = useIframeResizer();
+  
   // Handle iframe height updates
-  const triggerHeightUpdate = () => {
+  const triggerHeightUpdate = (step: string = "init") => {
     if (window !== window.parent) {
-      const height = document.body.scrollHeight;
-      window.parent.postMessage({ height }, '*');
-      console.log(`Sent height update after data fetch: ${height}px`);
+      setTimeout(() => {
+        sendHeight(step);
+      }, 300);
     }
   };
   
@@ -184,10 +187,8 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       setLoading(false);
       
-      // Send height update after data is loaded
-      setTimeout(() => {
-        triggerHeightUpdate();
-      }, 300);
+      // Send height update after data is loaded with "init" step
+      triggerHeightUpdate("goal_selection");
       
     } catch (error: any) {
       console.error("Error fetching products:", error);
