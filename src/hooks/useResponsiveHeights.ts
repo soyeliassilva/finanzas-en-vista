@@ -49,9 +49,11 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
       }
     });
     
-    resizeObserver.observe(summaryRef.current);
+    if (summaryRef.current) {
+      resizeObserver.observe(summaryRef.current);
+    }
     
-    // Window resize handler
+    // Window resize handler with debouncing
     const handleResize = () => {
       if (!isResizing) {
         updateHeight();

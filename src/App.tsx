@@ -8,15 +8,13 @@ import { SimulatorProvider } from "./context/SimulatorContext";
 import { useAppInitializer } from "./hooks/useAppInitializer";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
-import SimulationFormPage from "./pages/SimulationFormPage";
-import SimulationResultsPage from "./pages/SimulationResultsPage";
 import { preserveUrlParams } from "./utils/urlParamsUtils";
 
 const queryClient = new QueryClient();
 
 // App wrapper to handle initialization
 const AppContent = () => {
-  // Initialize app and send 'init' message
+  // Initialize app and send 'init' and current step message
   useAppInitializer();
   
   return (

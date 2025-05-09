@@ -15,64 +15,71 @@ import { useEffect, useRef, useCallback } from 'react';
  */
 export const useIframeResizer = () => {
   const isInIframe = window !== window.parent;
-  const resizeTimeoutRef = useRef<number | null>(null);
   const lastSentHeightRef = useRef<number>(0); // Track last sent height
   const lastSentStepRef = useRef<string | null>(null); // Track last sent step
-  const initialSentRef = useRef<boolean>(false); // Track if initial height was sent
-  const sentMessagesMapRef = useRef<Map<string, number>>(new Map()); // Track sent messages to prevent duplicates
+  const lastSentTimeRef = useRef<Record<string, number>>({}); // Track when messages were sent
+  const debounceTimeoutRef = useRef<number | null>(null);
 
   // Send the current height to the parent window if it has changed
   const sendHeight = useCallback((step?: string) => {
     if (!isInIframe) return;
     
-    try {
-      const height = document.body.scrollHeight;
-      const actualStep = step || 'not specified';
-      const messageKey = `${height}-${actualStep}`;
-      
-      // Check if we've sent this exact height+step combination recently
-      const lastSentTime = sentMessagesMapRef.current.get(messageKey);
-      const now = Date.now();
-      const isDuplicate = lastSentTime && (now - lastSentTime < 300); // Prevent duplicates within 300ms
-      
-      // Only send if height or step has changed and not a duplicate
-      const shouldSend = !isDuplicate && 
-        (height !== lastSentHeightRef.current || actualStep !== lastSentStepRef.current || actualStep === 'init');
-
-      if (shouldSend) {
-        const message = { height, step: actualStep };
-        window.parent.postMessage(message, '*');
-        console.log(`Sent height update: ${height}px, step: ${actualStep}`);
-        
-        // Update tracking refs
-        lastSentHeightRef.current = height;
-        lastSentStepRef.current = actualStep;
-        sentMessagesMapRef.current.set(messageKey, now);
-        
-        // Clean up old messages from the map (older than 1 second)
-        if (sentMessagesMapRef.current.size > 10) {
-          for (const [key, timestamp] of sentMessagesMapRef.current.entries()) {
-            if (now - timestamp > 1000) {
-              sentMessagesMapRef.current.delete(key);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error sending height message:', error);
+    // Clear any existing timeout
+    if (debounceTimeoutRef.current) {
+      window.clearTimeout(debounceTimeoutRef.current);
     }
+    
+    // Set a small debounce timeout to prevent rapid fire updates
+    debounceTimeoutRef.current = window.setTimeout(() => {
+      try {
+        const height = document.body.scrollHeight;
+        const actualStep = step || 'not specified';
+        const messageKey = `${height}-${actualStep}`;
+        const now = Date.now();
+        
+        // Only send if:
+        // 1. This is the first time we're sending for this step, or
+        // 2. The height has changed significantly since last time for this step, or
+        // 3. It's been more than 500ms since we sent for this step
+        const lastSentTime = lastSentTimeRef.current[actualStep] || 0;
+        const timeSinceLastSent = now - lastSentTime;
+        const isSameStep = lastSentStepRef.current === actualStep;
+        const heightDiff = Math.abs(height - lastSentHeightRef.current);
+        
+        // Special case for "init" step - always send
+        const isInitStep = actualStep === 'init';
+        
+        const shouldSend = isInitStep || 
+                          !isSameStep || 
+                          heightDiff > 10 ||
+                          timeSinceLastSent > 500;
+        
+        if (shouldSend) {
+          const message = { height, step: actualStep };
+          window.parent.postMessage(message, '*');
+          console.log(`Sent height update: ${height}px, step: ${actualStep}`);
+          
+          // Update tracking refs
+          lastSentHeightRef.current = height;
+          lastSentStepRef.current = actualStep;
+          lastSentTimeRef.current[actualStep] = now;
+        }
+      } catch (error) {
+        console.error('Error sending height message:', error);
+      } finally {
+        debounceTimeoutRef.current = null;
+      }
+    }, 50); // Small debounce to group changes
   }, [isInIframe]);
-
-  // Send initial height message with "init" step
+  
+  // Clean up on unmount
   useEffect(() => {
-    if (!isInIframe || initialSentRef.current) return;
-    
-    // Only send initial height once
-    initialSentRef.current = true;
-    
-    // Send init message first
-    sendHeight('init');
-  }, [isInIframe, sendHeight]);
+    return () => {
+      if (debounceTimeoutRef.current) {
+        window.clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
   
   // Return the function for manual calls
   return { sendHeight };
