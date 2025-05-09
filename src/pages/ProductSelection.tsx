@@ -5,6 +5,7 @@ import { useSimulator } from '../context/SimulatorContext';
 import ProductCard from './ProductCard';
 import ProductSelectionHeader, { Step2Instructions } from './ProductSelectionHeader';
 import { preserveUrlParams } from '../utils/urlParamsUtils';
+import { useIframeResizer } from '../hooks/useIframeResizer';
 
 interface ProductSelectionProps {
   selectedGoal: GoalType | null;
@@ -21,6 +22,7 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const { allProducts, loading, error } = useSimulator();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [multiplica, setMultiplica] = useState<Product | null>(null);
+  const { sendHeight } = useIframeResizer();
 
   useEffect(() => {
     if (selectedGoal && allProducts.length > 0) {
@@ -48,11 +50,15 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const handleContinue = () => {
     if (selectedProducts.length > 0) {
       navigate(preserveUrlParams('/simulacion'));
+      // Send height update after navigation
+      setTimeout(() => sendHeight(), 100);
     }
   };
 
   const handleBack = () => {
     navigate(preserveUrlParams('/'));
+    // Send height update after navigation
+    setTimeout(() => sendHeight(), 100);
   };
 
   const isSelected = (productId: string) => {

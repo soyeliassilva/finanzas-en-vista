@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType } from '../types';
 import { useSimulator } from '../context/SimulatorContext';
+import { useIframeResizer } from '../hooks/useIframeResizer';
 
 interface GoalSelectionProps {
   selectedGoal: GoalType | null;
@@ -11,10 +13,13 @@ interface GoalSelectionProps {
 const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelectedGoal }) => {
   const navigate = useNavigate();
   const { availableGoals, loading, error } = useSimulator();
+  const { sendHeight } = useIframeResizer();
   
   const handleContinue = () => {
     if (selectedGoal) {
       navigate('/productos');
+      // Send height update after navigation
+      setTimeout(() => sendHeight(), 100);
     }
   };
   

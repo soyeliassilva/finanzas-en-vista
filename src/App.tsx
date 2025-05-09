@@ -16,6 +16,7 @@ const queryClient = new QueryClient();
 
 // Component that uses the iframe resizer hook
 const IframeAwareApp = () => {
+  // Initialize iframe resizer
   useIframeResizer();
   
   return (

@@ -1,9 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GoalType, Product, SimulationResult } from '../types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { parseProductOverrides, applyOverridesToProducts, getCurrentUrlParams } from '../utils/urlParamsUtils';
+import { useIframeResizer } from '../hooks/useIframeResizer';
 
 // Type definition for the form values
 export type SimulationFormValues = {
@@ -45,6 +45,15 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [productInputs, setProductInputs] = useState<Record<string, SimulationFormValues>>({});
   const [simulationResults, setSimulationResults] = useState<SimulationResult[]>([]);
   const [calculationPerformed, setCalculationPerformed] = useState<boolean>(false);
+  
+  // Handle iframe height updates
+  const triggerHeightUpdate = () => {
+    if (window !== window.parent) {
+      const height = document.body.scrollHeight;
+      window.parent.postMessage({ height }, '*');
+      console.log(`Sent height update after data fetch: ${height}px`);
+    }
+  };
   
   const handleGoalChange = (goal: GoalType) => {
     setSelectedGoal(goal);
@@ -174,6 +183,12 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setRawProducts(transformedProducts);
 
       setLoading(false);
+      
+      // Send height update after data is loaded
+      setTimeout(() => {
+        triggerHeightUpdate();
+      }, 300);
+      
     } catch (error: any) {
       console.error("Error fetching products:", error);
       setError(error.message || 'Error loading products');

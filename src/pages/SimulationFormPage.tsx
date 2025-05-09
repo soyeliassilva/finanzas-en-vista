@@ -5,6 +5,7 @@ import { useSimulator } from '../context/SimulatorContext';
 import SimulationForm from '../components/simulation/SimulationForm';
 import { getProductDefaultFormValue } from '../utils/simulationUtils';
 import { useSimulationCalculations } from '../hooks/useSimulationCalculations';
+import { useIframeResizer } from '../hooks/useIframeResizer';
 
 const SimulationFormPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const SimulationFormPage: React.FC = () => {
     setSimulationResults,
     setCalculationPerformed
   } = useSimulator();
+  const { sendHeight } = useIframeResizer();
   
   const { calculateResults } = useSimulationCalculations(selectedProducts);
 
@@ -60,12 +62,16 @@ const SimulationFormPage: React.FC = () => {
     setSimulationResults(results);
     setCalculationPerformed(true);
     
-    // Navigate to results page instead of scrolling
+    // Navigate to results page
     navigate('/simulacion/results');
+    // Send height update after navigation
+    setTimeout(() => sendHeight(), 100);
   };
 
   const handleBack = () => {
     navigate('/productos');
+    // Send height update after navigation
+    setTimeout(() => sendHeight(), 100);
   };
 
   return (

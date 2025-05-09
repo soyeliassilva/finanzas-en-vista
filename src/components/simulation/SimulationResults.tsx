@@ -30,7 +30,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
   // Update iframe height when results are calculated or summary height changes
   useEffect(() => {
     if (calculationPerformed && results.length > 0) {
-      // Wait for chart to render
+      // Wait for chart to render then send height
       const timer = setTimeout(() => {
         sendHeight();
       }, 500);
