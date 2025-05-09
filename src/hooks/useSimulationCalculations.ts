@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { Product, SimulationResult } from '../types';
 import { calculateFutureValue } from '../utils/calculator';
-import { SimulationFormValues } from '../context/SimulatorContext';
+import { SimulationFormValues } from '../types/heightTypes';
 
 export const useSimulationCalculations = (selectedProducts: Product[]) => {
   const [calculationPerformed, setCalculationPerformed] = useState(false);

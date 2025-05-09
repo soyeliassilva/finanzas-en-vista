@@ -2,7 +2,7 @@
 import { useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useIframeResizer } from './useIframeResizer';
-import { StepName } from '../types';
+import { StepName } from '../types/heightTypes';
 
 /**
  * Hook that centralizes iframe height management
