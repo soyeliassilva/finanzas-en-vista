@@ -1,5 +1,5 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useIframeResizer } from './useIframeResizer';
 import { StepName } from '../types/heightTypes';
@@ -12,6 +12,7 @@ export const useHeightManager = () => {
   const { sendHeight } = useIframeResizer();
   const prevPathRef = useRef<string>(location.pathname);
   const lastStepSentRef = useRef<StepName | null>(null);
+  const isInitialLoadRef = useRef<boolean>(true);
   const heightUpdatedRef = useRef<Record<StepName, boolean>>({
     init: false,
     goal_selection: false,
@@ -34,16 +35,28 @@ export const useHeightManager = () => {
     return 'init';
   }, [location.pathname]);
   
+  // Effect to track initial load state
+  useEffect(() => {
+    // Set isInitialLoad to false after first render
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+    }
+  }, []);
+  
   // Handle iframe height updates with a centralized function
   const updateIframeHeight = useCallback((specifiedStep?: StepName) => {
     // Use provided step or determine from current route
     const stepToUse = specifiedStep || getCurrentStep();
     
     if (window !== window.parent) {
+      // Prevent sending goal_selection height during initial load
+      if (!specifiedStep && stepToUse === 'goal_selection' && isInitialLoadRef.current) {
+        return;
+      }
+      
       // Prevent sending goal_selection height during transitions
       if (!specifiedStep && stepToUse === 'goal_selection' && 
           prevPathRef.current !== '/' && prevPathRef.current !== '') {
-        console.log('Skipping automatic goal_selection height during transition');
         return;
       }
       
@@ -58,7 +71,6 @@ export const useHeightManager = () => {
         const stepChanged = lastStepSentRef.current !== stepToUse;
         
         if (isExplicitUpdate || pathChanged || stepChanged || !heightUpdatedRef.current[stepToUse]) {
-          console.log(`Sending height for ${stepToUse} (${isExplicitUpdate ? 'explicit' : 'auto'})`);
           sendHeight(stepToUse);
           
           // Update tracking refs

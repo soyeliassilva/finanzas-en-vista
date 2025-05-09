@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { GoalType } from '../types';
 import { useSimulator } from '../context/SimulatorContext';
 
@@ -11,15 +11,18 @@ interface GoalSelectionProps {
 
 const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelectedGoal }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { availableGoals, loading, error, updateIframeHeight } = useSimulator();
+  const isDirectNavigationRef = React.useRef(false);
   
-  // Update iframe height once when component mounts and data is loaded
+  // Check if this is a direct navigation to goal selection
   useEffect(() => {
-    if (!loading && window.location.pathname === '/') {
-      // Only update height if we're actually on the goal selection page
+    // Only update height when actually navigating to goal selection, not on initial load
+    if (!loading && window.location.pathname === '/' && location.key !== 'default') {
+      isDirectNavigationRef.current = true;
       updateIframeHeight('goal_selection');
     }
-  }, [loading, updateIframeHeight]);
+  }, [loading, location.key, updateIframeHeight]);
   
   const handleContinue = () => {
     if (selectedGoal) {

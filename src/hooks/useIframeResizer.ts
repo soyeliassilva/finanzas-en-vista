@@ -56,7 +56,6 @@ export const useIframeResizer = () => {
         if (shouldSend) {
           const message = { height, step };
           window.parent.postMessage(message, '*');
-          console.log(`Sent height update: ${height}px, step: ${step}`);
           
           // Update tracking refs
           lastSentHeightRef.current = height;
@@ -64,7 +63,7 @@ export const useIframeResizer = () => {
           lastSentTimeRef.current[step] = now;
         }
       } catch (error) {
-        console.error('Error sending height message:', error);
+        // Error handling without logging
       } finally {
         debounceTimeoutRef.current = null;
       }

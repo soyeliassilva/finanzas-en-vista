@@ -18,9 +18,6 @@ export const useAppInitializer = () => {
       
       // Only send the init message, don't send goal_selection automatically
       sendHeight('init');
-      
-      // Log initialization
-      console.log('App initialized, sent initial height update');
     }
   }, [sendHeight]);
   
