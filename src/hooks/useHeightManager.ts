@@ -11,6 +11,7 @@ export const useHeightManager = () => {
   const location = useLocation();
   const { sendHeight } = useIframeResizer();
   const prevPathRef = useRef<string>(location.pathname);
+  const lastStepSentRef = useRef<StepName | null>(null);
   const heightUpdatedRef = useRef<Record<StepName, boolean>>({
     init: false,
     goal_selection: false,
@@ -19,14 +20,18 @@ export const useHeightManager = () => {
     simulation_results: false
   });
 
-  // Determine current step based on location path
+  // Determine current step based on location path with more precise matching
   const getCurrentStep = useCallback((): StepName => {
     const path = location.pathname;
-    if (path === '/') return 'goal_selection';
-    if (path === '/productos') return 'product_selection';
-    if (path.includes('/simulacion/form')) return 'simulation_form';
+    
+    // More specific routes first
     if (path.includes('/simulacion/results')) return 'simulation_results';
-    return 'goal_selection';
+    if (path.includes('/simulacion/form')) return 'simulation_form';
+    if (path === '/productos') return 'product_selection';
+    if (path === '/') return 'goal_selection';
+    
+    // Default fallback (should rarely happen)
+    return 'init';
   }, [location.pathname]);
   
   // Handle iframe height updates with a centralized function
@@ -35,18 +40,33 @@ export const useHeightManager = () => {
     const stepToUse = specifiedStep || getCurrentStep();
     
     if (window !== window.parent) {
+      // Prevent sending goal_selection height during transitions
+      if (!specifiedStep && stepToUse === 'goal_selection' && 
+          prevPathRef.current !== '/' && prevPathRef.current !== '') {
+        console.log('Skipping automatic goal_selection height during transition');
+        return;
+      }
+      
       // Small delay to ensure DOM is updated
       setTimeout(() => {
-        // Only send height update if we haven't sent it for this step/path already,
-        // or if it's explicitly being forced with a specifiedStep
-        if (specifiedStep || location.pathname !== prevPathRef.current || !heightUpdatedRef.current[stepToUse]) {
+        // Track the current path for next time
+        const currentPath = location.pathname;
+        
+        // Check if this is an explicit height update request or if the path/step has changed
+        const isExplicitUpdate = !!specifiedStep;
+        const pathChanged = currentPath !== prevPathRef.current;
+        const stepChanged = lastStepSentRef.current !== stepToUse;
+        
+        if (isExplicitUpdate || pathChanged || stepChanged || !heightUpdatedRef.current[stepToUse]) {
+          console.log(`Sending height for ${stepToUse} (${isExplicitUpdate ? 'explicit' : 'auto'})`);
           sendHeight(stepToUse);
           
-          // Update the tracking refs
-          prevPathRef.current = location.pathname;
+          // Update tracking refs
+          prevPathRef.current = currentPath;
+          lastStepSentRef.current = stepToUse;
           heightUpdatedRef.current[stepToUse] = true;
         }
-      }, 50);
+      }, 100); // Increased delay to ensure proper sequencing
     }
   }, [getCurrentStep, sendHeight, location.pathname]);
   

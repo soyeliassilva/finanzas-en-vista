@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType } from '../types';
@@ -12,9 +13,10 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   const navigate = useNavigate();
   const { availableGoals, loading, error, updateIframeHeight } = useSimulator();
   
-  // Update iframe height once when component mounts
+  // Update iframe height once when component mounts and data is loaded
   useEffect(() => {
-    if (!loading) {
+    if (!loading && window.location.pathname === '/') {
+      // Only update height if we're actually on the goal selection page
       updateIframeHeight('goal_selection');
     }
   }, [loading, updateIframeHeight]);

@@ -10,26 +10,19 @@ import { useHeightManager } from './useHeightManager';
 export const useAppInitializer = () => {
   const initSentRef = useRef<boolean>(false);
   const { sendHeight } = useIframeResizer();
-  const { getCurrentStep } = useHeightManager();
   
   useEffect(() => {
     // Only send the init message once when the app loads
     if (!initSentRef.current && window !== window.parent) {
       initSentRef.current = true;
       
-      // First send the init message
+      // Only send the init message, don't send goal_selection automatically
       sendHeight('init');
-      
-      // Then send the current step height (with small delay to avoid conflicts)
-      setTimeout(() => {
-        const currentStep = getCurrentStep();
-        sendHeight(currentStep);
-      }, 100);
       
       // Log initialization
       console.log('App initialized, sent initial height update');
     }
-  }, [sendHeight, getCurrentStep]);
+  }, [sendHeight]);
   
   return { initialized: initSentRef.current };
 };
