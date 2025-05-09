@@ -1,10 +1,11 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { GoalType, Product, SimulationResult } from '../types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { parseProductOverrides, applyOverridesToProducts, getCurrentUrlParams } from '../utils/urlParamsUtils';
 import { useIframeResizer } from '../hooks/useIframeResizer';
+import { useLocation } from 'react-router-dom';
 
 // Type definition for the form values
 export type SimulationFormValues = {
@@ -29,6 +30,8 @@ interface SimulatorContextType {
   setSimulationResults: React.Dispatch<React.SetStateAction<SimulationResult[]>>;
   calculationPerformed: boolean;
   setCalculationPerformed: React.Dispatch<React.SetStateAction<boolean>>;
+  // Height management
+  updateIframeHeight: (step: string) => void;
 }
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
@@ -41,6 +44,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [availableGoals, setAvailableGoals] = useState<GoalType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
   
   // New simulation state
   const [productInputs, setProductInputs] = useState<Record<string, SimulationFormValues>>({});
@@ -49,14 +53,35 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   
   const { sendHeight } = useIframeResizer();
   
-  // Handle iframe height updates
-  const triggerHeightUpdate = (step: string = "init") => {
+  // Determine current step based on location path
+  const getCurrentStep = useCallback(() => {
+    const path = location.pathname;
+    if (path === '/') return 'goal_selection';
+    if (path === '/productos') return 'product_selection';
+    if (path.includes('/simulacion/form')) return 'simulation_form';
+    if (path.includes('/simulacion/results')) return 'simulation_results';
+    return 'init';
+  }, [location.pathname]);
+  
+  // Handle iframe height updates with a centralized function
+  const updateIframeHeight = useCallback((step: string = '') => {
+    // Use provided step or determine from current route
+    const stepToUse = step || getCurrentStep();
+    
     if (window !== window.parent) {
+      // Small delay to ensure DOM is updated
       setTimeout(() => {
-        sendHeight(step);
-      }, 300);
+        sendHeight(stepToUse);
+      }, 200);
     }
-  };
+  }, [getCurrentStep, sendHeight]);
+  
+  // Update height on location change
+  useEffect(() => {
+    if (!loading) {
+      updateIframeHeight();
+    }
+  }, [location, loading, updateIframeHeight]);
   
   const handleGoalChange = (goal: GoalType) => {
     setSelectedGoal(goal);
@@ -187,8 +212,8 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       setLoading(false);
       
-      // Send height update after data is loaded with "init" step
-      triggerHeightUpdate("goal_selection");
+      // Send height update after data is loaded with proper step
+      updateIframeHeight('goal_selection');
       
     } catch (error: any) {
       console.error("Error fetching products:", error);
@@ -223,7 +248,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     simulationResults,
     setSimulationResults,
     calculationPerformed,
-    setCalculationPerformed
+    setCalculationPerformed,
+    // Expose height update function
+    updateIframeHeight
   };
   
   return <SimulatorContext.Provider value={value}>{children}</SimulatorContext.Provider>;

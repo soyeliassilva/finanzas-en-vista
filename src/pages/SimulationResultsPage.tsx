@@ -3,16 +3,15 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
 import SimulationResults from '../components/simulation/SimulationResults';
-import { useIframeResizer } from '../hooks/useIframeResizer';
 
 const SimulationResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const { 
     simulationResults, 
     calculationPerformed,
-    selectedProducts 
+    selectedProducts,
+    updateIframeHeight
   } = useSimulator();
-  const { sendHeight } = useIframeResizer();
   
   // If user navigates directly to results page without calculation, redirect to form
   useEffect(() => {
@@ -20,9 +19,9 @@ const SimulationResultsPage: React.FC = () => {
       navigate('/simulacion/form');
     } else {
       // Send height update after results are loaded
-      setTimeout(() => sendHeight("simulation_results"), 300);
+      updateIframeHeight("simulation_results");
     }
-  }, [calculationPerformed, navigate, simulationResults.length, sendHeight]);
+  }, [calculationPerformed, navigate, simulationResults.length, updateIframeHeight]);
   
   const handleContactAdvisor = () => {
     if (simulationResults.length === 0) return;
@@ -43,8 +42,8 @@ const SimulationResultsPage: React.FC = () => {
   
   const handleBack = () => {
     navigate('/simulacion/form');
-    // Send height update after navigation
-    setTimeout(() => sendHeight("simulation_form"), 100);
+    // Update height after navigation
+    updateIframeHeight("simulation_form");
   };
 
   return (

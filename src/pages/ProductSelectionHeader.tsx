@@ -1,18 +1,18 @@
 
 import React from 'react';
-import { useIframeResizer } from '../hooks/useIframeResizer';
+import { useSimulator } from '../context/SimulatorContext';
 
 interface ProductSelectionHeaderProps {
   onBack: () => void;
 }
 
 const ProductSelectionHeader: React.FC<ProductSelectionHeaderProps> = ({ onBack }) => {
-  const { sendHeight } = useIframeResizer();
+  const { updateIframeHeight } = useSimulator();
   
   const handleBack = () => {
     onBack();
-    // Send height update after navigation
-    setTimeout(() => sendHeight("goal_selection"), 100);
+    // Update height with proper step name
+    updateIframeHeight("goal_selection");
   };
   
   return (

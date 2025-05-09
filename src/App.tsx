@@ -10,17 +10,12 @@ import Index from "./pages/Index";
 import SimulationFormPage from "./pages/SimulationFormPage";
 import SimulationResultsPage from "./pages/SimulationResultsPage";
 import { preserveUrlParams } from "./utils/urlParamsUtils";
-import { useIframeResizer } from "./hooks/useIframeResizer";
 
 const queryClient = new QueryClient();
 
-// Component that uses the iframe resizer hook
-const IframeAwareApp = () => {
-  // Initialize iframe resizer
-  useIframeResizer();
-  
-  return (
-    <>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
       <TooltipProvider>
         <SimulatorProvider>
           <Toaster />
@@ -35,14 +30,6 @@ const IframeAwareApp = () => {
           </Routes>
         </SimulatorProvider>
       </TooltipProvider>
-    </>
-  );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <IframeAwareApp />
     </BrowserRouter>
   </QueryClientProvider>
 );

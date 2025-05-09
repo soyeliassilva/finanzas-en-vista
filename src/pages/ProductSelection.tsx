@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType, Product } from '../types';
@@ -5,7 +6,6 @@ import { useSimulator } from '../context/SimulatorContext';
 import ProductCard from './ProductCard';
 import ProductSelectionHeader, { Step2Instructions } from './ProductSelectionHeader';
 import { preserveUrlParams } from '../utils/urlParamsUtils';
-import { useIframeResizer } from '../hooks/useIframeResizer';
 
 interface ProductSelectionProps {
   selectedGoal: GoalType | null;
@@ -19,10 +19,9 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   setSelectedProducts,
 }) => {
   const navigate = useNavigate();
-  const { allProducts, loading, error } = useSimulator();
+  const { allProducts, loading, error, updateIframeHeight } = useSimulator();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [multiplica, setMultiplica] = useState<Product | null>(null);
-  const { sendHeight } = useIframeResizer();
 
   useEffect(() => {
     if (selectedGoal && allProducts.length > 0) {
@@ -50,15 +49,15 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const handleContinue = () => {
     if (selectedProducts.length > 0) {
       navigate(preserveUrlParams('/simulacion'));
-      // Send height update after navigation
-      setTimeout(() => sendHeight("simulation_form"), 100);
+      // Update height with proper step name
+      updateIframeHeight("simulation_form");
     }
   };
 
   const handleBack = () => {
     navigate(preserveUrlParams('/'));
-    // Send height update after navigation
-    setTimeout(() => sendHeight("goal_selection"), 100);
+    // Update height with proper step name
+    updateIframeHeight("goal_selection");
   };
 
   const isSelected = (productId: string) => {

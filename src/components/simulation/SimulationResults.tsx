@@ -6,7 +6,7 @@ import SimulationSummary from '../../pages/SimulationSummary';
 import { useChartDataGenerator } from '../../hooks/useChartDataGenerator';
 import { useResponsiveHeights } from '../../hooks/useResponsiveHeights';
 import { ChevronLeft } from 'lucide-react';
-import { useIframeResizer } from '../../hooks/useIframeResizer';
+import { useSimulator } from '../../context/SimulatorContext';
 
 interface SimulationResultsProps {
   results: SimulationResult[];
@@ -25,19 +25,19 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
   const { summaryRef, summaryHeight } = useResponsiveHeights(calculationPerformed);
   const resultsRef = useRef<HTMLDivElement>(null);
   const chartData = generateChartData(results);
-  const { sendHeight } = useIframeResizer();
+  const { updateIframeHeight } = useSimulator();
   
   // Update iframe height when results are calculated or summary height changes
   useEffect(() => {
     if (calculationPerformed && results.length > 0) {
       // Wait for chart to render then send height
       const timer = setTimeout(() => {
-        sendHeight("simulation_results");
-      }, 500);
+        updateIframeHeight("simulation_results");
+      }, 300);
       
       return () => clearTimeout(timer);
     }
-  }, [calculationPerformed, results.length, summaryHeight, sendHeight]);
+  }, [calculationPerformed, results.length, summaryHeight, updateIframeHeight]);
 
   if (!calculationPerformed || results.length === 0) {
     return null;
