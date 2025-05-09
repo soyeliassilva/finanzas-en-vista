@@ -7,12 +7,8 @@ interface ProductSelectionHeaderProps {
 }
 
 const ProductSelectionHeader: React.FC<ProductSelectionHeaderProps> = ({ onBack }) => {
-  const { updateIframeHeight } = useSimulator();
-  
   const handleBack = () => {
     onBack();
-    // Update height with proper step name
-    updateIframeHeight("goal_selection");
   };
   
   return (

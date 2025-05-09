@@ -5,7 +5,6 @@ import { useSimulator } from '../context/SimulatorContext';
 import SimulationForm from '../components/simulation/SimulationForm';
 import { getProductDefaultFormValue } from '../utils/simulationUtils';
 import { useSimulationCalculations } from '../hooks/useSimulationCalculations';
-import { useIframeResizer } from '../hooks/useIframeResizer';
 
 const SimulationFormPage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,9 +13,9 @@ const SimulationFormPage: React.FC = () => {
     productInputs, 
     setProductInputs,
     setSimulationResults,
-    setCalculationPerformed
+    setCalculationPerformed,
+    updateIframeHeight
   } = useSimulator();
-  const { sendHeight } = useIframeResizer();
   
   const { calculateResults } = useSimulationCalculations(selectedProducts);
 
@@ -27,6 +26,11 @@ const SimulationFormPage: React.FC = () => {
     ),
     [selectedProducts]
   );
+
+  // Update iframe height once when component mounts
+  useEffect(() => {
+    updateIframeHeight('simulation_form');
+  }, [updateIframeHeight]);
 
   useEffect(() => {
     // If productInputs is empty or missing products, initialize with defaults
@@ -64,14 +68,10 @@ const SimulationFormPage: React.FC = () => {
     
     // Navigate to results page
     navigate('/simulacion/results');
-    // Send height update after navigation
-    setTimeout(() => sendHeight("simulation_results"), 100);
   };
 
   const handleBack = () => {
     navigate('/productos');
-    // Send height update after navigation
-    setTimeout(() => sendHeight("product_selection"), 100);
   };
 
   return (

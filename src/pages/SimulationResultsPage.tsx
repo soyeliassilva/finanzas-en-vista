@@ -9,19 +9,22 @@ const SimulationResultsPage: React.FC = () => {
   const { 
     simulationResults, 
     calculationPerformed,
-    selectedProducts,
     updateIframeHeight
   } = useSimulator();
+  
+  // Update iframe height once when component is mounted
+  useEffect(() => {
+    if (calculationPerformed && simulationResults.length > 0) {
+      updateIframeHeight("simulation_results");
+    }
+  }, [calculationPerformed, simulationResults.length, updateIframeHeight]);
   
   // If user navigates directly to results page without calculation, redirect to form
   useEffect(() => {
     if (!calculationPerformed || simulationResults.length === 0) {
       navigate('/simulacion/form');
-    } else {
-      // Send height update after results are loaded
-      updateIframeHeight("simulation_results");
     }
-  }, [calculationPerformed, navigate, simulationResults.length, updateIframeHeight]);
+  }, [calculationPerformed, navigate, simulationResults.length]);
   
   const handleContactAdvisor = () => {
     if (simulationResults.length === 0) return;
@@ -42,8 +45,6 @@ const SimulationResultsPage: React.FC = () => {
   
   const handleBack = () => {
     navigate('/simulacion/form');
-    // Update height after navigation
-    updateIframeHeight("simulation_form");
   };
 
   return (

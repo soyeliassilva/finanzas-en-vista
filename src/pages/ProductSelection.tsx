@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType, Product } from '../types';
@@ -22,6 +21,13 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const { allProducts, loading, error, updateIframeHeight } = useSimulator();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [multiplica, setMultiplica] = useState<Product | null>(null);
+
+  // Update iframe height once when component mounts
+  useEffect(() => {
+    if (!loading) {
+      updateIframeHeight('product_selection');
+    }
+  }, [loading, updateIframeHeight]);
 
   useEffect(() => {
     if (selectedGoal && allProducts.length > 0) {
@@ -49,15 +55,11 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const handleContinue = () => {
     if (selectedProducts.length > 0) {
       navigate(preserveUrlParams('/simulacion'));
-      // Update height with proper step name
-      updateIframeHeight("simulation_form");
     }
   };
 
   const handleBack = () => {
     navigate(preserveUrlParams('/'));
-    // Update height with proper step name
-    updateIframeHeight("goal_selection");
   };
 
   const isSelected = (productId: string) => {

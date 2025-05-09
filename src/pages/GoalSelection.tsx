@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType } from '../types';
 import { useSimulator } from '../context/SimulatorContext';
@@ -13,11 +12,16 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   const navigate = useNavigate();
   const { availableGoals, loading, error, updateIframeHeight } = useSimulator();
   
+  // Update iframe height once when component mounts
+  useEffect(() => {
+    if (!loading) {
+      updateIframeHeight('goal_selection');
+    }
+  }, [loading, updateIframeHeight]);
+  
   const handleContinue = () => {
     if (selectedGoal) {
       navigate('/productos');
-      // Update height with proper step name
-      updateIframeHeight('product_selection');
     }
   };
   

@@ -5,13 +5,13 @@ import { useEffect, useRef, useCallback } from 'react';
  * Hook that communicates the application's height to a parent iframe container
  * using the postMessage API. It sends height updates on:
  * - Initial load
- * - Window resize (horizontal only)
  * - When explicitly called (navigation events)
  * 
  * Optimized to:
  * - Include step name alongside height in messages
  * - Only send height if it or step has changed from previous value
- * - Only send on explicit calls and horizontal resizes
+ * - Prevent duplicate messages with the same step and height
+ * - Support an initial "init" message on first load
  */
 export const useIframeResizer = () => {
   const isInIframe = window !== window.parent;
@@ -19,6 +19,7 @@ export const useIframeResizer = () => {
   const lastSentHeightRef = useRef<number>(0); // Track last sent height
   const lastSentStepRef = useRef<string | null>(null); // Track last sent step
   const initialSentRef = useRef<boolean>(false); // Track if initial height was sent
+  const sentMessagesMapRef = useRef<Map<string, number>>(new Map()); // Track sent messages to prevent duplicates
 
   // Send the current height to the parent window if it has changed
   const sendHeight = useCallback((step?: string) => {
@@ -26,56 +27,52 @@ export const useIframeResizer = () => {
     
     try {
       const height = document.body.scrollHeight;
-      const message = step ? { height, step } : { height };
+      const actualStep = step || 'not specified';
+      const messageKey = `${height}-${actualStep}`;
       
-      // Only send if height or step has changed
-      const shouldSend = (height !== lastSentHeightRef.current || step !== lastSentStepRef.current);
+      // Check if we've sent this exact height+step combination recently
+      const lastSentTime = sentMessagesMapRef.current.get(messageKey);
+      const now = Date.now();
+      const isDuplicate = lastSentTime && (now - lastSentTime < 300); // Prevent duplicates within 300ms
       
+      // Only send if height or step has changed and not a duplicate
+      const shouldSend = !isDuplicate && 
+        (height !== lastSentHeightRef.current || actualStep !== lastSentStepRef.current || actualStep === 'init');
+
       if (shouldSend) {
+        const message = { height, step: actualStep };
         window.parent.postMessage(message, '*');
-        console.log(`Sent height update: ${height}px, step: ${step || 'not specified'}`);
-        lastSentHeightRef.current = height; // Update last sent height
-        if (step) lastSentStepRef.current = step; // Update last sent step
+        console.log(`Sent height update: ${height}px, step: ${actualStep}`);
+        
+        // Update tracking refs
+        lastSentHeightRef.current = height;
+        lastSentStepRef.current = actualStep;
+        sentMessagesMapRef.current.set(messageKey, now);
+        
+        // Clean up old messages from the map (older than 1 second)
+        if (sentMessagesMapRef.current.size > 10) {
+          for (const [key, timestamp] of sentMessagesMapRef.current.entries()) {
+            if (now - timestamp > 1000) {
+              sentMessagesMapRef.current.delete(key);
+            }
+          }
+        }
       }
     } catch (error) {
       console.error('Error sending height message:', error);
     }
   }, [isInIframe]);
 
-  // Debounced version for window resize events
-  const debouncedSendHeight = useCallback(() => {
-    if (resizeTimeoutRef.current) {
-      window.clearTimeout(resizeTimeoutRef.current);
-    }
-    
-    resizeTimeoutRef.current = window.setTimeout(() => {
-      sendHeight(lastSentStepRef.current || undefined);
-      resizeTimeoutRef.current = null;
-    }, 100);
-  }, [sendHeight]);
-
-  // Setup window resize listener (for horizontal resizes only)
+  // Send initial height message with "init" step
   useEffect(() => {
     if (!isInIframe || initialSentRef.current) return;
     
     // Only send initial height once
     initialSentRef.current = true;
     
-    // Handle window resize events
-    const handleResize = () => {
-      debouncedSendHeight();
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      if (resizeTimeoutRef.current) {
-        window.clearTimeout(resizeTimeoutRef.current);
-      }
-      
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [isInIframe, debouncedSendHeight]);
+    // Send init message first
+    sendHeight('init');
+  }, [isInIframe, sendHeight]);
   
   // Return the function for manual calls
   return { sendHeight };
