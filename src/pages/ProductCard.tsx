@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Product } from '../types';
@@ -5,6 +6,7 @@ import { formatNumber, formatPercentage } from '../utils/calculator';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
 import { useSimulator } from '../context/SimulatorContext';
+import { useIframeResizer } from '../hooks/useIframeResizer';
 
 interface ProductCardProps {
   product: Product;
@@ -15,19 +17,19 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle }) => {
   const isMobile = useIsMobile();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const { updateIframeHeight } = useSimulator();
+  const { sendHeight } = useIframeResizer();
   
   // Update iframe height when accordion is opened/closed
   useEffect(() => {
-    if (isMobile && isDetailsOpen) {
+    if (isMobile && isDetailsOpen !== null) {
       // Small delay to ensure content is fully rendered
       const timer = setTimeout(() => {
-        updateIframeHeight("product_selection");
+        sendHeight("init");
       }, 300);
       
       return () => clearTimeout(timer);
     }
-  }, [isDetailsOpen, isMobile, updateIframeHeight]);
+  }, [isDetailsOpen, isMobile, sendHeight]);
   
   // Truncate text with ellipsis at the word level
   const truncateText = (text: string, limit: number) => {
