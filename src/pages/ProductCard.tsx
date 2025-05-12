@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Product } from '../types';
@@ -95,17 +94,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           className="w-full flex-grow flex flex-col"
         >
           {!isDetailsOpen && (
-            <div className="mb-2">
-              <p className="text-sm">{truncatedDescription}</p>
-            </div>
+            <>
+              <div className="mb-2">
+                <p className="text-sm">{truncatedDescription}</p>
+              </div>
+              
+              <CollapsibleTrigger className="flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md">
+                <span className="text-xs font-medium mr-1">Ver detalles</span>
+                <ChevronDown size={14} />
+              </CollapsibleTrigger>
+            </>
           )}
-          
-          <CollapsibleTrigger className="flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md">
-            <span className="text-xs font-medium mr-1">
-              {isDetailsOpen ? 'Ver menos' : 'Ver detalles'}
-            </span>
-            <ChevronDown size={14} className={`transform transition-transform ${isDetailsOpen ? 'rotate-180' : ''}`} />
-          </CollapsibleTrigger>
           
           <CollapsibleContent className="space-y-2 mt-3 animate-accordion-down">
             <p className="text-sm mb-2">{product.description}</p>
@@ -133,6 +132,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
                 <p className="text-sm">{product.disclaimer}</p>
               </div>
             )}
+            
+            {/* Button at the bottom when expanded */}
+            <CollapsibleTrigger className="flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md mt-4">
+              <span className="text-xs font-medium mr-1">Ver menos</span>
+              <ChevronDown size={14} className="transform rotate-180" />
+            </CollapsibleTrigger>
           </CollapsibleContent>
         </Collapsible>
         

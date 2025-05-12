@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType, Product } from '../types';
@@ -106,7 +107,7 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
           </p>
         </div>
         <Step2Instructions show={showStep2Instructions} />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4 mb-6">
           {multiplica && (
             <ProductCard
               key={multiplica.id}
