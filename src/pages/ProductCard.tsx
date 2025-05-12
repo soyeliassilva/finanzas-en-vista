@@ -72,28 +72,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
             <p className="text-sm">Plazo: 1 año</p>
           </div>
         )}
-        {product.product_initial_contribution_min > 0 && (
-          <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-            <p className="text-sm">
-              Aportación inicial desde {formatNumber(product.product_initial_contribution_min)}€
-            </p>
-          </div>
-        )}
-        {(product.product_monthly_contribution_min !== 0 || 
-          (product.product_monthly_contribution_max !== null && 
-           product.product_monthly_contribution_max !== undefined)) && (
-          <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-            <p className="text-sm">
-              {product.product_monthly_contribution_min !== 0
-                ? `Aportaciones mensuales desde ${formatNumber(product.product_monthly_contribution_min)}€`
-                : product.product_monthly_contribution_max === null || product.product_monthly_contribution_max === undefined
-                ? "Aportaciones mensuales sin límites"
-                : `Con aportaciones mensuales de hasta ${formatNumber(product.product_monthly_contribution_max)}€`}
-            </p>
-          </div>
-        )}
         {product.product_total_contribution_max && (
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
@@ -108,7 +86,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
             <p className="text-sm">{product.conditions}</p>
           </div>
         )}
-        {product.terms && (
+        {product.terms && !product.product_yield_description && (
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
             <p className="text-sm">{product.terms}</p>
