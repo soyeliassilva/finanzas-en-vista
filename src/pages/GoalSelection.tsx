@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GoalType } from '../types';
 import { useSimulator } from '../context/SimulatorContext';
+import { useIsMobile } from '../hooks/use-mobile';
+import { ChevronRight } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
 
 interface GoalSelectionProps {
   selectedGoal: GoalType | null;
@@ -13,6 +16,8 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   const location = useLocation();
   const { availableGoals, loading, error, updateIframeHeight } = useSimulator();
   const isDirectNavigationRef = React.useRef(false);
+  const isMobile = useIsMobile();
+  const [showStep2Mobile, setShowStep2Mobile] = useState(false);
   
   // Check if this is a direct navigation to goal selection
   useEffect(() => {
@@ -25,15 +30,27 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   
   const handleContinue = () => {
     if (selectedGoal) {
-      navigate('/productos');
+      if (isMobile) {
+        setShowStep2Mobile(true);
+      } else {
+        navigate('/productos');
+      }
     }
+  };
+  
+  const handleBackToStep1 = () => {
+    setShowStep2Mobile(false);
+  };
+  
+  const handleNavigateToProducts = () => {
+    navigate('/productos');
   };
   
   if (loading) {
     return (
-      <div className="container mx-auto py-12">
+      <div className="container mx-auto py-8 md:py-12">
         <div className="text-center">
-          <p className="text-lg">Cargando objetivos de inversión...</p>
+          <p className="text-base md:text-lg">Cargando objetivos de inversión...</p>
         </div>
       </div>
     );
@@ -41,15 +58,96 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   
   if (error) {
     return (
-      <div className="container mx-auto py-12">
+      <div className="container mx-auto py-8 md:py-12">
         <div className="text-center">
-          <p className="text-lg text-red-600">Error: {error}</p>
-          <p>Por favor, recargue la página o intente más tarde.</p>
+          <p className="text-base md:text-lg text-red-600">Error: {error}</p>
+          <p className="text-sm md:text-base">Por favor, recargue la página o intente más tarde.</p>
         </div>
       </div>
     );
   }
   
+  // Mobile view with step toggle
+  if (isMobile) {
+    return (
+      <div className="container mx-auto">
+        {!showStep2Mobile ? (
+          // Step 1 Mobile View
+          <div className="step-container active-step">
+            <div className="mb-4 md:mb-6">
+              <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 1</h3>
+              <h2 className="text-2xl md:text-3xl text-primary mb-3 md:mb-4">
+                Selecciona tu objetivo de ahorro
+              </h2>
+            </div>
+            
+            <div>
+              {availableGoals.map((goal) => (
+                <div
+                  className="radio-option h-14 rounded-lg px-3 py-2 bg-white border border-neutral transition-all duration-150 cursor-pointer flex items-center gap-2"
+                  style={{ minHeight: "3.5rem", marginTop: "0.5rem", marginBottom: "0.5rem" }}
+                  key={goal}
+                  onClick={() => setSelectedGoal(goal)}
+                >
+                  <div className="radio-circle flex-shrink-0">
+                    {selectedGoal === goal && <div className="radio-selected" />}
+                  </div>
+                  <label className="cursor-pointer flex-1 text-base font-medium select-none m-0 p-0 flex items-center h-full">
+                    {goal}
+                  </label>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6">
+              <button
+                className={`btn-primary w-full justify-center ${!selectedGoal ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={handleContinue}
+                disabled={!selectedGoal}
+              >
+                Continuar <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        ) : (
+          // Step 2 Mobile View
+          <div className="step-container active-step">
+            <div className="mb-4 md:mb-6">
+              <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 2</h3>
+              <h2 className="text-2xl md:text-3xl text-primary mb-3 md:mb-4">
+                Propuesta de productos
+              </h2>
+              <p className="text-sm">
+                Elegiste <strong>{selectedGoal}</strong> como tu objetivo
+              </p>
+            </div>
+            
+            <div className="bg-neutral/20 p-6 rounded-md flex items-center justify-center">
+              <p className="text-primary/70">Haz clic en Continuar para ver los productos recomendados</p>
+            </div>
+            
+            <div className="mt-6 flex flex-col space-y-3">
+              <button
+                className="btn-primary w-full justify-center"
+                onClick={handleNavigateToProducts}
+              >
+                Continuar <ChevronRight size={16} />
+              </button>
+              
+              <button 
+                className="btn-outline w-full justify-center"
+                onClick={handleBackToStep1}
+              >
+                Volver a seleccionar objetivo
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  // Desktop view (unchanged layout)
   return (
     <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-4">
       <div className="md:col-span-4 step-container active-step">

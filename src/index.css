@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -89,11 +90,11 @@
 
 /* Custom styles for the application */
 .product-card {
-  @apply bg-white p-5 rounded-md;
+  @apply bg-white p-4 md:p-5 rounded-md;
 }
 
 .step-container {
-  @apply bg-light border border-neutral p-6 rounded-md;
+  @apply bg-light border border-neutral p-4 md:p-6 rounded-md;
 }
 
 .active-step {
@@ -101,23 +102,23 @@
 }
 
 .btn-primary {
-  @apply bg-primary text-white py-2 px-4 rounded-md flex items-center gap-2 hover:bg-primary/90;
+  @apply bg-primary text-white py-1.5 md:py-2 px-3 md:px-4 rounded-md flex items-center gap-2 hover:bg-primary/90;
 }
 
 .btn-outline {
-  @apply border border-primary text-primary py-2 px-4 rounded-md flex items-center gap-2 hover:bg-primary/10;
+  @apply border border-primary text-primary py-1.5 md:py-2 px-3 md:px-4 rounded-md flex items-center gap-2 hover:bg-primary/10;
 }
 
 .radio-option {
-  @apply flex items-center gap-2 my-4;
+  @apply flex items-center gap-2 my-3 md:my-4;
 }
 
 .radio-circle {
-  @apply w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center;
+  @apply w-4 h-4 md:w-5 md:h-5 rounded-full border-2 border-primary flex items-center justify-center;
 }
 
 .radio-selected {
-  @apply w-3 h-3 rounded-full bg-primary;
+  @apply w-2 h-2 md:w-3 md:h-3 rounded-full bg-primary;
 }
 
 /* Table styles */
@@ -127,7 +128,7 @@
 
 .comparison-table th,
 .comparison-table td {
-  @apply py-2 px-4 border-b border-neutral;
+  @apply py-1 md:py-2 px-2 md:px-4 border-b border-neutral;
 }
 
 .comparison-table th {
@@ -140,15 +141,15 @@
 
 /* Input styles */
 .form-input {
-  @apply px-3 py-2 border border-neutral rounded-md w-full focus:outline-none focus:ring-2 focus:ring-primary;
+  @apply px-2 md:px-3 py-1.5 md:py-2 border border-neutral rounded-md w-full focus:outline-none focus:ring-2 focus:ring-primary;
 }
 
 .form-group {
-  @apply mb-4;
+  @apply mb-3 md:mb-4;
 }
 
 .form-label {
-  @apply block mb-2;
+  @apply block mb-1 md:mb-2;
 }
 
 /* Custom chart colors */
@@ -162,4 +163,35 @@
 
 .chart-color-3 {
   @apply text-accent;
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .container {
+    @apply px-3;
+  }
+  
+  .product-card {
+    @apply mb-3;
+  }
+  
+  /* More compact form elements on mobile */
+  .form-input, .form-select {
+    @apply text-sm;
+  }
+  
+  /* Smaller spacing for accordion elements */
+  .accordion-content {
+    @apply py-1;
+  }
+  
+  /* Optimized mobile cards */
+  .mobile-card {
+    @apply p-3;
+  }
+  
+  /* Ensure buttons have appropriate touch targets */
+  button, a[role="button"] {
+    @apply min-h-[36px];
+  }
 }

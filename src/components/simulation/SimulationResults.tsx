@@ -7,6 +7,7 @@ import { useChartDataGenerator } from '../../hooks/useChartDataGenerator';
 import { useResponsiveHeights } from '../../hooks/useResponsiveHeights';
 import { ChevronLeft } from 'lucide-react';
 import { useSimulator } from '../../context/SimulatorContext';
+import { useIsMobile } from '../../hooks/use-mobile';
 
 interface SimulationResultsProps {
   results: SimulationResult[];
@@ -26,6 +27,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
   const resultsRef = useRef<HTMLDivElement>(null);
   const chartData = generateChartData(results);
   const { updateIframeHeight } = useSimulator();
+  const isMobile = useIsMobile();
   
   // Update iframe height once when results component is fully rendered
   useEffect(() => {
@@ -44,31 +46,55 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
   }
 
   return (
-    <div ref={resultsRef}>
-      <div className="mb-6">
+    <div ref={resultsRef} className="animate-fade-in">
+      <div className="mb-4 md:mb-6">
         <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 4</h3>
-        <h2 className="text-3xl text-primary mb-4">
+        <h2 className="text-2xl md:text-3xl text-primary mb-3 md:mb-4">
           Resultados de tu simulación
         </h2>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:grid-flow-col auto-rows-fr">
-        <SimulationSummary 
-          results={results} 
-          handleContactAdvisor={handleContactAdvisor}
-          ref={summaryRef} 
-        />
-        <SimulationChart 
-          results={results} 
-          chartData={chartData} 
-          getTotalAmount={() => getTotalAmount(results)}
-          summaryHeight={summaryHeight} 
-        />
-      </div>
+      {isMobile ? (
+        // Mobile layout: Chart on top, Summary below
+        <div className="flex flex-col space-y-4">
+          <div className="step-container">
+            <SimulationChart 
+              results={results} 
+              chartData={chartData} 
+              getTotalAmount={() => getTotalAmount(results)}
+              summaryHeight={null}
+              forceMobileHeight={300}
+            />
+          </div>
+          
+          <div className="step-container">
+            <SimulationSummary 
+              results={results} 
+              handleContactAdvisor={handleContactAdvisor}
+              ref={summaryRef} 
+            />
+          </div>
+        </div>
+      ) : (
+        // Desktop layout: Grid with columns
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:grid-flow-col auto-rows-fr">
+          <SimulationSummary 
+            results={results} 
+            handleContactAdvisor={handleContactAdvisor}
+            ref={summaryRef} 
+          />
+          <SimulationChart 
+            results={results} 
+            chartData={chartData} 
+            getTotalAmount={() => getTotalAmount(results)}
+            summaryHeight={summaryHeight} 
+          />
+        </div>
+      )}
       
-      <div className="mt-6">
-        <button className="btn-outline" type="button" onClick={handleBack}>
-          <ChevronLeft size={18} /> Volver a la simulación
+      <div className="mt-4 md:mt-6">
+        <button className="btn-outline py-1.5 md:py-2" type="button" onClick={handleBack}>
+          <ChevronLeft size={isMobile ? 16 : 18} /> Volver a la simulación
         </button>
       </div>
     </div>

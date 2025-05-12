@@ -14,9 +14,16 @@ interface SimulationChartProps {
   chartData: any[];
   getTotalAmount: () => number;
   summaryHeight: number | null;
+  forceMobileHeight?: number;
 }
 
-const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, getTotalAmount, summaryHeight }) => {
+const SimulationChart: React.FC<SimulationChartProps> = ({ 
+  results, 
+  chartData, 
+  getTotalAmount, 
+  summaryHeight,
+  forceMobileHeight 
+}) => {
   const headerRef = useRef<HTMLHeadingElement>(null);
   const summaryInfoRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
@@ -25,9 +32,15 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
   const isMobile = useIsMobile();
   
   // Calculate chart height based on number of products for desktop
-  // or based on summary height for mobile
+  // or based on summary height for mobile (or use forceMobileHeight)
   useEffect(() => {
     if (isMobile) {
+      // Use forced height if provided, otherwise calculate
+      if (forceMobileHeight) {
+        setChartHeight(forceMobileHeight);
+        return;
+      }
+      
       // Mobile height calculation (existing logic)
       if (!summaryHeight) return;
       
@@ -61,7 +74,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
       const cappedHeight = Math.min(desktopHeight, MAX_CHART_HEIGHT);
       setChartHeight(cappedHeight);
     }
-  }, [summaryHeight, isMobile, results.length]);
+  }, [summaryHeight, isMobile, results.length, forceMobileHeight]);
 
   // Find the highest value in the chart data for Y-axis domain calculation
   const maxDataValue = useMemo(() => {
@@ -81,13 +94,13 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
   const totalAmountText = "Importe total bruto acumulado";
 
   return (
-    <div className="md:col-span-7 step-container h-full">
-      <h3 ref={headerRef} className="text-xl font-bold mb-4">Previsión de rentabilidad</h3>
+    <div className={isMobile ? "" : "md:col-span-7 h-full"}>
+      <h3 ref={headerRef} className="text-lg md:text-xl font-bold mb-3 md:mb-4">Previsión de rentabilidad</h3>
 
-      <div ref={summaryInfoRef} className="mb-4">
+      <div ref={summaryInfoRef} className="mb-2 md:mb-4">
         <div className="flex justify-between items-center">
-          <p className="font-bold">{totalAmountText}</p>
-          <p className="text-2xl font-bold">
+          <p className="font-bold text-sm md:text-base">{totalAmountText}</p>
+          <p className="text-xl md:text-2xl font-bold">
             {formatCurrency(
               results.reduce((total, result) => total + result.finalAmount, 0)
             )}
@@ -95,27 +108,28 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
         </div>
       </div>
 
-      <div style={{ height: `${chartHeight}px` }} className="min-h-[300px] max-h-[700px] mt-6">
+      <div style={{ height: `${chartHeight}px` }} className={`min-h-[${isMobile ? '250px' : '300px'}] max-h-[700px] mt-4 md:mt-6`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#CFCFCF" />
             <XAxis 
               dataKey="month"
-              ticks={chartData.filter(d => d.month % 12 === 0).map(d => d.month)}
+              ticks={chartData.filter(d => d.month % (isMobile ? 24 : 12) === 0).map(d => d.month)}
               tickFormatter={(value) => {
-                if (value === 0) return '0 años';
-                return value === 12 ? '1 año' : `${Math.floor(value / 12)} años`;
+                if (value === 0) return '0';
+                return isMobile 
+                  ? `${Math.floor(value / 12)}` 
+                  : value === 12 ? '1 año' : `${Math.floor(value / 12)} años`;
               }}
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: isMobile ? 10 : 12 }}
             />
             <YAxis 
               tickFormatter={(value) => {
                 return `${formatNumber(value / 1000)}k`;
               }}
-              width={40}
-              tick={{ fontSize: 12 }}
+              width={35}
+              tick={{ fontSize: isMobile ? 10 : 12 }}
               domain={[0, maxDataValue]}
-              // Set interval property to prevent repetitive ticks
               interval="preserveStartEnd"
             />
             <Tooltip 
@@ -134,16 +148,16 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
                 type="monotone"
                 dataKey={result.name}
                 stroke={chartColors[index % chartColors.length]}
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
+                strokeWidth={isMobile ? 1.5 : 2}
+                dot={{ r: isMobile ? 2 : 3 }}
+                activeDot={{ r: isMobile ? 4 : 5 }}
               />
             ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div ref={footerRef} className="mt-4 text-xs text-left">
+      <div ref={footerRef} className="mt-2 md:mt-4 text-[10px] md:text-xs text-left">
         <p>Rentabilidades pasadas no presuponen rentabilidades futuras. La información facilitada por este simulador es orientativa al basarse en hipótesis , por lo que su contenido no es vinculante y puede variar en consultas futuras</p>
       </div>
     </div>
