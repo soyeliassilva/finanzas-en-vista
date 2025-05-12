@@ -75,7 +75,7 @@ const SimulationFormPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto">
       <SimulationForm
         selectedProducts={selectedProducts}
         productInputs={productInputs}
