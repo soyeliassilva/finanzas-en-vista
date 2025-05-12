@@ -51,9 +51,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
     ? Math.ceil(product.product_duration_months_min / 12) 
     : 1;
 
-  // Check if the product is Plan Ahorro Multiplica
-  const isPlanAhorroMultiplica = product.id === "494eb328-e867-46a7-8f60-c7a4840c7f29";
-
   return (
     <div
       className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
@@ -66,12 +63,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
           {displayYield()}
         </div>
-        {isPlanAhorroMultiplica && (
-          <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-            <p className="text-sm">Plazo: 1 año</p>
-          </div>
-        )}
         {product.product_total_contribution_max && (
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
