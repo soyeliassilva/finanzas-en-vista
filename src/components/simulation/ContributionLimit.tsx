@@ -56,11 +56,8 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
           )}
           {product.minInitialDeposit < annualLimit && product.minMonthlyDeposit > 0 && (
             <p className="mt-1 text-xs italic">
-              Con una aportación inicial de {formatNumber(product.minInitialDeposit)}€, 
-              podrá realizar hasta {potentialMonthsWithContributions} {potentialMonthsWithContributions === 1 ? 'aportación mensual' : 'aportaciones mensuales'} 
-              completas durante el primer año.
               {firstYearAllowance % product.minMonthlyDeposit !== 0 && potentialMonthsWithContributions < 12 && (
-                ` La última aportación será parcial de ${formatNumber(firstYearAllowance % product.minMonthlyDeposit)}€.`
+                `La última aportación será parcial de ${formatNumber(firstYearAllowance % product.minMonthlyDeposit)}€.`
               )}
             </p>
           )}
