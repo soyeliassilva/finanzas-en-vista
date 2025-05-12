@@ -56,13 +56,13 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
       <div className="md:col-span-4 step-container active-step">
         <div className="mb-6">
           <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 1</h3>
-          <h2 className="text-3xl text-primary mb-4">Objetivo de ahorro</h2>
-          <p className="text-sm">
+          <h2 className="text-3xl text-primary mb-4">Selecciona tu objetivo de ahorro</h2>
+          <p className="text-sm hidden">
             Selecciona tu objetivo de ahorro
           </p>
         </div>
         
-        <h3 className="text-lg font-bold mb-4">Selecciona tu necesidad</h3>
+        <h3 className="text-lg font-bold mb-4 hidden">Selecciona tu necesidad</h3>
         
         <div>
           {availableGoals.map((goal) => (
@@ -97,9 +97,9 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
         <div className="mb-6">
           <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 2</h3>
           <h2 className="text-3xl text-primary mb-4">
-            Compara los productos en función de tu objetivo
+            Propuesta de productos para conseguir tu objetivo, elige los que quieras comparar
           </h2>
-          <p className="text-sm">
+          <p className="text-sm hidden">
             Propuesta de productos para conseguir tu objetivo, elige los que quieras comparar
           </p>
         </div>

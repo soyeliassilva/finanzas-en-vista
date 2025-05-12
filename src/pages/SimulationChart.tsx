@@ -78,7 +78,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({ results, chartData, g
   }, [chartData, results]);
 
   // Changed to always use a single text regardless of number of products
-  const totalAmountText = "Importe total bruto";
+  const totalAmountText = "Importe total bruto acumulado";
 
   return (
     <div className="md:col-span-7 step-container h-full">

@@ -34,7 +34,7 @@ const SimulationForm: React.FC<SimulationFormProps> = ({
       <div className="mb-6">
         <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 3</h3>
         <h2 className="text-3xl text-primary mb-4">
-          Introduce tu plan de ahorro: cuanto puedes ahorrar y en cuanto tiempo
+          Personaliza tu plan de ahorro: cuanto puedes ahorrar y en cuanto tiempo
         </h2>
       </div>
       <form

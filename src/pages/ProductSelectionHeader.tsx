@@ -16,7 +16,7 @@ const ProductSelectionHeader: React.FC<ProductSelectionHeaderProps> = ({ onBack 
       <div className="mb-6">
         <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 1</h3>
         <h2 className="text-3xl text-primary mb-4">Objetivo de ahorro</h2>
-        <p className="text-sm">
+        <p className="text-sm hidden">
           Selecciona tu objetivo y compara productos para maximizar tus beneficios
         </p>
       </div>

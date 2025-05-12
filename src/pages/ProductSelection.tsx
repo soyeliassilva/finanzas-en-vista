@@ -99,9 +99,9 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
         <div className="mb-6">
           <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 2</h3>
           <h2 className="text-3xl text-primary mb-4">
-            Compara los productos en función de tu objetivo
+            Propuesta de productos para conseguir tu objetivo, elige los que quieras comparar
           </h2>
-          <p className="text-sm">
+          <p className="text-sm hidden">
             Elige los productos a continuación para simular tu rentabilidad
           </p>
         </div>
