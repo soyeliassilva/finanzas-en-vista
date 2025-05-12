@@ -63,14 +63,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
           {displayYield()}
         </div>
-        {product.product_total_contribution_max && (
-          <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
-            <p className="text-sm">
-              Contribución máxima: {formatNumber(product.product_total_contribution_max)}€
-            </p>
-          </div>
-        )}
         {product.conditions && (
           <div className="flex items-start">
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
