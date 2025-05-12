@@ -1,3 +1,4 @@
+
 export type GoalType = string;
 
 export interface Product {
@@ -30,6 +31,7 @@ export interface Product {
   url?: string;
   conditions?: string;
   terms?: string;
+  product_yield_description?: string;
 }
 
 export interface SimulationResult {

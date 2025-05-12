@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Product } from '../types';
@@ -13,6 +12,14 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle }) => {
   // Determine which yield rate to display
   const displayYield = () => {
+    // If product_yield_description exists, display it directly
+    if (product.product_yield_description) {
+      return (
+        <p className="text-sm">{product.product_yield_description}</p>
+      );
+    }
+    
+    // Otherwise fall back to the original logic
     if (product.yield10PlusYears || product.yield5PlusYears) {
       let yieldText = `Rentabilidad: ${formatPercentage(product.yield).replace(' %', '%')}`;
       
@@ -93,6 +100,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
             <p className="text-sm">
               Contribución máxima: {formatNumber(product.product_total_contribution_max)}€
             </p>
+          </div>
+        )}
+        {product.conditions && (
+          <div className="flex items-start">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <p className="text-sm">{product.conditions}</p>
+          </div>
+        )}
+        {product.terms && (
+          <div className="flex items-start">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <p className="text-sm">{product.terms}</p>
+          </div>
+        )}
+        {product.disclaimer && (
+          <div className="flex items-start">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <p className="text-sm">{product.disclaimer}</p>
           </div>
         )}
       </div>

@@ -29,6 +29,7 @@ export type Database = {
           product_terms: string | null
           product_total_contribution_max: number | null
           product_url: string | null
+          product_yield_description: string | null
         }
         Insert: {
           id?: string
@@ -49,6 +50,7 @@ export type Database = {
           product_terms?: string | null
           product_total_contribution_max?: number | null
           product_url?: string | null
+          product_yield_description?: string | null
         }
         Update: {
           id?: string
@@ -69,6 +71,7 @@ export type Database = {
           product_terms?: string | null
           product_total_contribution_max?: number | null
           product_url?: string | null
+          product_yield_description?: string | null
         }
         Relationships: []
       }

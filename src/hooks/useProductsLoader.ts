@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Product, GoalType } from '../types';
 import { toast } from 'sonner';
@@ -60,7 +59,8 @@ export const useProductsLoader = () => {
         disclaimer: item.product_disclaimer,
         url: item.product_url,
         conditions: item.product_conditions,
-        terms: item.product_terms
+        terms: item.product_terms,
+        product_yield_description: item.product_yield_description
       }));
       
       // Store raw products from Supabase
@@ -68,7 +68,6 @@ export const useProductsLoader = () => {
       setLoading(false);
       
     } catch (error: any) {
-      console.error("Error fetching products:", error);
       setError(error.message || 'Error loading products');
       setLoading(false);
       toast.error('Error al cargar los productos. Por favor, intente nuevamente.');
