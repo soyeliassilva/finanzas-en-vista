@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Product } from '../types';
@@ -28,6 +29,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
       return () => clearTimeout(timer);
     }
   }, [isDetailsOpen, isMobile, updateIframeHeight]);
+  
+  // Truncate text with ellipsis at the word level
+  const truncateText = (text: string, limit: number) => {
+    if (text.length <= limit) return text;
+    const truncated = text.substring(0, limit).split(' ').slice(0, -1).join(' ');
+    return `${truncated}...`;
+  };
   
   // Display yield information
   const displayYield = () => {
@@ -72,6 +80,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
   
   // For mobile accordion view
   if (isMobile) {
+    // Create a truncated version of the product description
+    const truncatedDescription = truncateText(product.description, 80);
+    
     return (
       <div
         className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
@@ -83,14 +94,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           onOpenChange={setIsDetailsOpen}
           className="w-full flex-grow flex flex-col"
         >
-          <CollapsibleTrigger className={`flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md ${isDetailsOpen ? 'mb-3' : ''}`}>
+          {!isDetailsOpen && (
+            <div className="mb-2">
+              <p className="text-sm">{truncatedDescription}</p>
+            </div>
+          )}
+          
+          <CollapsibleTrigger className="flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md">
             <span className="text-xs font-medium mr-1">
               {isDetailsOpen ? 'Ver menos' : 'Ver detalles'}
             </span>
             <ChevronDown size={14} className={`transform transition-transform ${isDetailsOpen ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           
-          <CollapsibleContent className="space-y-2 animate-accordion-down flex flex-col">
+          <CollapsibleContent className="space-y-2 mt-3 animate-accordion-down">
             <p className="text-sm mb-2">{product.description}</p>
             
             <div className="flex items-start">
@@ -115,14 +132,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
                 <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
                 <p className="text-sm">{product.disclaimer}</p>
               </div>
-            )}
-            
-            {/* Move the toggle button to the bottom when details are open */}
-            {isDetailsOpen && (
-              <CollapsibleTrigger className="flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md mt-3">
-                <span className="text-xs font-medium mr-1">Ver menos</span>
-                <ChevronDown size={14} className="transform rotate-180" />
-              </CollapsibleTrigger>
             )}
           </CollapsibleContent>
         </Collapsible>
