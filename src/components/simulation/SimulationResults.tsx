@@ -47,7 +47,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
 
   return (
     <div ref={resultsRef} className="animate-fade-in">
-      <div className="mb-4 md:mb-6">
+      <div className="mb-4 md:mb-6 px-3 md:px-0">
         <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 4</h3>
         <h2 className="text-2xl md:text-3xl text-primary mb-3 md:mb-4">
           Resultados de tu simulación
@@ -55,8 +55,8 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
       </div>
       
       {isMobile ? (
-        // Mobile layout: Chart on top, Summary below
-        <div className="flex flex-col space-y-4">
+        // Mobile layout: Chart on top, Summary below, with 0 gap
+        <div className="flex flex-col space-y-0">
           <div className="step-container">
             <SimulationChart 
               results={results} 
@@ -92,7 +92,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
         </div>
       )}
       
-      <div className="mt-4 md:mt-6">
+      <div className="mt-4 md:mt-6 px-3 md:px-0">
         <button className="btn-outline py-1.5 md:py-2" type="button" onClick={handleBack}>
           <ChevronLeft size={isMobile ? 16 : 18} /> Volver a la simulación
         </button>

@@ -5,6 +5,7 @@ import YieldRatesInfo from "../components/simulation/YieldRatesInfo";
 import ContributionLimit from "../components/simulation/ContributionLimit";
 import AmountInput from "../components/simulation/AmountInput";
 import { formatNumber } from "../utils/calculator";
+import { useIsMobile } from "../hooks/use-mobile";
 
 interface SimulationProductFormProps {
   product: Product;
@@ -28,6 +29,8 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   values,
   onInputChange,
 }) => {
+  const isMobile = useIsMobile();
+  
   // Product IDs
   const PLAN_AHORRO_FLEXIBLE_ID = "230e8acf-4d50-42ab-bff0-7ed5933d00d4";
   const PPA_MUTUALIDAD_ID = "9ec57a39-df3a-4a79-b845-887f3c3486e5";
@@ -123,7 +126,7 @@ const SimulationProductForm: React.FC<SimulationProductFormProps> = ({
   };
 
   return (
-    <div className="form-group border rounded-lg p-4 shadow-sm bg-white">
+    <div className={`form-group border rounded-lg p-3 ${isMobile ? 'my-3' : ''} md:p-4 shadow-sm bg-white`}>
       <h4 className="font-bold mb-2 text-base text-primary">{product.name}</h4>
       
       <YieldRatesInfo product={product} appliedYield={appliedYield} />

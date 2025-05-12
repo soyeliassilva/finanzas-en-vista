@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Product } from '../types';
 import { formatNumber, formatPercentage } from '../utils/calculator';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
+import { useSimulator } from '../context/SimulatorContext';
 
 interface ProductCardProps {
   product: Product;
@@ -15,8 +16,21 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle }) => {
   const isMobile = useIsMobile();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const { updateIframeHeight } = useSimulator();
   
-  // Determine which yield rate to display
+  // Update iframe height when accordion is opened/closed
+  useEffect(() => {
+    if (isMobile && isDetailsOpen) {
+      // Small delay to ensure content is fully rendered
+      const timer = setTimeout(() => {
+        updateIframeHeight("product_selection");
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isDetailsOpen, isMobile, updateIframeHeight]);
+  
+  // Display yield information
   const displayYield = () => {
     // If product_yield_description exists, display it directly
     if (product.product_yield_description) {
@@ -65,14 +79,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
       <div
         className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
       >
-        <div className="flex justify-between items-start">
-          <h3 className="text-lg font-bold">{product.name}</h3>
-        </div>
-        
-        <div className="flex items-start mt-1 mb-3">
-          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
-          {displayYield()}
-        </div>
+        <h3 className="text-lg font-bold mb-1">{product.name}</h3>
+        <p className="text-sm mb-3">{product.description.substring(0, 80)}...</p>
         
         <Collapsible
           open={isDetailsOpen}
@@ -87,6 +95,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 mb-3 animate-accordion-down">
             <p className="text-sm mb-2">{product.description}</p>
+            
+            <div className="flex items-start">
+              <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
+              {displayYield()}
+            </div>
             
             {product.conditions && (
               <div className="flex items-start">
