@@ -93,7 +93,7 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   const showStep2Instructions = numForGoal >= 4;
 
   return (
-    <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6">
+    <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-4">
       <ProductSelectionHeader onBack={handleBack} />
       <div className="md:col-span-8 step-container active-step">
         <div className="mb-6">

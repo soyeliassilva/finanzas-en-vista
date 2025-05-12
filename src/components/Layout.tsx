@@ -5,9 +5,9 @@ import StepsHeader from './StepsHeader';
 
 const Layout = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-light">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <StepsHeader currentStep={1} />
-      <main className="flex-grow pb-10">
+      <main className="flex-grow">
         <Outlet />
       </main>
     </div>

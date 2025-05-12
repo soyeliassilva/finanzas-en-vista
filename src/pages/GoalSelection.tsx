@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GoalType } from '../types';
@@ -32,7 +31,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto py-12">
         <div className="text-center">
           <p className="text-lg">Cargando objetivos de inversión...</p>
         </div>
@@ -42,7 +41,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto py-12">
         <div className="text-center">
           <p className="text-lg text-red-600">Error: {error}</p>
           <p>Por favor, recargue la página o intente más tarde.</p>
@@ -52,7 +51,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   }
   
   return (
-    <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6">
+    <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-4">
       <div className="md:col-span-4 step-container active-step">
         <div className="mb-6">
           <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 1</h3>
