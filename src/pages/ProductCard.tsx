@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Product } from '../types';
@@ -70,8 +69,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
   const minTermYears = product.product_duration_months_min 
     ? Math.ceil(product.product_duration_months_min / 12) 
     : 1;
-
-  const cardHeight = isMobile ? 'auto' : '320px';
   
   // For mobile accordion view
   if (isMobile) {
@@ -80,20 +77,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
         className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
       >
         <h3 className="text-lg font-bold mb-1">{product.name}</h3>
-        <p className="text-sm mb-3">{product.description.substring(0, 80)}...</p>
         
         <Collapsible
           open={isDetailsOpen}
           onOpenChange={setIsDetailsOpen}
-          className="w-full"
+          className="w-full flex-grow flex flex-col"
         >
-          <CollapsibleTrigger className="flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md mb-3">
+          <CollapsibleTrigger className={`flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md ${isDetailsOpen ? 'mb-3' : ''}`}>
             <span className="text-xs font-medium mr-1">
               {isDetailsOpen ? 'Ver menos' : 'Ver detalles'}
             </span>
             <ChevronDown size={14} className={`transform transition-transform ${isDetailsOpen ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 mb-3 animate-accordion-down">
+          
+          <CollapsibleContent className="space-y-2 animate-accordion-down flex flex-col">
             <p className="text-sm mb-2">{product.description}</p>
             
             <div className="flex items-start">
@@ -119,6 +116,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
                 <p className="text-sm">{product.disclaimer}</p>
               </div>
             )}
+            
+            {/* Move the toggle button to the bottom when details are open */}
+            {isDetailsOpen && (
+              <CollapsibleTrigger className="flex items-center justify-center w-full bg-neutral/20 text-primary py-1 rounded-md mt-3">
+                <span className="text-xs font-medium mr-1">Ver menos</span>
+                <ChevronDown size={14} className="transform rotate-180" />
+              </CollapsibleTrigger>
+            )}
           </CollapsibleContent>
         </Collapsible>
         
@@ -140,7 +145,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
   return (
     <div
       className={`product-card relative flex flex-col ${isSelected ? 'border-2 border-primary' : 'border border-neutral'}`}
-      style={{ minHeight: cardHeight }}
+      style={{ minHeight: 'auto' }}
     >
       <h3 className="text-lg font-bold mb-2">{product.name}</h3>
       <p className="text-sm mb-4">{product.description}</p>

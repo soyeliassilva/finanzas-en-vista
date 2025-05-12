@@ -46,7 +46,7 @@ const SimulationForm: React.FC<SimulationFormProps> = ({
         }}
       >
         <div
-          className={`grid grid-cols-1 ${isMobile ? 'gap-0' : 'gap-4'} mb-6 md:grid-cols-[var(--md-cols)] md:gap-4`}
+          className={`grid grid-cols-1 gap-4 mb-6 md:grid-cols-[var(--md-cols)] md:gap-4 ${isMobile ? 'gap-0' : ''}`}
           style={gridColsStyle}
         >
           {selectedProducts.map((product) => (
