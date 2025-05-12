@@ -14,15 +14,24 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
   totalPlannedContribution, 
   exceedsMaxContribution 
 }) => {
-  // Special handling for PIAS Mutualidad - annual contribution limit
-  const isPIASMutualidad = product.id === "6d65d7f1-835d-4e19-8625-b61abd881c4c";
+  // Product IDs
+  const PIAS_MUTUALIDAD_ID = "6d65d7f1-835d-4e19-8625-b61abd881c4c";
+  const PLAN_AHORRO_5_ID = "dec278a6-e9ed-4e9b-84aa-7306d19b173e";
   
-  if (!product.maxTotalContribution && !isPIASMutualidad) {
+  // Check which product we're dealing with
+  const isPIASMutualidad = product.id === PIAS_MUTUALIDAD_ID;
+  const isPlanAhorro5 = product.id === PLAN_AHORRO_5_ID;
+  
+  // Get the appropriate annual limit
+  const hasAnnualLimit = isPIASMutualidad || isPlanAhorro5;
+  const annualLimit = isPIASMutualidad ? 8000 : isPlanAhorro5 ? 5000 : 0;
+  
+  if (!hasAnnualLimit && !product.maxTotalContribution) {
     return null;
   }
 
-  // For PIAS Mutualidad, calculate available contribution room in first year
-  const firstYearAllowance = isPIASMutualidad ? Math.max(0, 8000 - product.minInitialDeposit) : 0;
+  // For products with annual limit, calculate available contribution room in first year
+  const firstYearAllowance = hasAnnualLimit ? Math.max(0, annualLimit - product.minInitialDeposit) : 0;
   
   // Calculate potential monthly contributions based on the allowance
   const potentialMonthsWithContributions = product.minMonthlyDeposit > 0 
@@ -31,21 +40,21 @@ const ContributionLimit: React.FC<ContributionLimitProps> = ({
     
   return (
     <div className={`text-xs p-2 rounded mt-2 ${exceedsMaxContribution ? 'bg-red-100 text-red-600' : 'bg-gray-100'}`}>
-      {isPIASMutualidad && (
+      {hasAnnualLimit && (
         <>
           <p className="font-semibold mb-1">
-            Límite de aportación anual: {formatNumber(8000)}€
+            Límite de aportación anual: {formatNumber(annualLimit)}€
           </p>
           <p className="mt-1 text-xs">
-            En el primer año, la suma de aportación inicial y mensual está limitada a {formatNumber(8000)}€.
+            En el primer año, la suma de aportación inicial y mensual está limitada a {formatNumber(annualLimit)}€.
           </p>
-          {product.minInitialDeposit >= 8000 && (
+          {product.minInitialDeposit >= annualLimit && (
             <p className="mt-1 text-xs italic">
               Con una aportación inicial de {formatNumber(product.minInitialDeposit)}€, 
               no habrá aportaciones mensuales durante el primer año.
             </p>
           )}
-          {product.minInitialDeposit < 8000 && product.minMonthlyDeposit > 0 && (
+          {product.minInitialDeposit < annualLimit && product.minMonthlyDeposit > 0 && (
             <p className="mt-1 text-xs italic">
               Con una aportación inicial de {formatNumber(product.minInitialDeposit)}€, 
               podrá realizar hasta {potentialMonthsWithContributions} {potentialMonthsWithContributions === 1 ? 'aportación mensual' : 'aportaciones mensuales'} 

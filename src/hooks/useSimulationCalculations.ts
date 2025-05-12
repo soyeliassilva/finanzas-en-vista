@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Product, SimulationResult } from '../types';
 import { calculateFutureValue } from '../utils/calculator';
@@ -5,6 +6,10 @@ import { SimulationFormValues } from '../types/heightTypes';
 
 export const useSimulationCalculations = (selectedProducts: Product[]) => {
   const [calculationPerformed, setCalculationPerformed] = useState(false);
+
+  // Product IDs
+  const PIAS_MUTUALIDAD_ID = "6d65d7f1-835d-4e19-8625-b61abd881c4c";
+  const PLAN_AHORRO_5_ID = "dec278a6-e9ed-4e9b-84aa-7306d19b173e";
 
   const getApplicableYield = (product: Product, termYears: number) => {
     if (termYears >= 10 && product.yield10PlusYears !== undefined) {
@@ -34,11 +39,14 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
 
       // Calculate actual contributions considering limits
       let totalContributions = initialDeposit;
-      const isPIASMutualidad = product.id === "6d65d7f1-835d-4e19-8625-b61abd881c4c";
       
-      if (isPIASMutualidad) {
-        // For PIAS Mutualidad, calculate first year contributions (respecting 8000€ limit)
-        const firstYearAllowance = Math.max(0, 8000 - initialDeposit);
+      // Check if product has annual contribution limit
+      const hasAnnualLimit = product.id === PIAS_MUTUALIDAD_ID || product.id === PLAN_AHORRO_5_ID;
+      const annualLimit = product.id === PIAS_MUTUALIDAD_ID ? 8000 : product.id === PLAN_AHORRO_5_ID ? 5000 : Infinity;
+      
+      if (hasAnnualLimit) {
+        // Calculate first year contributions (respecting annual limit)
+        const firstYearAllowance = Math.max(0, annualLimit - initialDeposit);
         const firstYearMonthlyTotal = Math.min(firstYearAllowance, monthlyDeposit * 12);
         
         // Calculate how many months will have contributions in the first year
