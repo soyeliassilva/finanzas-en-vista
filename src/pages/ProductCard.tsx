@@ -60,24 +60,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
       <p className="text-sm mb-4">{product.description}</p>
       <div className="space-y-2 mb-4">
         <div className="flex items-start">
-          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
           {displayYield()}
         </div>
         {product.conditions && (
           <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
             <p className="text-sm">{product.conditions}</p>
           </div>
         )}
         {product.terms && !product.product_yield_description && (
           <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
             <p className="text-sm">{product.terms}</p>
           </div>
         )}
         {product.disclaimer && (
           <div className="flex items-start">
-            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2"></div>
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
             <p className="text-sm">{product.disclaimer}</p>
           </div>
         )}
