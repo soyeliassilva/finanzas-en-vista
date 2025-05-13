@@ -5,6 +5,7 @@ import { SimulationFormValues, StepName } from '../types/heightTypes';
 import { useProductsLoader } from '../hooks/useProductsLoader';
 import { useHeightManager } from '../hooks/useHeightManager';
 import { useProductOverrides } from '../hooks/useProductOverrides';
+import { useIframeResizer } from '../hooks/useIframeResizer';
 
 interface SimulatorContextType {
   selectedGoal: GoalType | null;
@@ -51,6 +52,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   
   // Height management
   const { updateIframeHeight } = useHeightManager();
+  const { sendHeight } = useIframeResizer();
   
   // URL parameter override handling
   const { applyProductOverrides } = useProductOverrides();
@@ -89,8 +91,23 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         
         setSelectedProducts(updatedSelectedProducts);
       }
+      
+      // Send height update after products are processed
+      setTimeout(() => {
+        sendHeight('init');
+      }, 100);
     }
-  }, [rawProducts, applyProductOverrides]);
+  }, [rawProducts, applyProductOverrides, sendHeight]);
+  
+  // Effect to send height update when loading state changes from true to false
+  useEffect(() => {
+    if (!loading) {
+      // Small delay to ensure DOM is fully rendered after loading completes
+      setTimeout(() => {
+        sendHeight('init');
+      }, 200);
+    }
+  }, [loading, sendHeight]);
   
   const value = {
     selectedGoal,
