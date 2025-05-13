@@ -97,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
         >
           {!isDetailsOpen && (
             <>
-              <div className="mb-2">
+              <div className="mb-2 hidden">
                 <p className="text-sm">{truncatedDescription}</p>
               </div>
               
@@ -109,7 +109,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected, onToggle
           )}
           
           <CollapsibleContent className="space-y-2 mt-3 animate-accordion-down">
-            <p className="text-sm mb-2">{product.description}</p>
+            <p className="text-sm mb-2 hidden">{product.description}</p>
             
             <div className="flex items-start">
               <div className="w-2 h-2 rounded-full bg-primary mt-1.5 mr-2 flex-shrink-0"></div>
