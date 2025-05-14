@@ -32,7 +32,7 @@ const SimulationForm: React.FC<SimulationFormProps> = ({
   };
 
   return (
-    <div className="step-container active-step mb-6">
+    <div className="step-container active-step">
       <div className="mb-6">
         <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 3</h3>
         <h2 className={`${isMobile ? 'text-2xl' : 'text-3xl'} text-primary mb-4`}>
