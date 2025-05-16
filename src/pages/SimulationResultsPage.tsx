@@ -10,7 +10,8 @@ const SimulationResultsPage: React.FC = () => {
   const { 
     simulationResults, 
     calculationPerformed,
-    updateIframeHeight
+    updateIframeHeight,
+    rawProducts
   } = useSimulator();
   const isMobile = useIsMobile();
   
@@ -33,20 +34,39 @@ const SimulationResultsPage: React.FC = () => {
     }
   }, [calculationPerformed, navigate, simulationResults.length]);
   
+  // Build the dynamic Typeform URL with product information
+  const buildTypeformUrl = () => {
+    if (simulationResults.length === 0) return '';
+
+    // Base URL
+    let typeformUrl = "https://mutualidadabogacia.typeform.com/to/ItBwkIQR?#contenido=simula&product_id=despachos&simulaciondespacho=";
+    
+    // Build the simulaciondespacho parameter
+    const simulationParts = simulationResults.map(result => {
+      // Find the product details to get the short name
+      const product = rawProducts?.find(p => p.id === result.productId);
+      const shortName = product?.product_short_name || 'UNKNOWN';
+      
+      // Get duration in months
+      const durationMonths = result.termYears * 12;
+      
+      // Get the gross amount without decimals
+      const grossAmount = Math.floor(result.finalAmount);
+      
+      // Format: <product_short_name>_<duration_in_months>_<importe_total_bruto>
+      return `${shortName}_${durationMonths}_${grossAmount}`;
+    });
+    
+    // Join parts with dashes
+    typeformUrl += simulationParts.join('-');
+    
+    return typeformUrl;
+  };
+  
   const handleContactAdvisor = () => {
     if (simulationResults.length === 0) return;
-
-    let typeformUrl = "https://mutualidad.typeform.com/to/xxYYzz?";
-
-    simulationResults.forEach((result, index) => {
-      typeformUrl += `product_${index + 1}=${encodeURIComponent(result.name)}&`;
-      typeformUrl += `yield_${index + 1}=${encodeURIComponent(result.yield)}&`;
-      typeformUrl += `initial_${index + 1}=${encodeURIComponent(result.initialDeposit)}&`;
-      typeformUrl += `monthly_${index + 1}=${encodeURIComponent(result.monthlyDeposit)}&`;
-      typeformUrl += `term_${index + 1}=${encodeURIComponent(result.termYears)}&`;
-      typeformUrl += `final_${index + 1}=${encodeURIComponent(result.finalAmount)}&`;
-    });
-
+    
+    const typeformUrl = buildTypeformUrl();
     window.open(typeformUrl, '_blank');
   };
   

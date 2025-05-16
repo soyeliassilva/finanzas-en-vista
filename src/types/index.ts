@@ -32,6 +32,7 @@ export interface Product {
   conditions?: string;
   terms?: string;
   product_yield_description?: string;
+  product_short_name?: string; // Added this field to support Typeform URL generation
 }
 
 export interface SimulationResult {
@@ -49,4 +50,6 @@ export interface SimulationResult {
   url?: string;
   disclaimer?: string;
   maxTotalContribution?: number;
+  product_short_name?: string; // Added this field to pass down the short name
 }
+

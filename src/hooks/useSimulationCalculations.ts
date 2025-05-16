@@ -100,7 +100,8 @@ export const useSimulationCalculations = (selectedProducts: Product[]) => {
         taxation: product.taxation,
         url: product.url,
         disclaimer: product.disclaimer,
-        maxTotalContribution: product.maxTotalContribution
+        maxTotalContribution: product.maxTotalContribution,
+        product_short_name: product.product_short_name // Pass the short name to the result
       };
     });
 

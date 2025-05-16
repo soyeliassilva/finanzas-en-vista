@@ -25,6 +25,7 @@ export type Database = {
           product_monthly_contribution_max: number | null
           product_monthly_contribution_min: number | null
           product_name: string | null
+          product_short_name: string | null
           product_tax_treatment: string | null
           product_terms: string | null
           product_total_contribution_max: number | null
@@ -46,6 +47,7 @@ export type Database = {
           product_monthly_contribution_max?: number | null
           product_monthly_contribution_min?: number | null
           product_name?: string | null
+          product_short_name?: string | null
           product_tax_treatment?: string | null
           product_terms?: string | null
           product_total_contribution_max?: number | null
@@ -67,6 +69,7 @@ export type Database = {
           product_monthly_contribution_max?: number | null
           product_monthly_contribution_min?: number | null
           product_name?: string | null
+          product_short_name?: string | null
           product_tax_treatment?: string | null
           product_terms?: string | null
           product_total_contribution_max?: number | null

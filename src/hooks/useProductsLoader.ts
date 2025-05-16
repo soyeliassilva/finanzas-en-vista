@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Product, GoalType } from '../types';
 import { toast } from 'sonner';
@@ -60,7 +61,8 @@ export const useProductsLoader = () => {
         url: item.product_url,
         conditions: item.product_conditions,
         terms: item.product_terms,
-        product_yield_description: item.product_yield_description
+        product_yield_description: item.product_yield_description,
+        product_short_name: item.product_short_name || '' // Add the short name field with a fallback
       }));
       
       // Store raw products from Supabase
