@@ -25,6 +25,8 @@ interface SimulatorContextType {
   setCalculationPerformed: React.Dispatch<React.SetStateAction<boolean>>;
   // Height management
   updateIframeHeight: (step: StepName) => void;
+  // Raw products data from Supabase
+  rawProducts: Product[];
 }
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
@@ -126,7 +128,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     calculationPerformed,
     setCalculationPerformed,
     // Height update function
-    updateIframeHeight
+    updateIframeHeight,
+    // Add rawProducts to the context value
+    rawProducts
   };
   
   return <SimulatorContext.Provider value={value}>{children}</SimulatorContext.Provider>;
