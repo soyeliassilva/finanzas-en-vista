@@ -50,8 +50,8 @@ const SimulationResultsPage: React.FC = () => {
       // Get duration in months
       const durationMonths = result.termYears * 12;
       
-      // Get the gross amount without decimals
-      const grossAmount = Math.floor(result.finalAmount);
+      // Get the gross amount using Math.round instead of Math.floor to match the summary display
+      const grossAmount = Math.round(result.finalAmount);
       
       // Format: <product_short_name>_<duration_in_months>_<importe_total_bruto>
       return `${shortName}_${durationMonths}_${grossAmount}`;
