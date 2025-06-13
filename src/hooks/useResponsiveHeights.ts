@@ -5,6 +5,7 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
   const summaryRef = useRef<HTMLDivElement>(null);
   const [summaryHeight, setSummaryHeight] = useState<number | null>(null);
   const [isResizing, setIsResizing] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const resizeTimeoutRef = useRef<number | null>(null);
   const previousHeightRef = useRef<number | null>(null);
 
@@ -13,8 +14,9 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
     if (!calculationPerformed || !summaryRef.current) return;
     
     const updateHeight = () => {
-      if (summaryRef.current) {
+      if (summaryRef.current && !isUpdating) {
         setIsResizing(true);
+        setIsUpdating(true);
         
         // Clear any existing timeout
         if (resizeTimeoutRef.current) {
@@ -25,26 +27,27 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
         resizeTimeoutRef.current = window.setTimeout(() => {
           const height = summaryRef.current?.offsetHeight || 400;
           
-          // Only update if height has changed significantly (more than 10px)
+          // Only update if height has changed significantly (more than 20px)
           // This helps break potential feedback loops
           if (previousHeightRef.current === null || 
-              Math.abs(previousHeightRef.current - height) > 10) {
+              Math.abs(previousHeightRef.current - height) > 20) {
             previousHeightRef.current = height;
             setSummaryHeight(height);
           }
           
           setIsResizing(false);
+          setIsUpdating(false);
           resizeTimeoutRef.current = null;
-        }, 250); // Longer timeout for more stability
+        }, 500); // Longer timeout for more stability
       }
     };
 
     // Initial measurement
     updateHeight();
     
-    // Setup resize observer for dynamic height changes
+    // Setup resize observer for dynamic height changes - only if not updating
     const resizeObserver = new ResizeObserver(() => {
-      if (!isResizing) {
+      if (!isResizing && !isUpdating) {
         updateHeight();
       }
     });
@@ -55,7 +58,7 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
     
     // Window resize handler with debouncing
     const handleResize = () => {
-      if (!isResizing) {
+      if (!isResizing && !isUpdating) {
         updateHeight();
       }
     };
@@ -73,7 +76,7 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
         window.clearTimeout(resizeTimeoutRef.current);
       }
     };
-  }, [calculationPerformed, isResizing]);
+  }, [calculationPerformed, isResizing, isUpdating]);
 
   return { summaryRef, summaryHeight };
 };

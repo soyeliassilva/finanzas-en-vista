@@ -60,8 +60,8 @@ const SimulationChart: React.FC<SimulationChartProps> = ({
       // Set a minimum height to prevent too small charts
       newHeight = Math.max(newHeight, MIN_CHART_HEIGHT);
       
-      // Only update if the height change is significant (more than 5px)
-      if (Math.abs(newHeight - lastHeightRef.current) > 5) {
+      // Only update if the height change is significant (more than 20px)
+      if (Math.abs(newHeight - lastHeightRef.current) > 20) {
         lastHeightRef.current = newHeight;
         setChartHeight(newHeight);
       }
@@ -94,7 +94,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({
   const totalAmountText = "Importe total bruto acumulado";
 
   return (
-    <div className={isMobile ? "" : "md:col-span-7 h-full"}>
+    <div className={`${isMobile ? "" : "md:col-span-7 h-full"} chart-container no-scrollbar`}>
       <h3 ref={headerRef} className="text-lg md:text-xl font-bold mb-3 md:mb-4">Previsión de rentabilidad</h3>
 
       <div ref={summaryInfoRef} className="mb-2 md:mb-4">
@@ -108,7 +108,10 @@ const SimulationChart: React.FC<SimulationChartProps> = ({
         </div>
       </div>
 
-      <div style={{ height: `${chartHeight}px` }} className={`min-h-[${isMobile ? '250px' : '300px'}] max-h-[700px] mt-4 md:mt-6`}>
+      <div 
+        style={{ height: `${chartHeight}px` }} 
+        className={`min-h-[${isMobile ? '250px' : '300px'}] max-h-[700px] mt-4 md:mt-6 chart-container no-scrollbar`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#CFCFCF" />

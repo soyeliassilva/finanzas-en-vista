@@ -68,6 +68,13 @@
 
   body {
     @apply text-primary font-mutualidad bg-transparent;
+    /* Hide scrollbars */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  body::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -86,6 +93,31 @@
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Hide scrollbars for specific containers */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Stable chart container */
+.chart-container {
+  contain: layout;
+  box-sizing: border-box;
+  overflow: hidden;
+  will-change: auto;
+}
+
+/* Stable results container */
+.results-container {
+  overflow: hidden;
+  contain: layout;
+  box-sizing: border-box;
 }
 
 /* Custom styles for the application */

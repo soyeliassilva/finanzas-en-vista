@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
@@ -15,17 +14,17 @@ const SimulationResultsPage: React.FC = () => {
   } = useSimulator();
   const isMobile = useIsMobile();
   
-  // Update iframe height once when component is mounted
+  // Update iframe height once when component is mounted with longer delay
   useEffect(() => {
     if (calculationPerformed && simulationResults.length > 0) {
-      // Small delay to ensure everything is rendered correctly
+      // Longer delay to ensure everything is rendered correctly and stabilized
       const timer = setTimeout(() => {
         updateIframeHeight("simulation_results");
-      }, isMobile ? 400 : 300); // Slightly longer delay for mobile
+      }, 500); // Increased from 300ms to 500ms for more stability
       
       return () => clearTimeout(timer);
     }
-  }, [calculationPerformed, simulationResults.length, updateIframeHeight, isMobile]);
+  }, [calculationPerformed, simulationResults.length, updateIframeHeight]);
   
   // If user navigates directly to results page without calculation, redirect to form
   useEffect(() => {
