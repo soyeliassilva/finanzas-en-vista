@@ -1,4 +1,3 @@
-
 import React, { forwardRef } from "react";
 import { SimulationResult } from "../types";
 import { formatCurrency, formatPercentage, formatNumber } from "../utils/calculator";
@@ -29,7 +28,7 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
     const PLAN_AHORRO_5_ID = "dec278a6-e9ed-4e9b-84aa-7306d19b173e";
     
     const handleAccordionChange = (value: string) => {
-      // Immediate height update for accordion interactions
+      // Immediate height update for accordion interactions with immediate flag
       setTimeout(() => {
         updateIframeHeight('simulation_results', true);
       }, 0);

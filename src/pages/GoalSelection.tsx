@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GoalType } from '../types';
@@ -30,7 +29,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   const handleGoalSelection = (goal: GoalType) => {
     setSelectedGoal(goal);
     
-    // Update iframe height after goal selection
+    // Update iframe height after goal selection with immediate flag
     setTimeout(() => {
       updateIframeHeight('goal_selection', true);
     }, 0);

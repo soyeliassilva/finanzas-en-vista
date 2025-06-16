@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalType, Product } from '../types';
@@ -52,7 +51,7 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
       }
     }
     
-    // Update iframe height after product selection changes
+    // Update iframe height after product selection changes with immediate flag
     setTimeout(() => {
       updateIframeHeight('product_selection', true);
     }, 0);
