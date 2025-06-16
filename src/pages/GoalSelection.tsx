@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GoalType } from '../types';
@@ -25,6 +26,15 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
       updateIframeHeight('goal_selection');
     }
   }, [loading, location.key, updateIframeHeight]);
+  
+  const handleGoalSelection = (goal: GoalType) => {
+    setSelectedGoal(goal);
+    
+    // Update iframe height after goal selection
+    setTimeout(() => {
+      updateIframeHeight('goal_selection', true);
+    }, 0);
+  };
   
   const handleContinue = () => {
     if (selectedGoal) {
@@ -71,7 +81,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
                 className="radio-option h-12 rounded-lg px-3 py-2 bg-white border border-neutral transition-all duration-150 cursor-pointer flex items-center gap-2"
                 style={{ minHeight: "3rem", marginTop: "0.5rem", marginBottom: "0.5rem" }}
                 key={goal}
-                onClick={() => setSelectedGoal(goal)}
+                onClick={() => handleGoalSelection(goal)}
               >
                 <div className="radio-circle flex-shrink-0">
                   {selectedGoal === goal && <div className="radio-selected" />}
@@ -117,7 +127,7 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
               className="radio-option h-16 rounded-lg px-4 py-2 bg-white border border-neutral transition-all duration-150 cursor-pointer flex items-center gap-2"
               style={{ minHeight: "4rem", marginTop: "0.5rem", marginBottom: "0.5rem" }}
               key={goal}
-              onClick={() => setSelectedGoal(goal)}
+              onClick={() => handleGoalSelection(goal)}
             >
               <div className="radio-circle flex-shrink-0">
                 {selectedGoal === goal && <div className="radio-selected" />}

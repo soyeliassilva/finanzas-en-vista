@@ -10,6 +10,7 @@ import {
   AccordionTrigger,
 } from "../components/ui/accordion";
 import { useIsMobile } from "../hooks/use-mobile";
+import { useSimulator } from "../context/SimulatorContext";
 
 const chartColors = ['#004236', '#D1A4C4', '#B9EDAA'];
 
@@ -21,10 +22,18 @@ interface SimulationSummaryProps {
 const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
   ({ results, handleContactAdvisor }, ref) => {
     const isMobile = useIsMobile();
+    const { updateIframeHeight } = useSimulator();
     
     // Product IDs
     const PIAS_MUTUALIDAD_ID = "6d65d7f1-835d-4e19-8625-b61abd881c4c";
     const PLAN_AHORRO_5_ID = "dec278a6-e9ed-4e9b-84aa-7306d19b173e";
+    
+    const handleAccordionChange = (value: string) => {
+      // Immediate height update for accordion interactions
+      setTimeout(() => {
+        updateIframeHeight('simulation_results', true);
+      }, 0);
+    };
     
     return (
       <div className={isMobile ? "" : "md:col-span-5 h-full"} ref={ref}>
@@ -107,7 +116,7 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
                 </div>
                 
                 <div className="mt-1 md:mt-2">
-                  <Accordion type="single" collapsible className="border-0 p-0">
+                  <Accordion type="single" collapsible className="border-0 p-0" onValueChange={handleAccordionChange}>
                     <AccordionItem value="taxation" className="border-0">
                       <AccordionTrigger className="p-0 h-5 md:h-6 flex justify-between items-center">
                         <span className="font-mutualidad text-xs md:text-sm">Detalles fiscalidad del producto</span>

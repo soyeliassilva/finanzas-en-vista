@@ -44,7 +44,7 @@ export const useHeightManager = () => {
   }, []);
   
   // Handle iframe height updates with a centralized function
-  const updateIframeHeight = useCallback((specifiedStep?: StepName) => {
+  const updateIframeHeight = useCallback((specifiedStep?: StepName, immediate: boolean = false) => {
     // Use provided step or determine from current route
     const stepToUse = specifiedStep || getCurrentStep();
     
@@ -60,7 +60,17 @@ export const useHeightManager = () => {
         return;
       }
       
-      // Small delay to ensure DOM is updated
+      // Use optimized delays based on step and context
+      const getDelay = () => {
+        if (immediate) return 0;
+        // Longer delay only for results step to prevent wiggling
+        if (stepToUse === 'simulation_results') return 500;
+        // Shorter delays for responsive interactions
+        return 100;
+      };
+      
+      const delay = getDelay();
+      
       setTimeout(() => {
         // Track the current path for next time
         const currentPath = location.pathname;
@@ -71,14 +81,14 @@ export const useHeightManager = () => {
         const stepChanged = lastStepSentRef.current !== stepToUse;
         
         if (isExplicitUpdate || pathChanged || stepChanged || !heightUpdatedRef.current[stepToUse]) {
-          sendHeight(stepToUse);
+          sendHeight(stepToUse, immediate);
           
           // Update tracking refs
           prevPathRef.current = currentPath;
           lastStepSentRef.current = stepToUse;
           heightUpdatedRef.current[stepToUse] = true;
         }
-      }, 100); // Increased delay to ensure proper sequencing
+      }, delay);
     }
   }, [getCurrentStep, sendHeight, location.pathname]);
   

@@ -51,6 +51,11 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
         setSelectedProducts([...selectedProducts, product]);
       }
     }
+    
+    // Update iframe height after product selection changes
+    setTimeout(() => {
+      updateIframeHeight('product_selection', true);
+    }, 0);
   };
 
   const handleContinue = () => {

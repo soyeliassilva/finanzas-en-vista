@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
@@ -17,10 +18,9 @@ const SimulationResultsPage: React.FC = () => {
   // Update iframe height once when component is mounted with longer delay
   useEffect(() => {
     if (calculationPerformed && simulationResults.length > 0) {
-      // Longer delay to ensure everything is rendered correctly and stabilized
       const timer = setTimeout(() => {
         updateIframeHeight("simulation_results");
-      }, 500); // Increased from 300ms to 500ms for more stability
+      }, 500); // Keep longer delay for results step stability
       
       return () => clearTimeout(timer);
     }

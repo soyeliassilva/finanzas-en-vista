@@ -9,7 +9,7 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
   const resizeTimeoutRef = useRef<number | null>(null);
   const previousHeightRef = useRef<number | null>(null);
 
-  // Effect to measure and set the summary height with improved debouncing
+  // Effect to measure and set the summary height with step-specific stabilization
   useEffect(() => {
     if (!calculationPerformed || !summaryRef.current) return;
     
@@ -23,14 +23,18 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
           window.clearTimeout(resizeTimeoutRef.current);
         }
         
-        // Set a timeout to avoid rapid updates
+        // Use different timeout based on context - longer only for results to prevent wiggling
+        const isResultsStep = window.location.pathname.includes('/simulacion/results');
+        const timeout = isResultsStep ? 500 : 100;
+        const heightThreshold = isResultsStep ? 20 : 5;
+        
         resizeTimeoutRef.current = window.setTimeout(() => {
           const height = summaryRef.current?.offsetHeight || 400;
           
-          // Only update if height has changed significantly (more than 20px)
-          // This helps break potential feedback loops
+          // Only update if height has changed significantly
+          // Use different thresholds based on step
           if (previousHeightRef.current === null || 
-              Math.abs(previousHeightRef.current - height) > 20) {
+              Math.abs(previousHeightRef.current - height) > heightThreshold) {
             previousHeightRef.current = height;
             setSummaryHeight(height);
           }
@@ -38,14 +42,14 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
           setIsResizing(false);
           setIsUpdating(false);
           resizeTimeoutRef.current = null;
-        }, 500); // Longer timeout for more stability
+        }, timeout);
       }
     };
 
     // Initial measurement
     updateHeight();
     
-    // Setup resize observer for dynamic height changes - only if not updating
+    // Setup resize observer for dynamic height changes - with step-specific behavior
     const resizeObserver = new ResizeObserver(() => {
       if (!isResizing && !isUpdating) {
         updateHeight();
@@ -56,7 +60,7 @@ export const useResponsiveHeights = (calculationPerformed: boolean) => {
       resizeObserver.observe(summaryRef.current);
     }
     
-    // Window resize handler with debouncing
+    // Window resize handler - more responsive for non-results steps
     const handleResize = () => {
       if (!isResizing && !isUpdating) {
         updateHeight();
