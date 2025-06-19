@@ -51,9 +51,9 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
       }
     }
     
-    // Update iframe height after product selection changes
+    // Update iframe height after product selection changes using 'init' to prevent scroll
     setTimeout(() => {
-      updateIframeHeight('product_selection');
+      updateIframeHeight('init');
     }, 0);
   };
 
