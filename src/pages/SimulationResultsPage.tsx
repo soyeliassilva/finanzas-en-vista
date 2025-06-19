@@ -15,7 +15,15 @@ const SimulationResultsPage: React.FC = () => {
   } = useSimulator();
   const isMobile = useIsMobile();
   
-  // Update iframe height once when component is mounted with longer delay
+  // Phase 1: Immediate iframe resize to prevent scrollbars
+  useEffect(() => {
+    if (calculationPerformed && simulationResults.length > 0) {
+      // Immediate resize to prevent scrollbar flash
+      updateIframeHeight("simulation_results", true);
+    }
+  }, [calculationPerformed, simulationResults.length, updateIframeHeight]);
+  
+  // Phase 2: Delayed resize for content stabilization
   useEffect(() => {
     if (calculationPerformed && simulationResults.length > 0) {
       const timer = setTimeout(() => {
