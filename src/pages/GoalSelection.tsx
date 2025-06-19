@@ -29,9 +29,9 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   const handleGoalSelection = (goal: GoalType) => {
     setSelectedGoal(goal);
     
-    // Update iframe height after goal selection with immediate flag
+    // Update iframe height after goal selection
     setTimeout(() => {
-      updateIframeHeight('goal_selection', true);
+      updateIframeHeight('goal_selection');
     }, 0);
   };
   

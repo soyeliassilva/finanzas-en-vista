@@ -28,9 +28,9 @@ const SimulationSummary = forwardRef<HTMLDivElement, SimulationSummaryProps>(
     const PLAN_AHORRO_5_ID = "dec278a6-e9ed-4e9b-84aa-7306d19b173e";
     
     const handleAccordionChange = (value: string) => {
-      // Immediate height update for accordion interactions with immediate flag
+      // Immediate height update for accordion interactions
       setTimeout(() => {
-        updateIframeHeight('simulation_results', true);
+        updateIframeHeight('simulation_results');
       }, 0);
     };
     
