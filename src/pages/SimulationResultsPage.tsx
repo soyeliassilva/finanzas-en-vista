@@ -14,20 +14,16 @@ const SimulationResultsPage: React.FC = () => {
   } = useSimulator();
   const isMobile = useIsMobile();
   
-  // Phase 1: Immediate iframe resize to prevent scrollbars
+  // Single height update effect using 'init' for immediate, scroll-free updates
   useEffect(() => {
     if (calculationPerformed && simulationResults.length > 0) {
-      // Immediate resize to prevent scrollbar flash
-      updateIframeHeight("simulation_results");
-    }
-  }, [calculationPerformed, simulationResults.length, updateIframeHeight]);
-  
-  // Phase 2: Delayed resize for content stabilization
-  useEffect(() => {
-    if (calculationPerformed && simulationResults.length > 0) {
+      // Use 'init' step for immediate height updates without scroll issues
+      updateIframeHeight("init");
+      
+      // Add a small delay for content stabilization
       const timer = setTimeout(() => {
-        updateIframeHeight("simulation_results");
-      }, 500); // Keep longer delay for results step stability
+        updateIframeHeight("init");
+      }, 100);
       
       return () => clearTimeout(timer);
     }
