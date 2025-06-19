@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
@@ -19,7 +18,7 @@ const SimulationResultsPage: React.FC = () => {
   useEffect(() => {
     if (calculationPerformed && simulationResults.length > 0) {
       // Immediate resize to prevent scrollbar flash
-      updateIframeHeight("simulation_results", true);
+      updateIframeHeight("simulation_results");
     }
   }, [calculationPerformed, simulationResults.length, updateIframeHeight]);
   

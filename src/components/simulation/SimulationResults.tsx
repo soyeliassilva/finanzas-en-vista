@@ -32,7 +32,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
   }
 
   return (
-    <div ref={resultsRef} className="animate-fade-in results-container no-scrollbar">
+    <div ref={resultsRef} className="animate-fade-in results-container no-scrollbar overflow-hidden">
       <div className="mb-4 md:mb-6 px-3 md:px-0">
         <h3 className="text-sm text-primary font-mutualidad font-normal">Paso 4</h3>
         <h2 className="text-2xl md:text-3xl text-primary mb-3 md:mb-4">
@@ -42,8 +42,8 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
       
       {isMobile ? (
         // Mobile layout: Chart on top, Summary below, with 0 gap
-        <div className="flex flex-col space-y-0 no-scrollbar">
-          <div className="step-container">
+        <div className="flex flex-col space-y-0 no-scrollbar overflow-hidden">
+          <div className="step-container min-w-0">
             <SimulationChart 
               results={results} 
               chartData={chartData} 
@@ -53,7 +53,7 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
             />
           </div>
           
-          <div className="step-container">
+          <div className="step-container min-w-0">
             <SimulationSummary 
               results={results} 
               handleContactAdvisor={handleContactAdvisor}
@@ -62,16 +62,16 @@ const SimulationResults: React.FC<SimulationResultsProps> = ({
           </div>
         </div>
       ) : (
-        // Desktop layout: Flexbox with fixed proportions instead of grid
-        <div className="flex gap-6 h-full no-scrollbar">
-          <div className="flex-none w-[41.666%]">
+        // Desktop layout: Flexible layout with proper zoom support
+        <div className="flex gap-4 md:gap-6 h-full no-scrollbar overflow-hidden min-w-0">
+          <div className="flex-shrink-0 min-w-0 w-full max-w-[42%]">
             <SimulationSummary 
               results={results} 
               handleContactAdvisor={handleContactAdvisor}
               ref={summaryRef} 
             />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <SimulationChart 
               results={results} 
               chartData={chartData} 

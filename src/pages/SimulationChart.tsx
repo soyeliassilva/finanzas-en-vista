@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { SimulationResult } from "../types";
@@ -94,13 +93,13 @@ const SimulationChart: React.FC<SimulationChartProps> = ({
   const totalAmountText = "Importe total bruto acumulado";
 
   return (
-    <div className={`${isMobile ? "" : "md:col-span-7 h-full"} chart-container no-scrollbar`}>
+    <div className={`${isMobile ? "" : "md:col-span-7 h-full"} chart-container no-scrollbar overflow-hidden min-w-0`}>
       <h3 ref={headerRef} className="text-lg md:text-xl font-bold mb-3 md:mb-4">Previsión de rentabilidad</h3>
 
-      <div ref={summaryInfoRef} className="mb-2 md:mb-4">
-        <div className="flex justify-between items-center">
-          <p className="font-bold text-sm md:text-base">{totalAmountText}</p>
-          <p className="text-xl md:text-2xl font-bold">
+      <div ref={summaryInfoRef} className="mb-2 md:mb-4 overflow-hidden">
+        <div className="flex justify-between items-center min-w-0">
+          <p className="font-bold text-sm md:text-base truncate">Importe total bruto acumulado</p>
+          <p className="text-xl md:text-2xl font-bold flex-shrink-0 ml-2">
             {formatCurrency(
               results.reduce((total, result) => total + result.finalAmount, 0)
             )}
@@ -110,7 +109,7 @@ const SimulationChart: React.FC<SimulationChartProps> = ({
 
       <div 
         style={{ height: `${chartHeight}px` }} 
-        className={`min-h-[${isMobile ? '250px' : '300px'}] max-h-[700px] mt-4 md:mt-6 chart-container no-scrollbar`}
+        className={`min-h-[${isMobile ? '250px' : '300px'}] max-h-[700px] mt-4 md:mt-6 chart-container no-scrollbar overflow-hidden`}
       >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
@@ -160,8 +159,8 @@ const SimulationChart: React.FC<SimulationChartProps> = ({
         </ResponsiveContainer>
       </div>
 
-      <div ref={footerRef} className="mt-2 md:mt-4 text-[10px] md:text-xs text-left">
-        <p>Rentabilidades pasadas no presuponen rentabilidades futuras. La información facilitada por este simulador es orientativa al basarse en hipótesis , por lo que su contenido no es vinculante y puede variar en consultas futuras</p>
+      <div ref={footerRef} className="mt-2 md:mt-4 text-[10px] md:text-xs text-left overflow-hidden">
+        <p className="break-words">Rentabilidades pasadas no presuponen rentabilidades futuras. La información facilitada por este simulador es orientativa al basarse en hipótesis , por lo que su contenido no es vinculante y puede variar en consultas futuras</p>
       </div>
     </div>
   );
