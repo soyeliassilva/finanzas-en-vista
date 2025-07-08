@@ -16,8 +16,20 @@ export const useAppInitializer = () => {
     if (!initSentRef.current && window !== window.parent) {
       initSentRef.current = true;
       
-      // Only send the init message, don't send goal_selection automatically
-      sendHeight('init');
+      // Add a delay to ensure DOM is fully rendered before calculating height
+      setTimeout(() => {
+        // Ensure document is ready before sending height
+        if (document.readyState === 'complete') {
+          sendHeight('init');
+        } else {
+          // Wait for document to be ready
+          const handleLoad = () => {
+            sendHeight('init');
+            window.removeEventListener('load', handleLoad);
+          };
+          window.addEventListener('load', handleLoad);
+        }
+      }, 150);
     }
   }, [sendHeight]);
   

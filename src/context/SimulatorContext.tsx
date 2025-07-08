@@ -101,20 +101,15 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         
         setSelectedProducts(updatedSelectedProducts);
       }
-      
-      // Send height update after products are processed
-      setTimeout(() => {
-        sendHeight('init');
-      }, 100);
     }
-  }, [rawProducts, applyProductOverrides, sendHeight]);
+  }, [rawProducts, applyProductOverrides]);
   
   // Effect to send height update when loading state changes from true to false
   useEffect(() => {
     if (!loading) {
-      // Small delay to ensure DOM is fully rendered after loading completes
+      // Use goal_selection step name instead of init to allow proper scroll behavior
       setTimeout(() => {
-        sendHeight('init');
+        sendHeight('goal_selection');
       }, 200);
     }
   }, [loading, sendHeight]);
