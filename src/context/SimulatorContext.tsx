@@ -27,11 +27,19 @@ interface SimulatorContextType {
   updateIframeHeight: (step: StepName) => void;
   // Raw products data from Supabase
   rawProducts: Product[];
+  // Initial product_id from URL
+  initialProductId: string;
 }
 
 const SimulatorContext = createContext<SimulatorContextType | undefined>(undefined);
 
 export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Capture initial product_id from URL when context is created
+  const [initialProductId] = useState<string>(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('product_id') || 'despachos';
+  });
+
   // Core product state from hooks
   const {
     allProducts,
@@ -130,7 +138,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Height update function
     updateIframeHeight,
     // Add rawProducts to the context value
-    rawProducts
+    rawProducts,
+    // Initial product_id captured from URL
+    initialProductId
   };
   
   return <SimulatorContext.Provider value={value}>{children}</SimulatorContext.Provider>;

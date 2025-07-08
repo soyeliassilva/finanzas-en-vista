@@ -10,7 +10,8 @@ const SimulationResultsPage: React.FC = () => {
     simulationResults, 
     calculationPerformed,
     updateIframeHeight,
-    rawProducts
+    rawProducts,
+    initialProductId
   } = useSimulator();
   const isMobile = useIsMobile();
   
@@ -40,12 +41,8 @@ const SimulationResultsPage: React.FC = () => {
   const buildTypeformUrl = () => {
     if (simulationResults.length === 0) return '';
 
-    // Get product_id from URL parameters or default to "despachos"
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('product_id') || 'despachos';
-
-    // Base URL
-    let typeformUrl = `https://mutualidadabogacia.typeform.com/to/ItBwkIQR?#contenido=simula&product_id=${productId}&simulaciondespacho=`;
+    // Base URL with initial product_id captured from the original iframe URL
+    let typeformUrl = `https://mutualidadabogacia.typeform.com/to/ItBwkIQR?#contenido=simula&product_id=${initialProductId}&simulaciondespacho=`;
     
     // Build the simulaciondespacho parameter
     const simulationParts = simulationResults.map(result => {
