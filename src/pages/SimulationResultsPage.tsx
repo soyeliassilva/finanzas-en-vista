@@ -40,8 +40,12 @@ const SimulationResultsPage: React.FC = () => {
   const buildTypeformUrl = () => {
     if (simulationResults.length === 0) return '';
 
+    // Get product_id from URL parameters or default to "despachos"
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('product_id') || 'despachos';
+
     // Base URL
-    let typeformUrl = "https://mutualidadabogacia.typeform.com/to/ItBwkIQR?#contenido=simula&product_id=despachos&simulaciondespacho=";
+    let typeformUrl = `https://mutualidadabogacia.typeform.com/to/ItBwkIQR?#contenido=simula&product_id=${productId}&simulaciondespacho=`;
     
     // Build the simulaciondespacho parameter
     const simulationParts = simulationResults.map(result => {
