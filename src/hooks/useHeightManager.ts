@@ -24,14 +24,28 @@ export const useHeightManager = () => {
   // Determine current step based on location path with more precise matching
   const getCurrentStep = useCallback((): StepName => {
     const path = location.pathname;
+    console.log(`[useHeightManager] getCurrentStep called for path: ${path}`);
     
     // More specific routes first
-    if (path.includes('/simulacion/results')) return 'simulation_results';
-    if (path.includes('/simulacion/form')) return 'simulation_form';
-    if (path === '/productos') return 'product_selection';
-    if (path === '/') return 'goal_selection';
+    if (path.includes('/simulacion/results')) {
+      console.log('[useHeightManager] Determined step: simulation_results');
+      return 'simulation_results';
+    }
+    if (path.includes('/simulacion/form')) {
+      console.log('[useHeightManager] Determined step: simulation_form');
+      return 'simulation_form';
+    }
+    if (path === '/productos') {
+      console.log('[useHeightManager] Determined step: product_selection');
+      return 'product_selection';
+    }
+    if (path === '/') {
+      console.log('[useHeightManager] Determined step: goal_selection');
+      return 'goal_selection';
+    }
     
     // Default fallback (should rarely happen)
+    console.log('[useHeightManager] Determined step: init (fallback)');
     return 'init';
   }, [location.pathname]);
   
@@ -48,15 +62,27 @@ export const useHeightManager = () => {
     // Use provided step or determine from current route
     const stepToUse = specifiedStep || getCurrentStep();
     
+    console.log(`[useHeightManager] updateIframeHeight called:`, {
+      specifiedStep,
+      stepToUse,
+      immediate,
+      currentPath: location.pathname,
+      prevPath: prevPathRef.current,
+      isInitialLoad: isInitialLoadRef.current,
+      timestamp: new Date().toISOString()
+    });
+    
     if (window !== window.parent) {
       // Prevent sending goal_selection height during initial load
       if (!specifiedStep && stepToUse === 'goal_selection' && isInitialLoadRef.current) {
+        console.log('[useHeightManager] ❌ BLOCKED: goal_selection during initial load');
         return;
       }
       
       // Prevent sending goal_selection height during transitions
       if (!specifiedStep && stepToUse === 'goal_selection' && 
           prevPathRef.current !== '/' && prevPathRef.current !== '') {
+        console.log('[useHeightManager] ❌ BLOCKED: goal_selection during transition');
         return;
       }
       
@@ -70,6 +96,7 @@ export const useHeightManager = () => {
       };
       
       const delay = getDelay();
+      console.log(`[useHeightManager] Setting timeout with delay: ${delay}ms for step: ${stepToUse}`);
       
       setTimeout(() => {
         // Track the current path for next time
@@ -80,15 +107,30 @@ export const useHeightManager = () => {
         const pathChanged = currentPath !== prevPathRef.current;
         const stepChanged = lastStepSentRef.current !== stepToUse;
         
+        console.log(`[useHeightManager] Timeout executed - decision factors:`, {
+          isExplicitUpdate,
+          pathChanged,
+          stepChanged,
+          heightUpdatedForStep: heightUpdatedRef.current[stepToUse],
+          currentPath,
+          prevPath: prevPathRef.current,
+          lastStepSent: lastStepSentRef.current
+        });
+        
         if (isExplicitUpdate || pathChanged || stepChanged || !heightUpdatedRef.current[stepToUse]) {
+          console.log(`[useHeightManager] ✅ CALLING sendHeight for step: ${stepToUse}`);
           sendHeight(stepToUse, immediate);
           
           // Update tracking refs
           prevPathRef.current = currentPath;
           lastStepSentRef.current = stepToUse;
           heightUpdatedRef.current[stepToUse] = true;
+        } else {
+          console.log(`[useHeightManager] ❌ SKIPPED: conditions not met for step: ${stepToUse}`);
         }
       }, delay);
+    } else {
+      console.log('[useHeightManager] Not in iframe, skipping height update');
     }
   }, [getCurrentStep, sendHeight, location.pathname]);
   

@@ -106,9 +106,13 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   
   // Effect to send height update when loading state changes from true to false
   useEffect(() => {
+    console.log(`[SimulatorContext] Loading state changed - loading: ${loading}`);
+    
     if (!loading) {
+      console.log('[SimulatorContext] Loading completed - scheduling goal_selection height update');
       // Use goal_selection step name instead of init to allow proper scroll behavior
       setTimeout(() => {
+        console.log('[SimulatorContext] Sending goal_selection height after loading completion');
         sendHeight('goal_selection');
       }, 200);
     }
