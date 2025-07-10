@@ -27,16 +27,10 @@ export const useIframeResizer = () => {
 
   // Send the current height to the parent window if it has changed
   const sendHeight = useCallback((step: StepName, immediate: boolean = false) => {
-    console.log(`[useIframeResizer] sendHeight called - step: ${step}, immediate: ${immediate}, timestamp: ${new Date().toISOString()}`);
-    
-    if (!isInIframe) {
-      console.log('[useIframeResizer] Not in iframe, skipping height send');
-      return;
-    }
+    if (!isInIframe) return;
     
     // Clear any existing timeout
     if (debounceTimeoutRef.current) {
-      console.log('[useIframeResizer] Clearing existing timeout');
       window.clearTimeout(debounceTimeoutRef.current);
     }
     
@@ -51,14 +45,10 @@ export const useIframeResizer = () => {
     
     const debounceDelay = getDebounceDelay(step);
     
-    console.log(`[useIframeResizer] Setting timeout with delay: ${debounceDelay}ms for step: ${step}`);
-    
     debounceTimeoutRef.current = window.setTimeout(() => {
       try {
         const height = document.body.scrollHeight;
         const now = Date.now();
-        
-        console.log(`[useIframeResizer] Inside timeout - current height: ${height}, step: ${step}`);
         
         // Only send if:
         // 1. This is the first time we're sending for this step, or
@@ -82,32 +72,17 @@ export const useIframeResizer = () => {
                           heightDiff > heightThreshold ||
                           timeSinceLastSent > 500;
         
-        console.log(`[useIframeResizer] Decision factors:`, {
-          immediate,
-          isInitStep,
-          isSameStep,
-          heightDiff,
-          heightThreshold,
-          timeSinceLastSent,
-          lastSentHeight: lastSentHeightRef.current,
-          lastSentStep: lastSentStepRef.current,
-          shouldSend
-        });
-        
         if (shouldSend) {
           const message = { height, step };
-          console.log(`[useIframeResizer] ✅ SENDING MESSAGE:`, message, `at ${new Date().toISOString()}`);
           window.parent.postMessage(message, '*');
           
           // Update tracking refs
           lastSentHeightRef.current = height;
           lastSentStepRef.current = step;
           lastSentTimeRef.current[step] = now;
-        } else {
-          console.log(`[useIframeResizer] ❌ SKIPPING MESSAGE - conditions not met for step: ${step}`);
         }
       } catch (error) {
-        console.error('[useIframeResizer] Error in sendHeight:', error);
+        // Error handling without logging
       } finally {
         debounceTimeoutRef.current = null;
       }
@@ -119,11 +94,8 @@ export const useIframeResizer = () => {
     if (!isInIframe) return;
 
     const handleResize = () => {
-      console.log('[useIframeResizer] Window resize event detected');
-      
       // Clear any existing resize timeout
       if (resizeTimeoutRef.current) {
-        console.log('[useIframeResizer] Clearing existing resize timeout');
         window.clearTimeout(resizeTimeoutRef.current);
       }
       
@@ -139,9 +111,7 @@ export const useIframeResizer = () => {
           return 'init';
         };
         
-        const currentStep = getCurrentStep();
-        console.log(`[useIframeResizer] Resize timeout triggered - sending height for step: ${currentStep}`);
-        sendHeight(currentStep);
+        sendHeight(getCurrentStep());
       }, 150); // Quick response for resize events
     };
 
