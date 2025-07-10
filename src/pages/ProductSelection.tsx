@@ -64,7 +64,7 @@ const ProductSelection: React.FC<ProductSelectionProps> = ({
   };
 
   const handleBack = () => {
-    navigate(preserveUrlParams('/'));
+    navigate(preserveUrlParams('/'), { state: { from: '/productos' } });
   };
 
   const isSelected = (productId: string) => {

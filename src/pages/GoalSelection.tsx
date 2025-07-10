@@ -17,22 +17,17 @@ const GoalSelection: React.FC<GoalSelectionProps> = ({ selectedGoal, setSelected
   const isDirectNavigationRef = React.useRef(false);
   const isMobile = useIsMobile();
   
-  // Check if this is a direct navigation to goal selection
+  // Track if user navigated back from product selection
   useEffect(() => {
-    // Only update height when actually navigating to goal selection, not on initial load
-    if (!loading && window.location.pathname === '/' && location.key !== 'default') {
-      isDirectNavigationRef.current = true;
+    // Only send goal_selection message when navigating back from products page
+    if (!loading && window.location.pathname === '/' && location.state?.from === '/productos') {
       updateIframeHeight('goal_selection');
     }
-  }, [loading, location.key, updateIframeHeight]);
+  }, [loading, location.state, updateIframeHeight]);
   
   const handleGoalSelection = (goal: GoalType) => {
     setSelectedGoal(goal);
-    
-    // Update iframe height after goal selection
-    setTimeout(() => {
-      updateIframeHeight('goal_selection');
-    }, 0);
+    // No need to update iframe height - content size doesn't change significantly
   };
   
   const handleContinue = () => {

@@ -101,17 +101,8 @@ export const useIframeResizer = () => {
       
       // Debounce resize events
       resizeTimeoutRef.current = window.setTimeout(() => {
-        // Determine current step and send height
-        const getCurrentStep = (): StepName => {
-          const path = window.location.pathname;
-          if (path.includes('/simulacion/results')) return 'simulation_results';
-          if (path.includes('/simulacion/form')) return 'simulation_form';
-          if (path === '/productos') return 'product_selection';
-          if (path === '/') return 'goal_selection';
-          return 'init';
-        };
-        
-        sendHeight(getCurrentStep());
+        // Send init message for resize events to update height without scrolling
+        sendHeight('init');
       }, 150); // Quick response for resize events
     };
 
