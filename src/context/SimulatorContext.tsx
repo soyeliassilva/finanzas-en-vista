@@ -107,9 +107,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Effect to send height update when loading state changes from true to false
   useEffect(() => {
     if (!loading) {
-      // Use goal_selection step name instead of init to allow proper scroll behavior
+      // Use init to update height without scrolling on initial load
       setTimeout(() => {
-        sendHeight('goal_selection');
+        sendHeight('init');
       }, 200);
     }
   }, [loading, sendHeight]);
